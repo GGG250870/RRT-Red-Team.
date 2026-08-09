@@ -1,0 +1,24 @@
+{
+  "version": "1.1",
+  "name": "RRT Target-Specific Deep Scan Engine",
+  "change_reason": "Il primo run live ha mostrato che 250 query search-engine per 10 aziende sono ridondanti, costose e non necessarie quando il sito ufficiale espone sitemap/navigation/service pages.",
+  "saturation_strategy": [
+    "1. Official-domain homepage discovery",
+    "2. Sitemap/navigation/service-page discovery",
+    "3. Target keyword scan on discovered official pages",
+    "4. Search-engine site: query only for unresolved target dimensions",
+    "5. Follow dedicated pages surfaced by those queries",
+    "6. NOT_FOUND only after unresolved dimension exhausts the adaptive protocol"
+  ],
+  "target_terms": {
+    "D1": ["paura","ansia","sedazione","odontofobia","dolore","anestesia","anestesista"],
+    "D2": ["prezzo","prezzi","costo","costi","finanziamento","rate","pagamento","dilazione"],
+    "D3": ["implantologia","TAC","3D","scanner","chirurgia guidata","digitale","team","specialista","garanzia"],
+    "D4": ["carico immediato","24 ore","in un giorno","stessa giornata","provvisorio","all on four","all-on-4"],
+    "D5": ["perché scegliere","vantaggi","testimonianze","recensioni","FAQ","garanzia","esperienza"]
+  },
+  "adaptive_query_budget": {"initial_search_queries_per_domain":1,"unresolved_target_queries_max":2,"total_external_queries_target":"significantly below brute-force 25/domain","principle":"More official-page coverage, fewer search-engine calls."},
+  "saturation_pass_conditions": ["official identity confirmed","scope resolved","official page graph inspected","each scored positive level has evidence_id","each zero has explicit search trace proving target-specific unresolved search","confidence >=90","no unresolved contradictory evidence"],
+  "states": ["PASS","NOT_FOUND_AFTER_PROTOCOL","COLLECTION_RESTRICTED","INSUFFICIENT","CONTRADICTORY","ENTITY_AMBIGUOUS"],
+  "anti_gaming": "A target cannot pass merely because one broad search query was executed."
+}
