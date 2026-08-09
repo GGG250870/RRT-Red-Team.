@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "execution_model": "PARALLEL_WHERE_INDEPENDENT",
+  "waves": [
+    {"wave":1,"parallel":["A1_DISCOVERY","A2_ENTITY_SCOPE"],"note":"Entity agent può validare identità mentre Discovery costruisce page graph; solo fonti accettate avanzano."},
+    {"wave":2,"parallel":["A3_DEEP_SCAN per prospect/target"],"note":"Target D1-D5 possono essere processati in parallelo quando dominio/scope sono validi."},
+    {"wave":3,"parallel":["A4_EVIDENCE_AUDITOR","A5_TARGET_MATCH"],"note":"Target Match usa soltanto evidence pack già emersi; audit può retrocedere prima del downstream."},
+    {"wave":4,"parallel":["A6_BENCHMARK per target"],"note":"Benchmark selection congelata prima del gap."},
+    {"wave":5,"parallel":["A7_RED_TEAM per finding","discoverability checks"],"note":"Red-team indipendente dalla generazione del finding."},
+    {"wave":6,"parallel":["A8_COMMERCIAL_GATE"],"note":"Nessun Signal senza red-team e audit PASS."},
+    {"wave":7,"parallel":["A9_QA_ORCHESTRATOR"],"note":"Conflitti => BLOCKED, mai media automatica."}
+  ],
+  "conflict_policy": {
+    "entity_conflict": "hard block",
+    "scope_conflict": "hard block",
+    "evidence_conflict": "auditor wins only by downgrade/reject, never by adding facts",
+    "benchmark_conflict": "retain top alternatives and require human gate",
+    "commercial_conflict": "choose more conservative state"
+  },
+  "human_review": "Mandatory for Opportunity Signal Candidate."
+}
