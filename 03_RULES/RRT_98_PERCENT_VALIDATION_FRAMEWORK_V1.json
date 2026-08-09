@@ -1,0 +1,20 @@
+{
+  "version": "1.0",
+  "name": "RRT 98% Validation Framework",
+  "principle": "98% is not a single vague accuracy number. It is decomposed into independently measurable reliability metrics.",
+  "metrics": {
+    "M1_claim_attribution_accuracy": {"target":0.98,"unit":"material factual claims correctly supported by cited evidence"},
+    "M2_entity_integrity": {"target":0.99,"unit":"evidence assigned to correct prospect/competitor entity"},
+    "M3_saturation_gate_precision": {"target":0.98,"unit":"cases allowed downstream that pass independent saturation audit"},
+    "M4_false_signal_rate": {"target_max":0.02,"unit":"approved Opportunity Signals rejected by independent blind review"},
+    "M5_overclaim_rate": {"target_max":0.01,"unit":"outputs containing unsupported causal/economic claims"},
+    "M6_human_model_agreement": {"target":0.9,"unit":"agreement on NO_SIGNAL/WATCHLIST/OPPORTUNITY_SIGNAL before adjudication"}
+  },
+  "validation_stages": [
+    {"stage":"Pilot","n":10,"purpose":"architecture debugging; not statistical certification"},
+    {"stage":"Calibration","n":50,"purpose":"estimate error modes and tune gates"},
+    {"stage":"Validation","n":100,"purpose":"measure reliability with blinded independent review"},
+    {"stage":"Expansion","n":250,"purpose":"sector/geography robustness"}
+  ],
+  "hard_rule": "The project may not claim '98% accurate' until the named metric reaches its target on the Validation sample, with denominator and adjudication method reported."
+}
