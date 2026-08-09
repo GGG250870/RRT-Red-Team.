@@ -1,0 +1,59 @@
+{
+  "version": "1.0",
+  "roles": {
+    "A1_DISCOVERY": {
+      "mission": "Seleziona e raccoglie fonti senza valutare il risultato commerciale.",
+      "inputs": ["frozen prospect identity", "official domain"],
+      "outputs": ["source candidates", "page graph", "query trace"],
+      "forbidden": ["scoring", "benchmark selection", "commercial conclusion"]
+    },
+    "A2_ENTITY_SCOPE": {
+      "mission": "Verifica identità, dominio, sede/rete/gruppo e blocca contaminazioni.",
+      "inputs": ["source candidates", "identity metadata"],
+      "outputs": ["entity state", "scope map", "accepted/rejected sources"],
+      "forbidden": ["target scoring", "commercial conclusion"]
+    },
+    "A3_DEEP_SCAN": {
+      "mission": "Porta ogni target a FOUND / NOT_FOUND_AFTER_PROTOCOL / terminal block.",
+      "inputs": ["accepted official-domain sources", "target definitions"],
+      "outputs": ["target evidence packs", "zero-search trace", "saturation state"],
+      "forbidden": ["invented zero", "benchmark", "signal"]
+    },
+    "A4_EVIDENCE_AUDITOR": {
+      "mission": "Tenta di falsificare saturazione, claim e riferimenti.",
+      "inputs": ["target evidence packs"],
+      "outputs": ["PASS / DOWNGRADE / REJECT", "audit reasons"],
+      "forbidden": ["aggiungere nuove evidenze non raccolte", "promuovere Signal"]
+    },
+    "A5_TARGET_MATCH": {
+      "mission": "Identifica target dichiarati/osservati/inferiti prima del Decision Loss.",
+      "inputs": ["audited evidence"],
+      "outputs": ["eligible targets", "confidence"],
+      "forbidden": ["benchmark influenced by gap", "economic inference"]
+    },
+    "A6_BENCHMARK": {
+      "mission": "Seleziona top benchmark comparabili prima di calcolare il gap.",
+      "inputs": ["prospect profile", "eligible target", "market candidates"],
+      "outputs": ["top 3 benchmark", "fit scores", "scope warnings"],
+      "forbidden": ["scegliere il competitor che massimizza Decision Loss"]
+    },
+    "A7_RED_TEAM": {
+      "mission": "Cerca deliberatamente prove che distruggano il finding.",
+      "inputs": ["prospect evidence", "benchmark evidence", "proposed finding"],
+      "outputs": ["FALSIFIED / SURVIVES / WEAK_SURVIVAL", "counterevidence"],
+      "forbidden": ["difendere il finding per default"]
+    },
+    "A8_COMMERCIAL_GATE": {
+      "mission": "Classifica NO_SIGNAL / WATCHLIST / OPPORTUNITY_SIGNAL_CANDIDATE.",
+      "inputs": ["audited finding", "red-team result", "discoverability/economic evidence"],
+      "outputs": ["commercial state", "safe wording", "forbidden claims"],
+      "forbidden": ["inventare ROI", "lost revenue", "autonomous outreach"]
+    },
+    "A9_QA_ORCHESTRATOR": {
+      "mission": "Controlla coerenza tra agenti e blocca conflitti non risolti.",
+      "inputs": ["all agent outputs"],
+      "outputs": ["READY / BLOCKED", "conflict ledger", "audit hash"],
+      "forbidden": ["riscrivere silenziosamente output degli agenti"]
+    }
+  }
+}
