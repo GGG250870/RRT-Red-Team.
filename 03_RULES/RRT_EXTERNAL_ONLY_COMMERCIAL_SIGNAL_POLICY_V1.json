@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "name": "RRT External-Only Commercial Signal Policy",
+  "principle": "RRT must remain useful before first-party access without pretending to know conversion or revenue loss.",
+  "external_outputs": {
+    "NO_SIGNAL": {"meaning":"No defensible external commercial gap found."},
+    "WATCHLIST": {"meaning":"A defensible difference exists but commercial pressure is not yet sufficiently corroborated."},
+    "OPPORTUNITY_SIGNAL": {"meaning":"Externally defensible opportunity: saturated evidence + repeated competitive pressure + discoverability proxy + adversarial survival. It is NOT a claim of proven lead/revenue loss."}
+  },
+  "promotion_to_opportunity_signal_requires": [
+    "prospect saturation PASS + evidence re-audit PASS",
+    "gap survives adversarial falsification",
+    "L1 competitive pressure from >=2 comparable competitors",
+    "L2 frozen-query discoverability proxy",
+    "actionable decision dimension",
+    "no strong contradictory public behavior evidence",
+    "human review"
+  ],
+  "forbidden_external_claims": [
+    "lost revenue amount","lost lead count","conversion-rate loss","CAC disadvantage","advertising waste","causal statement that the communication gap caused economic loss"
+  ],
+  "first_party_upgrade": {"L3":"behavior evidence tied to the exact dimension","L4":"verified economic evidence","output":"VALIDATED_SIGNAL"}
+}
