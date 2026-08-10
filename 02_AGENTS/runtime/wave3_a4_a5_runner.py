@@ -28,6 +28,34 @@ def is_repair_output(record):
     return bool(out.get("repaired_evidence") or out.get("execution_trace") or out.get("still_unresolved"))
 
 
+def audit_gate_decision(a4_output):
+    verdict = a4_output.get("verdict")
+    state = a4_output.get("overall_state") or a4_output.get("final_saturation_state")
+    dimensions = a4_output.get("dimensions") or {}
+    unresolved = a4_output.get("unresolved") or []
+
+    if verdict != "PASS":
+        return False, "AUDIT_VERDICT_NOT_PASS"
+
+    if state == "PASS":
+        return True, "PASS"
+
+    if state != "COLLECTION_RESTRICTED":
+        return False, "AUDIT_STATE_BLOCKING"
+
+    blocking_dimension_states = {"DOWNGRADE", "REJECT", "UNRESOLVED", "CONTRADICTORY"}
+    for dim_id, dim in dimensions.items():
+        if (dim or {}).get("state") in blocking_dimension_states:
+            return False, f"BLOCKING_DIMENSION_{dim_id}"
+
+    allowed_restrictions = {"E08", "E11"}
+    unresolved_items = {str((item or {}).get("item")) for item in unresolved}
+    if unresolved_items and not unresolved_items.issubset(allowed_restrictions):
+        return False, "UNRESOLVED_OUTSIDE_NONBLOCKING_ALLOWLIST"
+
+    return True, "PASS_WITH_NONBLOCKING_COLLECTION_RESTRICTIONS"
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--case-id", required=True)
@@ -112,7 +140,7 @@ def main():
     a4_output = ((a4_parsed.get("result") or {}).get("output") or {})
     a4_verdict = a4_output.get("verdict")
     a4_state = a4_output.get("overall_state") or a4_output.get("final_saturation_state")
-    audit_gate_pass = a4_verdict == "PASS" and a4_state == "PASS"
+    audit_gate_pass, audit_gate_reason = audit_gate_decision(a4_output)
 
     if args.live and not audit_gate_pass:
         print(json.dumps({
@@ -121,6 +149,7 @@ def main():
             "current_run_status": {
                 "status": "BLOCKED",
                 "reason": "A4_AUDIT_NOT_CERTIFIED",
+                "gate_reason": audit_gate_reason,
                 "required_action": "REOPEN_A3_ON_DOWNGRADED_OR_UNRESOLVED_EVIDENCE",
                 "a4_verdict": a4_verdict,
                 "a4_state": a4_state,
@@ -145,9 +174,12 @@ def main():
         "purpose": "controlled Wave 3 target match after certified evidence audit",
         "audited_input": latest_a4,
         "target_terms": spec.get("target_terms", {}),
+        "audit_gate_reason": audit_gate_reason,
         "constraints": [
             "A5 must use only A4-audited persisted evidence",
             "do not resurrect evidence downgraded or rejected by A4",
+            "preserve any COLLECTION_RESTRICTED evidence exactly as restricted",
+            "non-blocking collection restrictions may not be promoted to positive target evidence",
             "map only against supplied D1-D5 target definitions",
             "no benchmark selection",
             "no economic inference",
@@ -170,6 +202,7 @@ def main():
         "run_started_at": started_at,
         "current_run_status": {
             "status": "PASS" if a5_ok else "BLOCKED",
+            "audit_gate_reason": audit_gate_reason,
             "agents": {
                 "A4_EVIDENCE_AUDITOR": {"returncode": a4_worker.get("returncode"), "status": a4_parsed.get("status")},
                 "A5_TARGET_MATCH": {"returncode": a5_worker.get("returncode"), "status": a5_parsed.get("status")}
