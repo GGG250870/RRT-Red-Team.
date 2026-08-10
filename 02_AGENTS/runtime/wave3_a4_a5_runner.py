@@ -34,10 +34,7 @@ def main():
     prior_outputs = orch.store.outputs_for_case(args.case_id)
     a3_outputs = [o for o in prior_outputs if o.get("agent_id") == "A3_DEEP_SCAN"]
     if not a3_outputs:
-        print(json.dumps({
-            "case_id": args.case_id,
-            "current_run_status": {"status": "BLOCKED", "reason": "NO_A3_OUTPUT"}
-        }, ensure_ascii=False, indent=2))
+        print(json.dumps({"case_id": args.case_id, "current_run_status": {"status": "BLOCKED", "reason": "NO_A3_OUTPUT"}}, ensure_ascii=False, indent=2))
         return 2
 
     latest_a3 = a3_outputs[-1]
@@ -52,17 +49,27 @@ def main():
         "freshness_context": {
             "audit_run_started_at": started_at,
             "collection_is_current_runtime_run": True,
-            "rule": "Do not infer page freshness from collection time; distinguish collection timestamp from page publication/update timestamp."
+            "rule": "Collection time is not page freshness."
+        },
+        "output_contract": {
+            "format": "compact_json_only",
+            "required_keys": ["verdict", "overall_state", "dimensions", "downgraded_evidence_ids", "unresolved", "reason"],
+            "dimensions_shape": "D1-D5 => PASS|DOWNGRADE|REJECT|UNRESOLVED",
+            "reason_max_words": 80,
+            "per_dimension_notes_max_words": 18,
+            "forbidden": ["long prose", "repeat evidence claims", "repeat source URLs", "narrative restatement of input"]
         },
         "constraints": [
             "A4 may PASS, DOWNGRADE or REJECT but cannot add new evidence",
             "preserve unresolved and contradiction states",
-            "evaluate D1-D5 against the supplied target_terms and pass conditions",
+            "evaluate D1-D5 against supplied target terms and pass conditions",
             "search-result snippets are weaker than acquired page content and may be downgraded",
-            "do not certify SATURATED unless the supplied trace demonstrates the protocol",
+            "do not certify SATURATED unless supplied trace demonstrates the protocol",
+            "return compact JSON only",
+            "list downgraded evidence IDs once, without repeating their claims",
             "no benchmark selection",
-            "no economic inference",
-        ],
+            "no economic inference"
+        ]
     }
 
     orch.enqueue_agent_task(args.case_id, "A4_EVIDENCE_AUDITOR", "EVIDENCE_AUDIT", a4_payload)
@@ -75,13 +82,9 @@ def main():
         print(json.dumps({
             "case_id": args.case_id,
             "run_started_at": started_at,
-            "current_run_status": {
-                "status": "BLOCKED",
-                "reason": "A4_GATE_FAILED",
-                "agents": {"A4_EVIDENCE_AUDITOR": {"returncode": a4_worker.get("returncode"), "status": a4_parsed.get("status")}}
-            },
+            "current_run_status": {"status": "BLOCKED", "reason": "A4_GATE_FAILED", "agents": {"A4_EVIDENCE_AUDITOR": {"returncode": a4_worker.get("returncode"), "status": a4_parsed.get("status")}}},
             "result": a4_result,
-            "historical_store_status": orch.status(),
+            "historical_store_status": orch.status()
         }, ensure_ascii=False, indent=2))
         return 1
 
@@ -100,20 +103,19 @@ def main():
                 "required_action": "REOPEN_A3_ON_DOWNGRADED_OR_UNRESOLVED_EVIDENCE",
                 "a4_verdict": a4_verdict,
                 "a4_state": a4_state,
+                "downgraded_evidence_ids": a4_output.get("downgraded_evidence_ids", []),
+                "unresolved": a4_output.get("unresolved", []),
                 "agents": {"A4_EVIDENCE_AUDITOR": {"returncode": a4_worker.get("returncode"), "status": a4_parsed.get("status")}}
             },
             "result": a4_result,
-            "historical_store_status": orch.status(),
+            "historical_store_status": orch.status()
         }, ensure_ascii=False, indent=2))
         return 4
 
     latest_outputs = orch.store.outputs_for_case(args.case_id)
     a4_outputs = [o for o in latest_outputs if o.get("agent_id") == "A4_EVIDENCE_AUDITOR"]
     if not a4_outputs:
-        print(json.dumps({
-            "case_id": args.case_id,
-            "current_run_status": {"status": "BLOCKED", "reason": "A4_OUTPUT_NOT_PERSISTED"}
-        }, ensure_ascii=False, indent=2))
+        print(json.dumps({"case_id": args.case_id, "current_run_status": {"status": "BLOCKED", "reason": "A4_OUTPUT_NOT_PERSISTED"}}, ensure_ascii=False, indent=2))
         return 3
 
     latest_a4 = a4_outputs[-1]
@@ -125,11 +127,11 @@ def main():
         "constraints": [
             "A5 must use only A4-audited persisted evidence",
             "do not resurrect evidence downgraded or rejected by A4",
-            "map only against the supplied D1-D5 target definitions",
+            "map only against supplied D1-D5 target definitions",
             "no benchmark selection",
             "no economic inference",
-            "preserve unresolved and contradiction states",
-        ],
+            "preserve unresolved and contradiction states"
+        ]
     }
 
     orch.enqueue_agent_task(args.case_id, "A5_TARGET_MATCH", "TARGET_MATCH", a5_payload)
@@ -149,11 +151,11 @@ def main():
             "status": "PASS" if a5_ok else "BLOCKED",
             "agents": {
                 "A4_EVIDENCE_AUDITOR": {"returncode": a4_worker.get("returncode"), "status": a4_parsed.get("status")},
-                "A5_TARGET_MATCH": {"returncode": a5_worker.get("returncode"), "status": a5_parsed.get("status")},
-            },
+                "A5_TARGET_MATCH": {"returncode": a5_worker.get("returncode"), "status": a5_parsed.get("status")}
+            }
         },
         "result": combined,
-        "historical_store_status": orch.status(),
+        "historical_store_status": orch.status()
     }, ensure_ascii=False, indent=2))
     return 0 if a5_ok else 1
 
