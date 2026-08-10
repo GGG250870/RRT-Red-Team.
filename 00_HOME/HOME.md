@@ -10,6 +10,7 @@ updated: 2026-08-10
 ## Navigazione
 - [[01_ARCHITECTURE/Architecture Overview]]
 - [[01_ARCHITECTURE/Integrated Knowledge Model]]
+- [[01_ARCHITECTURE/RRT_ARCHITECTURE_ECONOMIC_SUSTAINABILITY_AUDIT_V1]]
 - [[02_AGENTS/Multi-Agent System]]
 - [[03_RULES/Rules Index]]
 - [[04_PROSPECTS/Prospects Index]]
@@ -25,15 +26,18 @@ updated: 2026-08-10
 ## Stato progetto
 - Core metodologico: avanzato.
 - Knowledge model integrato: il framework operativo persistito è stato unificato con le librerie consolidate di Problem, Pattern, Blind Spot, Question, Evidence e Insight/Revenue Trigger.
-- Multi-agent architecture: 9 ruoli separati + runtime, SQLite state store e audit log.
-- Provider live: adapter predisposto; i worker restano dry-run finché non è configurata una credenziale live.
+- Multi-agent architecture: 9 ruoli separati + orchestratore, SQLite state store, audit log e agent registry.
+- Provider OpenAI live: **verificato con chiamata reale PASS** il 2026-08-10.
+- Runtime multi-agent orchestrato: **BLOCKED** prima del canary live; `worker.py` è mancante e devono essere aggiunti cost ledger, budget guard e stop conditions dei loop.
+- Audit architetturale/economico: `GO_WITH_BLOCKERS`; metodologia PASS, GitHub/Obsidian PASS, profittabilità reale `UNRESOLVED` finché non misurata su unit economics reali.
 - Batch 04 Calibration: 50 prospect congelati; Entity Resolution chiusa in stati terminali; Deep Scan in corso per tranche.
-- Ultimo avanzamento operativo: Deep Scan Tranche D completata su 4 casi; 3 `SATURATED_MULTI_TARGET`, 1 `PARTIALLY_SATURATED`.
-- Candidati al prossimo Saturation Evidence Re-Audit: B04-34 Centro Odontoiatrico Gioia, B04-37 Pietro Leone, B04-48 Savasta & Partners.
+- Tranche D: 3 casi passati al Saturation Re-Audit; Target Match e benchmark freeze completati; Commercial Gate resta provvisorio finché Prominence & Discoverability P1-P8 non sono completati.
 - Human review: obbligatorio per ogni Opportunity Signal.
 
 ## Ultimi artefatti
+- [[01_ARCHITECTURE/RRT_ARCHITECTURE_ECONOMIC_SUSTAINABILITY_AUDIT_V1]]
 - [[01_ARCHITECTURE/Integrated Knowledge Model]]
+- `03_RULES/RRT_PROMINENCE_DISCOVERABILITY_GATE_V1.json`
 - `09_VALIDATION/RRT_BATCH_04_DEEP_SCAN_TRANCHE_D_V1.json`
 - [[10_REPORTS/RRT_BATCH_04_DEEP_SCAN_TRANCHE_D_REPORT_V1]]
 
@@ -51,6 +55,8 @@ updated: 2026-08-10
 8. `SATURATED_MULTI_TARGET` è vietato con target ancora `UNRESOLVED`.
 9. I progressi operativi vengono letti dal ledger persistito, non da riepiloghi conversazionali.
 10. Le librerie metodologiche conversazionali possono essere integrate solo se non contraddicono il repository e non introducono claim empirici non verificati.
+11. Ogni loop di granularità deve avere stop condition e budget; nessun loop infinito.
+12. Cheap-first, escalate-on-uncertainty: modelli più costosi solo quando il valore informativo lo giustifica.
 
 ## Obiettivo validazione
 Vedi [[09_VALIDATION/Validation Dashboard]] e `03_RULES/RRT_98_PERCENT_VALIDATION_FRAMEWORK_V1.json`.
