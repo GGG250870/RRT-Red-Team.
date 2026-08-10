@@ -120,8 +120,22 @@ def test_wave3_nonblocking_restrictions_gate():
 
 
 def test_wave4_7_stage_gates():
-    ok, _ = stage_gate("A6_BENCHMARK", {"overall_state": "PASS", "benchmarks": [{"id": "B1"}], "contradictions": []})
-    assert ok
+    ok, reason = stage_gate("A6_BENCHMARK", {
+        "overall_state": "PASS",
+        "benchmarks": [{"id": "B1"}],
+        "fit_basis": [{"benchmark_id": "B1", "basis": "same vertical and decision job"}],
+        "contradictions": [],
+    })
+    assert ok and reason == "PASS"
+
+    ok, reason = stage_gate("A6_BENCHMARK", {
+        "overall_state": "UNRESOLVED",
+        "benchmarks": [],
+        "fit_basis": [],
+        "contradictions": [],
+    })
+    assert not ok and reason == "A6_UNRESOLVED"
+
     ok, reason = stage_gate("A7_RED_TEAM", {"verdict": "FALSIFIED", "contradictions": []})
     assert not ok and reason == "A7_FALSIFIED"
     ok, reason = stage_gate("A7_RED_TEAM", {"verdict": "WEAK_SURVIVAL", "contradictions": []})
