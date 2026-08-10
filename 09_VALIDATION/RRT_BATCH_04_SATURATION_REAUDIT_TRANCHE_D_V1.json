@@ -1,0 +1,46 @@
+{
+  "version": "1.0",
+  "batch": "04_calibration",
+  "stage": "SATURATION_EVIDENCE_REAUDIT_TRANCHE_D",
+  "performed_at": "2026-08-10",
+  "input": "05_EVIDENCE/B04_TRANCHE_D_ATOMIC_EVIDENCE_PACK_V1.json",
+  "method": "Independent structural re-audit against target completeness, evidence provenance, official-domain scope, missing-data rules and anti-overclaim constraints.",
+  "cases": {
+    "B04-34": {
+      "company": "Centro Odontoiatrico Gioia",
+      "audit_result": "PASS",
+      "target_states": {"D1":"FOUND","D2":"FOUND","D3":"FOUND","D4":"FOUND","D5":"FOUND"},
+      "critical_unresolved": [],
+      "downgrade_reasons": [],
+      "downstream_state": "READY_FOR_TARGET_MATCH_AND_BENCHMARK_FREEZE"
+    },
+    "B04-37": {
+      "company": "Studio Dentistico Dott. Pietro Leone",
+      "audit_result": "PASS",
+      "target_states": {"D1":"FOUND","D2":"FOUND","D3":"FOUND","D4":"FOUND","D5":"FOUND"},
+      "critical_unresolved": [],
+      "downgrade_reasons": [],
+      "downstream_state": "READY_FOR_TARGET_MATCH_AND_BENCHMARK_FREEZE"
+    },
+    "B04-48": {
+      "company": "Savasta & Partners",
+      "audit_result": "PASS",
+      "target_states": {"D1":"FOUND","D2":"FOUND","D3":"FOUND","D4":"FOUND","D5":"FOUND"},
+      "critical_unresolved": [],
+      "downgrade_reasons": [],
+      "downstream_state": "READY_FOR_TARGET_MATCH_AND_BENCHMARK_FREEZE"
+    }
+  },
+  "summary": {
+    "audited": 3,
+    "pass": 3,
+    "downgrade": 0,
+    "reject": 0,
+    "next_stage": "TARGET_MATCH_THEN_BENCHMARK_SELECTION_FREEZE"
+  },
+  "constraints": [
+    "PASS certifies evidence saturation only; it does not certify commercial loss.",
+    "No L3/L4 economic claim is introduced by this re-audit.",
+    "Benchmark must be selected and frozen before Decision Loss or gap scoring."
+  ]
+}
