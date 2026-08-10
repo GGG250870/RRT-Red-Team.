@@ -11,7 +11,7 @@ import urllib.request
 from html import unescape
 from pathlib import Path
 
-USER_AGENT = "Mozilla/5.0 (compatible; RRT-PreScreen/1.0; +public-web-research)"
+USER_AGENT = "Mozilla/5.0 (compatible; RRT-PreScreen/1.1; +public-web-research)"
 TIMEOUT = 8
 MAX_BYTES = 750_000
 
@@ -23,7 +23,31 @@ DIMENSIONS = {
     "D5": [r"perch[eé] scegliere", r"vantagg", r"testimonianz", r"recension", r"faq", r"garanzia", r"esperienza", r"dicono di noi"],
 }
 
-PAGE_HINTS = ["implant", "servizi", "trattamenti", "tecnolog", "chi-siamo", "studio", "team", "faq", "recension", "testimon", "contatti", "sedaz", "finanzi"]
+HIGH_VALUE_PATTERNS = [
+    r"implantolog", r"all[- ]on[- ]4", r"carico immediato", r"ortodonzia invisibile",
+    r"invisalign", r"faccette", r"estetica dentale", r"riabilitazione completa", r"chirurgia orale"
+]
+
+STRUCTURE_PATTERNS = [
+    r"\b3\s+(riuniti|sale|poltrone|studi)\b", r"\b4\s+(riuniti|sale|poltrone|studi)\b",
+    r"\b5\s+(riuniti|sale|poltrone|studi)\b", r"team", r"equipe", r"staff", r"specialisti",
+    r"odontoiatri", r"medici", r"igienist"
+]
+
+YOUTH_GROWTH_PATTERNS = [
+    r"nuovo studio", r"nuova sede", r"inaugurat", r"dal 20(1[8-9]|2[0-6])", r"fondat[oa] nel 20(1[8-9]|2[0-6])",
+    r"ampliament", r"crescita", r"innovazione", r"tecnologia", r"digitale", r"nuova generazione"
+]
+
+COMMERCIAL_GAP_PATTERNS = {
+    "no_financing_signal": DIMENSIONS["D2"],
+    "no_fear_reassurance_signal": DIMENSIONS["D1"],
+    "no_social_proof_signal": [r"testimonianz", r"recension", r"dicono di noi"],
+    "no_faq_signal": [r"faq", r"domande frequenti"],
+    "no_guarantee_signal": [r"garanzia", r"garantito"],
+}
+
+PAGE_HINTS = ["implant", "servizi", "trattamenti", "tecnolog", "chi-siamo", "studio", "team", "faq", "recension", "testimon", "contatti", "sedaz", "finanzi", "invisalign", "faccette"]
 
 CONTACT_PATTERNS = [
     re.compile(r"mailto:", re.I),
@@ -105,7 +129,7 @@ def extract_internal_links(html, current_url, domain):
         if url not in seen:
             seen.add(url)
             out.append(url)
-    return out[:4]
+    return out[:5]
 
 
 def count_hits(text, patterns):
@@ -113,34 +137,9 @@ def count_hits(text, patterns):
     return sum(1 for p in patterns if re.search(p, text, re.I))
 
 
-def score_row(website_live, pages_found, hits, contactability):
-    if not website_live:
-        return 0
-    score = 15
-    score += min(pages_found, 5) * 3
-    observed_dims = sum(1 for v in hits.values() if v > 0)
-    total_hits = sum(min(v, 5) for v in hits.values())
-    score += observed_dims * 8
-    score += min(total_hits, 15) * 2
-    score += 10 if contactability >= 2 else 5 if contactability == 1 else 0
-    return min(score, 100)
-
-
-def decision(score, website_live, observed_dims, fetch_state):
-    if not website_live:
-        if fetch_state == "NO_DOMAIN":
-            return "REJECT"
-        return "COLLECTION_RESTRICTED"
-    if score >= 70 and observed_dims >= 3:
-        return "ESCALATE"
-    if score >= 45 and observed_dims >= 2:
-        return "SHORTLIST"
-    return "REJECT"
-
-
 def scan(domain):
     if not domain:
-        return {"website_live": 0, "fetch_state": "NO_DOMAIN", "pages_found": 0, "contactability": 0, "hits": {d: 0 for d in DIMENSIONS}}
+        return {"website_live": 0, "fetch_state": "NO_DOMAIN", "pages_found": 0, "contactability": 0, "hits": {d: 0 for d in DIMENSIONS}, "high_value_hits": 0, "structure_hits": 0, "youth_growth_hits": 0, "commercial_gap_count": 0}
 
     homepage = base_url(domain)
     final_url, html, state = fetch(homepage)
@@ -148,7 +147,7 @@ def scan(domain):
         final_url, html, state2 = fetch("http://" + domain)
         state = state2
     if state != "OK" or not html:
-        return {"website_live": 0, "fetch_state": state, "pages_found": 0, "contactability": 0, "hits": {d: 0 for d in DIMENSIONS}}
+        return {"website_live": 0, "fetch_state": state, "pages_found": 0, "contactability": 0, "hits": {d: 0 for d in DIMENSIONS}, "high_value_hits": 0, "structure_hits": 0, "youth_growth_hits": 0, "commercial_gap_count": 0}
 
     pages = [(final_url, html)]
     for url in extract_internal_links(html, final_url, domain):
@@ -160,8 +159,52 @@ def scan(domain):
     text = strip_html(combined_html)
     hits = {d: count_hits(text, pats) for d, pats in DIMENSIONS.items()}
     contactability = sum(1 for p in CONTACT_PATTERNS if p.search(combined_html))
+    high_value_hits = count_hits(text, HIGH_VALUE_PATTERNS)
+    structure_hits = count_hits(text, STRUCTURE_PATTERNS)
+    youth_growth_hits = count_hits(text, YOUTH_GROWTH_PATTERNS)
+    commercial_gap_count = sum(1 for pats in COMMERCIAL_GAP_PATTERNS.values() if count_hits(text, pats) == 0)
 
-    return {"website_live": 1, "fetch_state": "OK", "pages_found": len(pages), "contactability": contactability, "hits": hits}
+    return {
+        "website_live": 1,
+        "fetch_state": "OK",
+        "pages_found": len(pages),
+        "contactability": contactability,
+        "hits": hits,
+        "high_value_hits": high_value_hits,
+        "structure_hits": structure_hits,
+        "youth_growth_hits": youth_growth_hits,
+        "commercial_gap_count": commercial_gap_count,
+    }
+
+
+def score_row(result):
+    if not result["website_live"]:
+        return 0
+    hits = result["hits"]
+    observed_dims = sum(1 for v in hits.values() if v > 0)
+    total_hits = sum(min(v, 5) for v in hits.values())
+    score = 10
+    score += min(result["pages_found"], 6) * 2
+    score += observed_dims * 5
+    score += min(total_hits, 12)
+    score += min(result["high_value_hits"], 5) * 5
+    score += min(result["structure_hits"], 4) * 4
+    score += min(result["youth_growth_hits"], 4) * 5
+    score += min(result["commercial_gap_count"], 4) * 3
+    score += 8 if result["contactability"] >= 2 else 4 if result["contactability"] == 1 else 0
+    return min(score, 100)
+
+
+def decision(score, website_live, observed_dims, fetch_state, high_value_hits, structure_hits):
+    if not website_live:
+        if fetch_state == "NO_DOMAIN":
+            return "REJECT"
+        return "COLLECTION_RESTRICTED"
+    if score >= 70 and high_value_hits >= 1 and (structure_hits >= 1 or observed_dims >= 3):
+        return "ESCALATE"
+    if score >= 45 and (high_value_hits >= 1 or observed_dims >= 2):
+        return "SHORTLIST"
+    return "REJECT"
 
 
 def main():
@@ -184,7 +227,12 @@ def main():
         return 2
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    fields = ["company", "domain", "city", "vertical", "website_live", "fetch_state", "pages_found", "D1_hits", "D2_hits", "D3_hits", "D4_hits", "D5_hits", "contactability", "observed_dimensions", "preliminary_score", "decision"]
+    fields = [
+        "company", "domain", "city", "vertical", "website_live", "fetch_state", "pages_found",
+        "D1_hits", "D2_hits", "D3_hits", "D4_hits", "D5_hits", "contactability", "observed_dimensions",
+        "high_value_hits", "structure_hits", "youth_growth_hits", "commercial_gap_count",
+        "preliminary_score", "decision"
+    ]
 
     with output_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
@@ -197,8 +245,8 @@ def main():
             result = scan(domain)
             hits = result["hits"]
             observed_dims = sum(1 for v in hits.values() if v > 0)
-            score = score_row(result["website_live"], result["pages_found"], hits, result["contactability"])
-            gate = decision(score, result["website_live"], observed_dims, result["fetch_state"])
+            score = score_row(result)
+            gate = decision(score, result["website_live"], observed_dims, result["fetch_state"], result["high_value_hits"], result["structure_hits"])
             writer.writerow({
                 "company": company,
                 "domain": domain,
@@ -214,10 +262,14 @@ def main():
                 "D5_hits": hits["D5"],
                 "contactability": result["contactability"],
                 "observed_dimensions": observed_dims,
+                "high_value_hits": result["high_value_hits"],
+                "structure_hits": result["structure_hits"],
+                "youth_growth_hits": result["youth_growth_hits"],
+                "commercial_gap_count": result["commercial_gap_count"],
                 "preliminary_score": score,
                 "decision": gate,
             })
-            print(f"[{idx}/{len(rows)}] {company or domain}: {gate} ({score})")
+            print(f"[{idx}/{len(rows)}] {company or domain}: {gate} ({score}) HV={result['high_value_hits']} STR={result['structure_hits']} YG={result['youth_growth_hits']} GAP={result['commercial_gap_count']}")
     return 0
 
 
