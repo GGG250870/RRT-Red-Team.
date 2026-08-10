@@ -7,7 +7,7 @@ import urllib.request
 from html import unescape
 from pathlib import Path
 
-USER_AGENT = "Mozilla/5.0 (compatible; RRT-BatchBuilder/1.0; +public-web-research)"
+USER_AGENT = "Mozilla/5.0 (compatible; RRT-BatchBuilder/1.1; +public-web-research)"
 TIMEOUT = 8
 MAX_BYTES = 500_000
 
@@ -38,11 +38,9 @@ def clean_title(title):
 
 def extract_search_results(html):
     results = []
-    # DuckDuckGo HTML result pattern; public HTML endpoint, no API key.
     for m in re.finditer(r'(?is)<a[^>]+class="[^"]*result__a[^"]*"[^>]+href="([^"]+)"[^>]*>(.*?)</a>', html or ""):
         href, title_html = m.groups()
-        title = re.sub(r"(?s)<[^>]+>", " ", title_html)
-        title = clean_title(title)
+        title = clean_title(re.sub(r"(?s)<[^>]+>", " ", title_html))
         href = unescape(href)
         p = urllib.parse.urlparse(href)
         qs = urllib.parse.parse_qs(p.query)
@@ -52,12 +50,12 @@ def extract_search_results(html):
     return results
 
 
-def discover_city(city, limit):
-    queries = [
-        f'studio dentistico {city}',
-        f'implantologia dentale {city}',
-        f'centro odontoiatrico {city}',
-    ]
+def discover_area(area, limit, vertical):
+    vertical_terms = {
+        "dentale": ["studio dentistico", "implantologia dentale", "centro odontoiatrico"],
+    }
+    terms = vertical_terms.get(vertical, [vertical])
+    queries = [f"{term} {area}" for term in terms]
     out, seen = [], set()
     for query in queries:
         qurl = "https://html.duckduckgo.com/html/?q=" + urllib.parse.quote_plus(query)
@@ -69,29 +67,30 @@ def discover_city(city, limit):
             if any(x in domain for x in ["facebook.com", "instagram.com", "linkedin.com", "youtube.com", "paginegialle.it", "miodottore.it", "doctolib.it"]):
                 continue
             seen.add(domain)
-            out.append({"company": title or domain, "domain": domain, "city": city, "vertical": "dentale"})
+            out.append({"company": title or domain, "domain": domain, "area": area, "vertical": vertical})
             if len(out) >= limit:
                 return out
     return out
 
 
 def main():
-    ap = argparse.ArgumentParser(description="RRT free batch builder")
+    ap = argparse.ArgumentParser(description="RRT free batch builder with neighborhood-level targeting")
     ap.add_argument("output_csv")
-    ap.add_argument("--cities", default="Milano,Roma,Torino,Genova,Bologna,Firenze,Napoli,Palermo,Bari,Verona")
+    ap.add_argument("--areas", default="Milano Navigli,Roma Prati,Torino Crocetta,Genova Albaro,Bologna Centro")
     ap.add_argument("--target", type=int, default=100)
+    ap.add_argument("--vertical", default="dentale")
     args = ap.parse_args()
 
-    cities = [c.strip() for c in args.cities.split(",") if c.strip()]
-    per_city = max(5, (args.target + len(cities) - 1) // len(cities))
+    areas = [a.strip() for a in args.areas.split(",") if a.strip()]
+    per_area = max(5, (args.target + len(areas) - 1) // len(areas))
     rows, seen = [], set()
-    for city in cities:
-        for row in discover_city(city, per_city):
+    for area in areas:
+        for row in discover_area(area, per_area, args.vertical):
             if row["domain"] in seen:
                 continue
             seen.add(row["domain"])
             rows.append(row)
-            print(f"[{len(rows)}/{args.target}] {city}: {row['company']} -> {row['domain']}")
+            print(f"[{len(rows)}/{args.target}] {area}: {row['company']} -> {row['domain']}")
             if len(rows) >= args.target:
                 break
         if len(rows) >= args.target:
@@ -100,13 +99,14 @@ def main():
     path = Path(args.output_csv)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["company", "domain", "city", "vertical"])
+        writer = csv.DictWriter(f, fieldnames=["company", "domain", "area", "vertical"])
         writer.writeheader()
         writer.writerows(rows)
 
     print(f"Creati {len(rows)} prospect in {path}")
+    print("Aree richieste: " + " | ".join(areas))
     if len(rows) < args.target:
-        print("ATTENZIONE: target non raggiunto. Aggiungere città/query o una fonte discovery alternativa.")
+        print("ATTENZIONE: target non raggiunto. Aggiungere aree/query o una fonte discovery alternativa.")
     return 0
 
 
