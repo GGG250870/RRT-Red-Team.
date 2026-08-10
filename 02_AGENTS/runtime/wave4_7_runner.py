@@ -50,12 +50,15 @@ def stage_gate(agent_id, output):
 
     if agent_id == "A6_BENCHMARK":
         state = output.get("overall_state") or output.get("state") or output.get("benchmark_state") or output.get("benchmark_selection_state")
-        benchmarks = output.get("benchmarks") or output.get("comparables") or output.get("top_comparables") or []
-        fit_basis = output.get("fit_basis") or []
+        benchmarks = output.get("benchmarks") or output.get("comparables") or output.get("top_comparables") or output.get("frozen_benchmarks") or []
+        fit_basis = output.get("fit_basis") or output.get("benchmark_fit_summary") or []
         if state in {"BLOCKED", "REJECT", "CONTRADICTORY", "UNRESOLVED", "COLLECTION_RESTRICTED"}:
             return False, f"A6_{state}"
         if not benchmarks:
             return False, "A6_NO_BENCHMARKS"
+        if not fit_basis:
+            # Accept per-benchmark fit_basis when the compact A6 packet omits a duplicate top-level summary.
+            fit_basis = [b.get("fit_basis") for b in benchmarks if isinstance(b, dict) and b.get("fit_basis")]
         if not fit_basis:
             return False, "A6_NO_FIT_BASIS"
         return True, "PASS"
@@ -101,15 +104,25 @@ def build_payload(agent_id, case_id, upstream, a5_record):
             **common,
             "purpose": "discover and freeze defensible comparable benchmark before gap evaluation",
             "target_match": a5_output,
+            "output_contract": {
+                "required_keys": ["case_id", "state", "frozen_benchmarks", "benchmark_fit_summary", "candidate_gaps", "scope_warnings", "rejected_candidates", "search_trace"],
+                "max_frozen_benchmarks": 3,
+                "max_rejected_candidates": 3,
+                "max_candidate_gaps": 3,
+                "per_note_max_words": 20,
+                "forbidden": ["long prose", "duplicate target terms", "duplicate evidence text", "marketing copy", "economic inference"]
+            },
             "requirements": [
                 "Actively discover a candidate benchmark universe using web_search before declaring UNRESOLVED.",
                 "Use same vertical, same geography when practical, and same decision job.",
                 "Prefer official domains and public verifiable pages for each candidate.",
                 "Collect at least 2 candidate comparables when available; retain only candidates with verifiable fit.",
-                "For each retained comparable include name, official_domain, fit_basis, source_provenance and covered decision dimensions.",
+                "For each retained comparable include only name, official_domain, covered_dimensions, concise fit_basis and concise source_provenance.",
                 "Freeze benchmark selection before interpreting any gap.",
+                "Formulate at most 3 explicit benchmark-relative candidate_gaps for A7 to falsify; each gap must identify target dimension, target evidence basis, benchmark basis and unresolved caveats.",
                 "Do not choose the competitor that maximizes the gap.",
-                "If no defensible comparable survives discovery, return UNRESOLVED and explain search trace; downstream must stop."
+                "If no defensible comparable survives discovery, return UNRESOLVED and concise search_trace; downstream must stop.",
+                "Do not repeat full claims, URLs more than once per benchmark, or the complete A5 packet."
             ]
         }
 
@@ -121,7 +134,7 @@ def build_payload(agent_id, case_id, upstream, a5_record):
             "benchmark_output": provider_output(upstream["A6_BENCHMARK"]),
             "requirements": [
                 "Act independently from benchmark selection.",
-                "Falsify only explicitly formulated benchmark-relative gaps; never invent a generic gap.",
+                "Falsify only explicitly formulated candidate_gaps from A6; never invent a generic gap.",
                 "Search for alternative explanations, scope errors, prominence/discoverability confusion and overclaim.",
                 "No web tool: falsify only from persisted audited material and frozen benchmark packet.",
                 "Return one of FALSIFIED, SURVIVES, WEAK_SURVIVAL plus concise reasons and unresolved items."
