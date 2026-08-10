@@ -37,6 +37,7 @@ def main():
     ap.add_argument("--agent", required=True)
     ap.add_argument("--db", required=True)
     ap.add_argument("--registry", required=True)
+    ap.add_argument("--case-id")
     ap.add_argument("--live", action="store_true")
     args = ap.parse_args()
 
@@ -47,9 +48,9 @@ def main():
         print(json.dumps({"status": "BLOCKED", "reason": f"Unknown agent {args.agent}"}))
         return 2
 
-    task = store.claim_next(args.agent)
+    task = store.claim_next(args.agent, case_id=args.case_id)
     if not task:
-        print(json.dumps({"status": "IDLE", "agent_id": args.agent}))
+        print(json.dumps({"status": "IDLE", "agent_id": args.agent, "case_id": args.case_id}))
         return 0
 
     try:
