@@ -11,7 +11,7 @@ import urllib.request
 from html import unescape
 from pathlib import Path
 
-USER_AGENT = "Mozilla/5.0 (compatible; RRT-PreScreen/1.1; +public-web-research)"
+USER_AGENT = "Mozilla/5.0 (compatible; RRT-PreScreen/1.2; +public-web-research)"
 TIMEOUT = 8
 MAX_BYTES = 750_000
 
@@ -21,6 +21,20 @@ DIMENSIONS = {
     "D3": [r"implantolog", r"impiant", r"tac", r"cbct", r"scanner", r"3d", r"chirurgia guidata", r"digitale", r"specialist", r"team", r"garanzia"],
     "D4": [r"carico immediato", r"24\s*ore", r"in un giorno", r"stessa giornata", r"same day", r"provvisor", r"all[- ]on[- ]4", r"all[- ]on[- ]four"],
     "D5": [r"perch[eé] scegliere", r"vantagg", r"testimonianz", r"recension", r"faq", r"garanzia", r"esperienza", r"dicono di noi"],
+}
+
+SOCIAL_DOMAINS = {
+    "facebook": ["facebook.com", "fb.com"],
+    "instagram": ["instagram.com"],
+    "linkedin": ["linkedin.com"],
+    "tiktok": ["tiktok.com"],
+}
+
+SOCIAL_REPUTATION_PATTERNS = {
+    "facebook": [r"recension", r"raccomand", r"recommend", r"rating", r"valutaz"],
+    "instagram": [r"testimonianz", r"recension", r"dicono di noi", r"feedback", r"pazient"],
+    "linkedin": [r"testimonianz", r"recension", r"recommend", r"feedback", r"pazient"],
+    "tiktok": [r"testimonianz", r"recension", r"feedback", r"pazient"],
 }
 
 HIGH_VALUE_PATTERNS = [
@@ -132,14 +146,33 @@ def extract_internal_links(html, current_url, domain):
     return out[:5]
 
 
+def extract_social_links(html):
+    found = {name: "" for name in SOCIAL_DOMAINS}
+    for href in re.findall(r'(?i)href=["\']([^"\']+)', html or ""):
+        href = unescape(href.strip())
+        host = normalize_domain(href)
+        if not host:
+            continue
+        for name, domains in SOCIAL_DOMAINS.items():
+            if any(host == d or host.endswith("." + d) for d in domains):
+                found[name] = href
+    return found
+
+
+def social_reputation_from_text(text):
+    return {name: count_hits(text, pats) for name, pats in SOCIAL_REPUTATION_PATTERNS.items()}
+
+
 def count_hits(text, patterns):
     text = (text or "").lower()
     return sum(1 for p in patterns if re.search(p, text, re.I))
 
 
 def scan(domain):
+    empty_social = {name: "" for name in SOCIAL_DOMAINS}
+    empty_rep = {name: 0 for name in SOCIAL_DOMAINS}
     if not domain:
-        return {"website_live": 0, "fetch_state": "NO_DOMAIN", "pages_found": 0, "contactability": 0, "hits": {d: 0 for d in DIMENSIONS}, "high_value_hits": 0, "structure_hits": 0, "youth_growth_hits": 0, "commercial_gap_count": 0}
+        return {"website_live": 0, "fetch_state": "NO_DOMAIN", "pages_found": 0, "contactability": 0, "hits": {d: 0 for d in DIMENSIONS}, "high_value_hits": 0, "structure_hits": 0, "youth_growth_hits": 0, "commercial_gap_count": 0, "social_links": empty_social, "social_reputation_hits": empty_rep}
 
     homepage = base_url(domain)
     final_url, html, state = fetch(homepage)
@@ -147,7 +180,7 @@ def scan(domain):
         final_url, html, state2 = fetch("http://" + domain)
         state = state2
     if state != "OK" or not html:
-        return {"website_live": 0, "fetch_state": state, "pages_found": 0, "contactability": 0, "hits": {d: 0 for d in DIMENSIONS}, "high_value_hits": 0, "structure_hits": 0, "youth_growth_hits": 0, "commercial_gap_count": 0}
+        return {"website_live": 0, "fetch_state": state, "pages_found": 0, "contactability": 0, "hits": {d: 0 for d in DIMENSIONS}, "high_value_hits": 0, "structure_hits": 0, "youth_growth_hits": 0, "commercial_gap_count": 0, "social_links": empty_social, "social_reputation_hits": empty_rep}
 
     pages = [(final_url, html)]
     for url in extract_internal_links(html, final_url, domain):
@@ -163,6 +196,8 @@ def scan(domain):
     structure_hits = count_hits(text, STRUCTURE_PATTERNS)
     youth_growth_hits = count_hits(text, YOUTH_GROWTH_PATTERNS)
     commercial_gap_count = sum(1 for pats in COMMERCIAL_GAP_PATTERNS.values() if count_hits(text, pats) == 0)
+    social_links = extract_social_links(combined_html)
+    social_reputation_hits = social_reputation_from_text(text)
 
     return {
         "website_live": 1,
@@ -174,6 +209,8 @@ def scan(domain):
         "structure_hits": structure_hits,
         "youth_growth_hits": youth_growth_hits,
         "commercial_gap_count": commercial_gap_count,
+        "social_links": social_links,
+        "social_reputation_hits": social_reputation_hits,
     }
 
 
@@ -183,6 +220,8 @@ def score_row(result):
     hits = result["hits"]
     observed_dims = sum(1 for v in hits.values() if v > 0)
     total_hits = sum(min(v, 5) for v in hits.values())
+    social_presence_count = sum(1 for v in result["social_links"].values() if v)
+    social_rep_count = sum(1 for v in result["social_reputation_hits"].values() if v > 0)
     score = 10
     score += min(result["pages_found"], 6) * 2
     score += observed_dims * 5
@@ -192,6 +231,8 @@ def score_row(result):
     score += min(result["youth_growth_hits"], 4) * 5
     score += min(result["commercial_gap_count"], 4) * 3
     score += 8 if result["contactability"] >= 2 else 4 if result["contactability"] == 1 else 0
+    score += min(social_presence_count, 4) * 2
+    score += min(social_rep_count, 4) * 2
     return min(score, 100)
 
 
@@ -231,6 +272,9 @@ def main():
         "company", "domain", "city", "vertical", "website_live", "fetch_state", "pages_found",
         "D1_hits", "D2_hits", "D3_hits", "D4_hits", "D5_hits", "contactability", "observed_dimensions",
         "high_value_hits", "structure_hits", "youth_growth_hits", "commercial_gap_count",
+        "facebook_url", "instagram_url", "linkedin_url", "tiktok_url",
+        "facebook_reputation_hits", "instagram_reputation_hits", "linkedin_reputation_hits", "tiktok_reputation_hits",
+        "social_presence_count", "social_reputation_channels",
         "preliminary_score", "decision"
     ]
 
@@ -245,6 +289,8 @@ def main():
             result = scan(domain)
             hits = result["hits"]
             observed_dims = sum(1 for v in hits.values() if v > 0)
+            social_presence_count = sum(1 for v in result["social_links"].values() if v)
+            social_reputation_channels = sum(1 for v in result["social_reputation_hits"].values() if v > 0)
             score = score_row(result)
             gate = decision(score, result["website_live"], observed_dims, result["fetch_state"], result["high_value_hits"], result["structure_hits"])
             writer.writerow({
@@ -266,10 +312,20 @@ def main():
                 "structure_hits": result["structure_hits"],
                 "youth_growth_hits": result["youth_growth_hits"],
                 "commercial_gap_count": result["commercial_gap_count"],
+                "facebook_url": result["social_links"]["facebook"],
+                "instagram_url": result["social_links"]["instagram"],
+                "linkedin_url": result["social_links"]["linkedin"],
+                "tiktok_url": result["social_links"]["tiktok"],
+                "facebook_reputation_hits": result["social_reputation_hits"]["facebook"],
+                "instagram_reputation_hits": result["social_reputation_hits"]["instagram"],
+                "linkedin_reputation_hits": result["social_reputation_hits"]["linkedin"],
+                "tiktok_reputation_hits": result["social_reputation_hits"]["tiktok"],
+                "social_presence_count": social_presence_count,
+                "social_reputation_channels": social_reputation_channels,
                 "preliminary_score": score,
                 "decision": gate,
             })
-            print(f"[{idx}/{len(rows)}] {company or domain}: {gate} ({score}) HV={result['high_value_hits']} STR={result['structure_hits']} YG={result['youth_growth_hits']} GAP={result['commercial_gap_count']}")
+            print(f"[{idx}/{len(rows)}] {company or domain}: {gate} ({score}) HV={result['high_value_hits']} STR={result['structure_hits']} YG={result['youth_growth_hits']} GAP={result['commercial_gap_count']} SOC={social_presence_count}/{social_reputation_channels}")
     return 0
 
 
