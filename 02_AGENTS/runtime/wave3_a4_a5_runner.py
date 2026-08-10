@@ -194,13 +194,6 @@ def main():
         }, ensure_ascii=False, indent=2))
         return 4
 
-    latest_outputs = orch.store.outputs_for_case(args.case_id)
-    a4_outputs = [o for o in latest_outputs if o.get("agent_id") == "A4_EVIDENCE_AUDITOR"]
-    if not a4_outputs:
-        print(json.dumps({"case_id": args.case_id, "current_run_status": {"status": "BLOCKED", "reason": "A4_OUTPUT_NOT_PERSISTED"}}, ensure_ascii=False, indent=2))
-        return 3
-
-    latest_a4 = a4_outputs[-1]
     a5_payload = {
         "case_id": args.case_id,
         "purpose": "controlled Wave 3 target match after certified evidence audit",
@@ -208,23 +201,34 @@ def main():
             "a4_certification": a4_output,
             "baseline_deep_scan": baseline_output,
             "repair_overlay": repair_output,
-            "exclusion_rule": "A5 may inspect A3 evidence only to perform term-to-evidence mapping. A4 remains authoritative for admissibility. Any evidence downgraded, rejected, unresolved, or collection-restricted by A4 is excluded from positive matching."
+            "exclusion_rule": "A4 is authoritative for admissibility. Exclude any evidence A4 downgraded, rejected, unresolved or collection-restricted."
         },
         "target_terms": spec.get("target_terms", {}),
         "audit_gate_reason": audit_gate_reason,
+        "output_contract": {
+            "format": "compact_json_only",
+            "required_keys": ["overall_state", "confidence", "dimensions", "excluded_evidence_ids", "unresolved", "contradictions"],
+            "dimension_shape": {
+                "state": "OBSERVED|OBSERVED_WITH_UNRESOLVED_SPECIFICITY|NOT_FOUND_AFTER_PROTOCOL|UNRESOLVED|CONTRADICTORY",
+                "matched_terms": "flat string list, max 6",
+                "evidence_ids": "flat admissible evidence id list, max 5",
+                "confidence": "0-100",
+                "unresolved_specificity": "flat string list, max 3"
+            },
+            "forbidden": ["term-by-term objects", "per-term evidence maps", "long unmatched term lists", "repeated evidence ids", "economic inference", "benchmark selection"]
+        },
         "constraints": [
             "A5 must treat A4 certification as authoritative",
-            "A5 may inspect baseline and repair evidence only for granular term-to-evidence mapping",
-            "do not resurrect evidence downgraded or rejected by A4",
-            "preserve any COLLECTION_RESTRICTED evidence exactly as restricted",
-            "non-blocking collection restrictions may not be promoted to positive target evidence",
-            "E08 and E11 are excluded from positive target evidence when the gate passes with non-blocking collection restrictions",
-            "for each observed target dimension, cite the admissible evidence IDs and matched terms when present in the supplied A3 evidence",
-            "do not infer a matched term solely from A4 prose when the underlying A3 evidence is available",
-            "map only against supplied D1-D5 target definitions",
+            "use A3 only for granular term-to-evidence mapping",
+            "never resurrect excluded evidence",
+            "for each D1-D5 return one compact dimension object only",
+            "matched_terms must be a flat list; evidence_ids must be a flat list",
+            "do not enumerate every missing synonym; summarize unresolved specificity only when material",
+            "map only supplied D1-D5 target definitions",
             "no benchmark selection",
             "no economic inference",
-            "preserve unresolved and contradiction states"
+            "preserve unresolved and contradiction states",
+            "return complete valid JSON before optional detail"
         ]
     }
 

@@ -60,7 +60,15 @@ def main():
                 },
                 "unresolved": [],
                 "collection_restrictions": [],
-                "saturation_state": "SATURATED|PARTIALLY_SATURATED|UNDERCOVERED|BLOCKED"
+                "saturation_state": "SATURATED|PARTIALLY_SATURATED|UNDERCOVERED|BLOCKED",
+                "execution_trace": {
+                    "official_pages_checked": [],
+                    "discovery_method": [],
+                    "target_queries": [],
+                    "followed_dedicated_pages": [],
+                    "negative_or_unresolved_checks": [],
+                    "protocol_completion": "COMPLETE|PARTIAL|BLOCKED"
+                }
             }
         },
         "constraints": [
@@ -69,10 +77,13 @@ def main():
             "NOT_FOUND only after target-specific protocol",
             "one evidence_id per material claim",
             "preserve provenance and search trace",
+            "execution_trace is mandatory and must prove which saturation steps were actually executed",
+            "if saturation_state is SATURATED then execution_trace.protocol_completion must be COMPLETE",
+            "include enough execution trace for A4 to independently certify saturation without web access",
             "no benchmark selection",
             "no commercial signal",
             "compress repeated target terms into one material finding when they rely on the same evidence",
-            "do not narrate the full browsing process",
+            "do not narrate the full browsing process; use compact arrays in execution_trace",
             "keep each finding concise: evidence_id, claim, url/source_ref, locator only",
             "return complete valid JSON before adding optional detail"
         ],

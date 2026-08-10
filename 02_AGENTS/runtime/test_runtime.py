@@ -148,6 +148,15 @@ def test_wave4_7_stage_gates():
     assert ok and reason == "READY"
 
 
+def test_end_to_end_runner_contract():
+    runtime = Path(__file__).resolve().parent
+    runner = (runtime / "end_to_end_runner.py").read_text(encoding="utf-8")
+    positions = [runner.index(token) for token in ["canary.py", "wave2_a3_runner.py", "wave3_a4_a5_runner.py", "wave4_7_runner.py"]]
+    assert positions == sorted(positions)
+    assert "--resume" in runner
+    assert "current_run_status" in runner
+
+
 def main():
     tests = [
         test_cost_control,
@@ -161,6 +170,7 @@ def main():
         test_wave3_persisted_a3_extraction,
         test_wave3_nonblocking_restrictions_gate,
         test_wave4_7_stage_gates,
+        test_end_to_end_runner_contract,
     ]
     for test in tests:
         test()
