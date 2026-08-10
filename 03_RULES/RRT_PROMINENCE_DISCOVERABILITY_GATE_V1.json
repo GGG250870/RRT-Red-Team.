@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "name": "RRT Prominence & Discoverability Gate",
+  "purpose": "Prevent false negatives caused by treating mere content presence as equivalent to commercial visibility or decision support strength.",
+  "principle": "FOUND proves presence, not prominence, clarity, accessibility, discoverability or competitive strength.",
+  "dimensions": {
+    "P1_homepage_prominence": "Is the decision-job message visible from homepage or primary navigation without deep navigation?",
+    "P2_message_clarity": "Is the proposition compressed into immediate patient-oriented language rather than only technical detail?",
+    "P3_path_depth": "How many meaningful navigation steps are required to reach the decision-job proof?",
+    "P4_cta_proximity": "Is an actionable CTA adjacent to the relevant proposition/proof?",
+    "P5_search_discoverability": "Does a frozen high-intent query surface the prospect's relevant page/message?",
+    "P6_competitive_pressure": "Do at least two frozen comparable competitors surface a clearer or more discoverable proposition on the same decision job?",
+    "P7_proof_density": "Are proof elements such as cases, testimonials, guarantees, team credentials or concrete process details adjacent to the claim?",
+    "P8_message_consistency": "Is the same proposition coherent across homepage, service page and other public channels?"
+  },
+  "states": ["NOT_TESTED","PASS","WEAK","FAIL","UNRESOLVED","COLLECTION_RESTRICTED","CONTRADICTORY"],
+  "rules": [
+    "A target with evidence state FOUND cannot be promoted or dismissed solely from presence/absence.",
+    "NO_SIGNAL after saturation is provisional until P1-P8 are tested where commercial comparison is material.",
+    "L1 competitive pressure requires at least two comparable frozen competitors on the same decision job.",
+    "L2 discoverability requires frozen query definitions, timestamp, geography assumptions where material, and recorded result set.",
+    "Search result rank is not a causal economic claim.",
+    "No retroactive query editing after seeing results; changed query creates a new test version.",
+    "Missing result remains UNRESOLVED or NOT_FOUND_AFTER_PROTOCOL, never zero by default."
+  ],
+  "promotion_logic": {
+    "NO_SIGNAL_CONFIRMED": "No material gap after saturation + prominence/discoverability comparison + red-team.",
+    "WATCHLIST": "Defensible difference exists but L1/L2 or actionable consequence is incomplete.",
+    "OPPORTUNITY_SIGNAL_CANDIDATE": "Gap survives red-team with repeated L1 pressure and L2 frozen-query discoverability; human review pending."
+  }
+}
