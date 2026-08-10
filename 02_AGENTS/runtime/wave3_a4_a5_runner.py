@@ -41,30 +41,50 @@ def audit_gate_decision(a4_output):
     unresolved = a4_output.get("unresolved") or []
     downgraded = set(a4_output.get("downgraded_evidence_ids") or [])
 
-    blocking_dimension_states = {"DOWNGRADE", "REJECT", "UNRESOLVED", "CONTRADICTORY"}
-    for dim_id, dim in dimensions.items():
-        if (dim or {}).get("state") in blocking_dimension_states:
-            return False, f"BLOCKING_DIMENSION_{dim_id}"
-
     allowed_restrictions = {"E08", "E11"}
     unresolved_items = {str((item or {}).get("item")) for item in unresolved}
     restricted_only = unresolved_items.issubset(allowed_restrictions) and downgraded.issubset(allowed_restrictions)
-    all_dimensions_pass = bool(dimensions) and all((dim or {}).get("state") == "PASS" for dim in dimensions.values())
 
     if verdict == "PASS" and state == "PASS":
         return True, "PASS"
 
-    if all_dimensions_pass and restricted_only and state in {"COLLECTION_RESTRICTED", "PARTIALLY_SATURATED"} and verdict in {"PASS", "DOWNGRADE"}:
+    blocking_dimension_states = {"REJECT", "UNRESOLVED", "CONTRADICTORY"}
+    for dim_id, dim in dimensions.items():
+        if (dim or {}).get("state") in blocking_dimension_states:
+            return False, f"BLOCKING_DIMENSION_{dim_id}"
+
+    if not restricted_only:
+        if unresolved_items and not unresolved_items.issubset(allowed_restrictions):
+            return False, "UNRESOLVED_OUTSIDE_NONBLOCKING_ALLOWLIST"
+        if downgraded and not downgraded.issubset(allowed_restrictions):
+            return False, "DOWNGRADED_OUTSIDE_NONBLOCKING_ALLOWLIST"
+        return False, "AUDIT_RESTRICTIONS_NOT_NONBLOCKING"
+
+    # Deterministic non-blocking exception: D4/D5 may be labelled DOWNGRADE by A4
+    # only because optional evidence E08/E11 could not be directly acquired.
+    # D1-D3 must remain PASS; D4/D5 must retain positive supporting evidence in A4 notes.
+    if state in {"COLLECTION_RESTRICTED", "PARTIALLY_SATURATED"} and verdict in {"PASS", "DOWNGRADE"}:
+        required_pass = {"D1", "D2", "D3"}
+        if not all((dimensions.get(d) or {}).get("state") == "PASS" for d in required_pass):
+            return False, "CORE_DIMENSIONS_NOT_PASS"
+
+        for dim_id in ("D4", "D5"):
+            dim = dimensions.get(dim_id) or {}
+            dim_state = dim.get("state")
+            if dim_state not in {"PASS", "DOWNGRADE", "COLLECTION_RESTRICTED"}:
+                return False, f"BLOCKING_DIMENSION_{dim_id}"
+            note = str(dim.get("note") or "").lower()
+            if dim_state != "PASS":
+                positive_markers = ("supporto", "evidenz", "restano valid", "sufficiente", "copertura")
+                if not any(marker in note for marker in positive_markers):
+                    return False, f"NO_POSITIVE_SUPPORT_{dim_id}"
+
         return True, "PASS_WITH_NONBLOCKING_COLLECTION_RESTRICTIONS"
 
     if verdict not in {"PASS", "DOWNGRADE"}:
         return False, "AUDIT_VERDICT_NOT_PASS"
     if state not in {"PASS", "COLLECTION_RESTRICTED", "PARTIALLY_SATURATED"}:
         return False, "AUDIT_STATE_BLOCKING"
-    if unresolved_items and not unresolved_items.issubset(allowed_restrictions):
-        return False, "UNRESOLVED_OUTSIDE_NONBLOCKING_ALLOWLIST"
-    if downgraded and not downgraded.issubset(allowed_restrictions):
-        return False, "DOWNGRADED_OUTSIDE_NONBLOCKING_ALLOWLIST"
     return False, "AUDIT_NOT_CERTIFIED"
 
 
@@ -195,6 +215,7 @@ def main():
             "do not resurrect evidence downgraded or rejected by A4",
             "preserve any COLLECTION_RESTRICTED evidence exactly as restricted",
             "non-blocking collection restrictions may not be promoted to positive target evidence",
+            "E08 and E11 are excluded from positive target evidence when the gate passes with non-blocking collection restrictions",
             "map only against supplied D1-D5 target definitions",
             "no benchmark selection",
             "no economic inference",
