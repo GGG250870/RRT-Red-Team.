@@ -9,7 +9,25 @@ RETRY_DELAY="${RRT_LAUNCHER_RETRY_SECONDS:-3}"
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT"
 
+# Validation runs can legitimately exceed the normal $2/case guard because they
+# include retries and benchmark discovery. Keep production defaults untouched;
+# this launcher opts into a higher case ceiling unless the caller overrides it.
+export RRT_BUDGET_PER_CASE_USD="${RRT_BUDGET_PER_CASE_USD:-3.00}"
+
 printf '\n[RRT] Pull aggiornamenti...\n'
+# If only the launcher itself has local edits, preserve them automatically so
+# Git can fast-forward. Do not auto-stash unrelated project files.
+local_changes="$(git status --porcelain)"
+if [[ -n "$local_changes" ]]; then
+  non_launcher="$(printf '%s\n' "$local_changes" | grep -vE '^.. rrt_run\.sh$' || true)"
+  if [[ -n "$non_launcher" ]]; then
+    printf '[RRT] Modifiche locali fuori da rrt_run.sh: pull bloccato per sicurezza.\n'
+    printf '%s\n' "$non_launcher"
+    exit 19
+  fi
+  git stash push -m "rrt-launcher-autostash" -- rrt_run.sh >/dev/null
+fi
+
 git pull --ff-only || exit 20
 
 printf '\n[RRT] Test runtime...\n'
