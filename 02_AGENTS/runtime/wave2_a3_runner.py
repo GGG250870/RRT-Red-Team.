@@ -42,6 +42,27 @@ def main():
         "adaptive_query_budget": spec.get("adaptive_query_budget", {}),
         "saturation_pass_conditions": spec.get("saturation_pass_conditions", []),
         "allowed_states": spec.get("states", []),
+        "output_contract": {
+            "compact": True,
+            "language": "it",
+            "max_findings_per_dimension": 4,
+            "max_evidence_per_finding": 1,
+            "no_term_by_term_repetition": True,
+            "required_shape": {
+                "overall_state": "PASS|INSUFFICIENT|COLLECTION_RESTRICTED|CONTRADICTORY|ENTITY_AMBIGUOUS",
+                "confidence": "0-100",
+                "dimensions": {
+                    "D1": {"state": "PASS|NOT_FOUND_AFTER_PROTOCOL|COLLECTION_RESTRICTED|INSUFFICIENT|CONTRADICTORY", "findings": []},
+                    "D2": {"state": "...", "findings": []},
+                    "D3": {"state": "...", "findings": []},
+                    "D4": {"state": "...", "findings": []},
+                    "D5": {"state": "...", "findings": []}
+                },
+                "unresolved": [],
+                "collection_restrictions": [],
+                "saturation_state": "SATURATED|PARTIALLY_SATURATED|UNDERCOVERED|BLOCKED"
+            }
+        },
         "constraints": [
             "official-domain-first",
             "no invented zeros",
@@ -50,6 +71,10 @@ def main():
             "preserve provenance and search trace",
             "no benchmark selection",
             "no commercial signal",
+            "compress repeated target terms into one material finding when they rely on the same evidence",
+            "do not narrate the full browsing process",
+            "keep each finding concise: evidence_id, claim, url/source_ref, locator only",
+            "return complete valid JSON before adding optional detail"
         ],
     }
 
