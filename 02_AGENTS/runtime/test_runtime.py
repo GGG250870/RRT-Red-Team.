@@ -6,6 +6,9 @@ from cost_control import BudgetPolicy, check_call_budget, estimate_cost_usd
 from granularity_loop import LoopPolicy, should_continue
 from llm_provider import LLMProvider, _normalize_url, MAX_OUTPUT_BY_AGENT
 from state_store import StateStore
+from wave2_a3_runner import load_deep_scan_spec
+from wave3_a4_a5_runner import extract_a3_output, is_repair_output, audit_gate_decision
+from wave4_7_runner import stage_gate
 
 
 def test_cost_control():
@@ -63,16 +66,105 @@ def test_url_normalization():
 def test_output_policy():
     assert MAX_OUTPUT_BY_AGENT["A1_DISCOVERY"] >= 2000
     assert MAX_OUTPUT_BY_AGENT["A2_ENTITY_SCOPE"] >= 1500
+    assert MAX_OUTPUT_BY_AGENT["A3_DEEP_SCAN"] >= 2000
+
+
+def test_deep_scan_spec_loading():
+    runtime = Path(__file__).resolve().parent
+    repo_root = runtime.parents[1]
+    spec = load_deep_scan_spec(repo_root)
+    targets = spec.get("target_terms", {})
+    assert set(targets.keys()) == {"D1", "D2", "D3", "D4", "D5"}
+    assert spec.get("adaptive_query_budget")
+    assert spec.get("saturation_pass_conditions")
+
+
+def test_wave3_dependency_guard():
+    with tempfile.TemporaryDirectory() as td:
+        db = Path(td) / "test.sqlite"
+        s = StateStore(db)
+        assert [o for o in s.outputs_for_case("NOCASE") if o.get("agent_id") == "A3_DEEP_SCAN"] == []
+
+
+def test_wave3_persisted_a3_extraction():
+    baseline = {
+        "agent_id": "A3_DEEP_SCAN",
+        "output": {"dimensions": {"D1": {"state": "PASS"}}, "saturation_state": "SATURATED"},
+    }
+    repair = {
+        "agent_id": "A3_DEEP_SCAN",
+        "output": {"repaired_evidence": [{"target": "E05", "state": "FOUND"}], "execution_trace": {"pages_checked": []}},
+    }
+    assert extract_a3_output(baseline).get("dimensions", {}).get("D1", {}).get("state") == "PASS"
+    assert not is_repair_output(baseline)
+    assert is_repair_output(repair)
+
+
+def test_wave3_nonblocking_restrictions_gate():
+    a4 = {
+        "verdict": "DOWNGRADE",
+        "overall_state": "COLLECTION_RESTRICTED",
+        "dimensions": {
+            "D1": {"state": "PASS", "note": "supporto ufficiale"},
+            "D2": {"state": "PASS", "note": "supporto ufficiale"},
+            "D3": {"state": "PASS", "note": "supporto diretto"},
+            "D4": {"state": "DOWNGRADE", "note": "Supporto generale diretto disponibile, E08 resta non verificabile."},
+            "D5": {"state": "DOWNGRADE", "note": "E09-E10 restano validi; E11 resta limitata."},
+        },
+        "downgraded_evidence_ids": ["E08", "E11"],
+        "unresolved": [{"item": "E08"}, {"item": "E11"}],
+    }
+    ok, reason = audit_gate_decision(a4)
+    assert ok is True
+    assert reason == "PASS_WITH_NONBLOCKING_COLLECTION_RESTRICTIONS"
+
+
+def test_wave4_7_stage_gates():
+    ok, reason = stage_gate("A6_BENCHMARK", {
+        "overall_state": "PASS",
+        "benchmarks": [{"id": "B1"}],
+        "fit_basis": [{"benchmark_id": "B1", "basis": "same vertical and decision job"}],
+        "contradictions": [],
+    })
+    assert ok and reason == "PASS"
+
+    ok, reason = stage_gate("A6_BENCHMARK", {
+        "overall_state": "UNRESOLVED",
+        "benchmarks": [],
+        "fit_basis": [],
+        "contradictions": [],
+    })
+    assert not ok and reason == "A6_UNRESOLVED"
+
+    ok, reason = stage_gate("A7_RED_TEAM", {"verdict": "FALSIFIED", "contradictions": []})
+    assert not ok and reason == "A7_FALSIFIED"
+    ok, reason = stage_gate("A7_RED_TEAM", {"verdict": "WEAK_SURVIVAL", "contradictions": []})
+    assert ok and reason == "WEAK_SURVIVAL"
+    ok, reason = stage_gate("A8_COMMERCIAL_GATE", {"signal_class": "WATCHLIST", "contradictions": []})
+    assert ok and reason == "WATCHLIST"
+    ok, reason = stage_gate("A8_COMMERCIAL_GATE", {"signal_class": "OPPORTUNITY_SIGNAL", "contradictions": []})
+    assert not ok and reason == "A8_INVALID_SIGNAL_CLASS"
+    ok, reason = stage_gate("A9_QA_ORCHESTRATOR", {"verdict": "READY", "contradictions": []})
+    assert ok and reason == "READY"
 
 
 def main():
-    test_cost_control()
-    test_loop_controller()
-    test_state_store_roundtrip()
-    test_web_tool_routing()
-    test_url_normalization()
-    test_output_policy()
-    print(json.dumps({"status": "PASS", "tests": 6}))
+    tests = [
+        test_cost_control,
+        test_loop_controller,
+        test_state_store_roundtrip,
+        test_web_tool_routing,
+        test_url_normalization,
+        test_output_policy,
+        test_deep_scan_spec_loading,
+        test_wave3_dependency_guard,
+        test_wave3_persisted_a3_extraction,
+        test_wave3_nonblocking_restrictions_gate,
+        test_wave4_7_stage_gates,
+    ]
+    for test in tests:
+        test()
+    print(json.dumps({"status": "PASS", "tests": len(tests)}))
 
 
 if __name__ == "__main__":

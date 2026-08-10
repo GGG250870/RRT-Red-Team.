@@ -1,4 +1,4 @@
-import os, json, re
+import os, json, re, time
 from typing import Dict, Any
 
 try:
@@ -29,19 +29,19 @@ REASONING_BY_AGENT={
     "A6_BENCHMARK":"medium",
     "A7_RED_TEAM":"high",
     "A8_COMMERCIAL_GATE":"medium",
-    "A9_QA_ORCHESTRATOR":"high",
+    "A9_QA_ORCHESTRATOR":"medium",
 }
 
 MAX_OUTPUT_BY_AGENT={
     "A1_DISCOVERY":2200,
     "A2_ENTITY_SCOPE":1600,
-    "A3_DEEP_SCAN":2400,
-    "A4_EVIDENCE_AUDITOR":1800,
+    "A3_DEEP_SCAN":4200,
+    "A4_EVIDENCE_AUDITOR":3000,
     "A5_TARGET_MATCH":1600,
-    "A6_BENCHMARK":2200,
+    "A6_BENCHMARK":3200,
     "A7_RED_TEAM":2000,
     "A8_COMMERCIAL_GATE":1600,
-    "A9_QA_ORCHESTRATOR":1800,
+    "A9_QA_ORCHESTRATOR":2600,
 }
 
 WEB_ENABLED_AGENTS={"A1_DISCOVERY","A2_ENTITY_SCOPE","A3_DEEP_SCAN","A6_BENCHMARK"}
@@ -65,6 +65,32 @@ def _normalize_payload(payload):
     if "official_domain" in clean:
         clean["official_domain"]=_normalize_url(clean.get("official_domain"))
     return clean
+
+
+def _response_incomplete_reason(response):
+    details=getattr(response,"incomplete_details",None)
+    if not details:
+        return None
+    if isinstance(details, dict):
+        return details.get("reason") or str(details)
+    return getattr(details,"reason",None) or str(details)
+
+
+def _is_retryable_error(exc):
+    text=str(exc).lower()
+    markers=(
+        "error code: 520",
+        "error code: 502",
+        "error code: 503",
+        "error code: 504",
+        "retryable': true",
+        'retryable": true',
+        "rate limit",
+        "temporarily unavailable",
+        "connection error",
+        "timeout",
+    )
+    return any(m in text for m in markers)
 
 
 class LLMProvider:
@@ -140,18 +166,33 @@ class LLMProvider:
             kwargs["tools"]=tools
             kwargs["tool_choice"]="auto"
 
-        response=self.client.responses.create(**kwargs)
+        max_attempts=max(1, int(os.getenv("RRT_API_MAX_ATTEMPTS", "3")))
+        base_delay=max(1.0, float(os.getenv("RRT_API_RETRY_BASE_SECONDS", "2")))
+        response=None
+        last_error=None
+        for attempt in range(1, max_attempts + 1):
+            try:
+                response=self.client.responses.create(**kwargs)
+                break
+            except Exception as exc:
+                last_error=exc
+                if attempt >= max_attempts or not _is_retryable_error(exc):
+                    raise
+                time.sleep(base_delay * (2 ** (attempt - 1)))
+        if response is None:
+            raise last_error or RuntimeError("OpenAI call failed without response")
 
         text=getattr(response,"output_text",None)
         if not text:
             text=str(response)
 
+        incomplete_reason=_response_incomplete_reason(response)
         try:
             parsed=json.loads(text)
             parse_status="PASS"
         except Exception:
             parsed={"raw_output":text}
-            parse_status="FAIL_JSON"
+            parse_status="TRUNCATED_JSON" if incomplete_reason in {"max_output_tokens","max_tokens"} else "FAIL_JSON"
 
         usage={}
         actual_cost_usd=0.0
@@ -175,6 +216,7 @@ class LLMProvider:
           "normalized_official_domain":payload.get("official_domain"),
           "response_id":getattr(response,"id",None),
           "parse_status":parse_status,
+          "incomplete_reason":incomplete_reason,
           "output":parsed,
           "usage":usage,
           "estimated_cost_usd":round(estimated_usd,6),
