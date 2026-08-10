@@ -25,6 +25,19 @@ def parse_worker_stdout(worker_result):
         return {"status": "UNPARSEABLE", "raw": raw}
 
 
+def derive_repair_dimensions(a4_output):
+    dims = []
+    for dim_id, dim in (a4_output.get("dimensions") or {}).items():
+        if (dim or {}).get("state") in {"DOWNGRADE", "UNRESOLVED", "COLLECTION_RESTRICTED", "REJECT"}:
+            dims.append(dim_id)
+    if not dims:
+        unresolved_text = json.dumps(a4_output.get("unresolved") or [], ensure_ascii=False)
+        for dim_id in ("D1", "D2", "D3", "D4", "D5"):
+            if dim_id in unresolved_text:
+                dims.append(dim_id)
+    return dims or ["D1", "D2", "D3", "D4", "D5"]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--case-id", required=True)
@@ -48,17 +61,18 @@ def main():
     a4_output = (prior_a4.get("output") or {})
     downgraded = a4_output.get("downgraded_evidence_ids") or []
     unresolved = a4_output.get("unresolved") or []
+    repair_dimensions = derive_repair_dimensions(a4_output)
 
     payload = {
         "company": args.company,
         "official_domain": args.official_domain,
-        "purpose": "targeted A3 repair after A4 downgrade",
+        "purpose": "targeted A3 repair after A4 downgrade or collection restriction",
         "prior_a3": prior_a3,
         "a4_audit": prior_a4,
         "repair_scope": {
             "downgraded_evidence_ids": downgraded,
             "unresolved_items": unresolved,
-            "dimensions": ["D3", "D4", "D5"]
+            "dimensions": repair_dimensions
         },
         "target_terms": spec.get("target_terms", {}),
         "saturation_strategy": spec.get("saturation_strategy", []),
@@ -75,12 +89,14 @@ def main():
             }
         },
         "constraints": [
-            "repair only downgraded or unresolved evidence",
+            "repair only downgraded, unresolved or collection-restricted dimensions",
             "prefer direct official-page acquisition over search snippets",
-            "do not claim a repaired evidence item unless page content is acquired with URL and locator",
+            "use official-domain web search adaptively when direct navigation is insufficient",
+            "do not claim repaired evidence unless content is acquired with URL and locator",
             "record pages checked, queries executed and negative results needed for saturation",
+            "preserve COLLECTION_RESTRICTED when official content still cannot be acquired",
             "do not infer page freshness from collection time",
-            "do not re-litigate already certified D1 and D2 unless contradiction is found",
+            "do not re-litigate already certified dimensions unless contradiction is found",
             "no benchmark selection",
             "no commercial signal",
             "return complete valid JSON before optional detail"
@@ -97,7 +113,7 @@ def main():
         "case_id": args.case_id,
         "run_started_at": started_at,
         "current_run_status": {"status": "PASS" if ok else "BLOCKED", "agent": "A3_DEEP_SCAN", "worker_status": parsed.get("status")},
-        "repair_scope": {"downgraded_evidence_ids": downgraded, "unresolved": unresolved},
+        "repair_scope": {"dimensions": repair_dimensions, "downgraded_evidence_ids": downgraded, "unresolved": unresolved},
         "result": result,
         "historical_store_status": orch.status()
     }, ensure_ascii=False, indent=2))
