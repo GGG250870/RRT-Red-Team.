@@ -8,6 +8,7 @@ updated: 2026-08-10
 # RRT Red Team — Home
 
 ## Navigazione
+- [[00_HOME/SECOND_BRAIN]]
 - [[01_ARCHITECTURE/Architecture Overview]]
 - [[01_ARCHITECTURE/Integrated Knowledge Model]]
 - [[01_ARCHITECTURE/RRT_ARCHITECTURE_ECONOMIC_SUSTAINABILITY_AUDIT_V1]]
@@ -19,44 +20,40 @@ updated: 2026-08-10
 - [[07_SIGNALS/Signals Index]]
 - [[08_RED_TEAM/Red Team Index]]
 - [[09_VALIDATION/Validation Dashboard]]
-- [[09_VALIDATION/Batch 04 National Calibration]]
 - [[10_REPORTS/Reports Index]]
 - [[99_CHANGELOG/CHANGELOG]]
 
 ## Stato progetto
-- Core metodologico: avanzato.
-- Knowledge model integrato: il framework operativo persistito è stato unificato con le librerie consolidate di Problem, Pattern, Blind Spot, Question, Evidence e Insight/Revenue Trigger.
-- Multi-agent architecture: 9 ruoli separati + orchestratore, SQLite state store, audit log e agent registry.
-- Provider OpenAI live: **verificato con chiamata reale PASS** il 2026-08-10.
-- Runtime multi-agent orchestrato: **BLOCKED** prima del canary live; `worker.py` è mancante e devono essere aggiunti cost ledger, budget guard e stop conditions dei loop.
-- Audit architetturale/economico: `GO_WITH_BLOCKERS`; metodologia PASS, GitHub/Obsidian PASS, profittabilità reale `UNRESOLVED` finché non misurata su unit economics reali.
-- Batch 04 Calibration: 50 prospect congelati; Entity Resolution chiusa in stati terminali; Deep Scan in corso per tranche.
-- Tranche D: 3 casi passati al Saturation Re-Audit; Target Match e benchmark freeze completati; Commercial Gate resta provvisorio finché Prominence & Discoverability P1-P8 non sono completati.
+- Runtime A1→A9: **VALIDATO** su B04-37 con A9 `READY`.
+- Runner end-to-end: `rrt_e2e.sh` + `02_AGENTS/runtime/end_to_end_runner.py` presenti in `main`.
+- Auto-repair: **VALIDATO**. Se A4 blocca con `COLLECTION_RESTRICTED`, il runner esegue una sola volta A3 repair e A4/A5 re-audit.
+- Isolation guard: i worker reclamano task per `case_id`; eliminata contaminazione tra prospect.
+- Caso B04-37: pipeline completa PASS; A8 `WATCHLIST`; A9 `READY`.
+- Caso ICO-01: auto-repair eseguito correttamente; esito finale `COLLECTION_RESTRICTED` su D1-D5 per insufficiente acquisizione ufficiale. Questo è uno stato valido, non un errore tecnico.
 - Human review: obbligatorio per ogni Opportunity Signal.
+- GitHub: fonte persistente e auditabile.
+- Obsidian: interfaccia umana del second brain.
 
-## Ultimi artefatti
-- [[01_ARCHITECTURE/RRT_ARCHITECTURE_ECONOMIC_SUSTAINABILITY_AUDIT_V1]]
-- [[01_ARCHITECTURE/Integrated Knowledge Model]]
-- `03_RULES/RRT_PROMINENCE_DISCOVERABILITY_GATE_V1.json`
-- `09_VALIDATION/RRT_BATCH_04_DEEP_SCAN_TRANCHE_D_V1.json`
-- [[10_REPORTS/RRT_BATCH_04_DEEP_SCAN_TRANCHE_D_REPORT_V1]]
+## Knowledge flow
+PUNTO ZERO / PROBLEMA PERCEPITO → PATTERN → BLIND SPOT → EVIDENCE → TARGET → SATURATION → TARGET MATCH → BENCHMARK → FINDING → RED TEAM → COMMERCIAL GATE → SIGNAL → HUMAN REVIEW → VALIDATION.
 
-## Caso di riferimento
-- [[08_RED_TEAM/U03 Oberholtzer Martini - Opportunity Signal Candidate]] — primo candidate arrivato a L2 Discoverability Proxy e gate umano senza claim economici non dimostrati.
-
-## Principi
+## Regole chiave
 1. Nessun dato inventato.
 2. Nessun `NOT_FOUND` senza Target-Specific Deep Scan.
 3. Identità e scope prima dello scoring.
-4. Benchmark congelato prima del Decision Loss.
-5. Ogni finding deve sopravvivere a red-team.
-6. Opportunity Signal ≠ perdita economica dimostrata.
-7. Validated Signal richiede comportamento o dati economici verificabili.
-8. `SATURATED_MULTI_TARGET` è vietato con target ancora `UNRESOLVED`.
-9. I progressi operativi vengono letti dal ledger persistito, non da riepiloghi conversazionali.
-10. Le librerie metodologiche conversazionali possono essere integrate solo se non contraddicono il repository e non introducono claim empirici non verificati.
-11. Ogni loop di granularità deve avere stop condition e budget; nessun loop infinito.
-12. Cheap-first, escalate-on-uncertainty: modelli più costosi solo quando il valore informativo lo giustifica.
+4. A4 audita prima di A5.
+5. Benchmark congelato prima del gap.
+6. Red Team può falsificare il finding.
+7. Opportunity Signal ≠ perdita economica dimostrata.
+8. Missing ≠ zero.
+9. `COLLECTION_RESTRICTED` è uno stato valido e non va forzato.
+10. Ogni loop ha stop condition e budget.
+11. Cheap-first, escalate-on-uncertainty.
+12. Ogni finding deve mantenere la catena prospect → evidence → target → benchmark → red-team → commercial gate → validation.
 
-## Obiettivo validazione
-Vedi [[09_VALIDATION/Validation Dashboard]] e `03_RULES/RRT_98_PERCENT_VALIDATION_FRAMEWORK_V1.json`.
+## Casi runtime di riferimento
+- [[04_PROSPECTS/B04-37 - Studio Dentistico Pietro Leone]]
+- [[04_PROSPECTS/ICO-01 - ICO Dental]]
+
+## Obiettivo operativo
+Usare [[00_HOME/SECOND_BRAIN]] come pannello quotidiano. Le note prospect diventano l'unità principale di navigazione umana; il runtime continua a vivere in `02_AGENTS/runtime/` senza dipendere da Obsidian.
