@@ -1,4 +1,4 @@
-import os, json, re
+import os, json, re, time
 from typing import Dict, Any
 
 try:
@@ -76,6 +76,23 @@ def _response_incomplete_reason(response):
     return getattr(details,"reason",None) or str(details)
 
 
+def _is_retryable_error(exc):
+    text=str(exc).lower()
+    markers=(
+        "error code: 520",
+        "error code: 502",
+        "error code: 503",
+        "error code: 504",
+        "retryable': true",
+        'retryable": true',
+        "rate limit",
+        "temporarily unavailable",
+        "connection error",
+        "timeout",
+    )
+    return any(m in text for m in markers)
+
+
 class LLMProvider:
     def __init__(self, dry_run=True):
         self.dry_run=dry_run
@@ -149,7 +166,21 @@ class LLMProvider:
             kwargs["tools"]=tools
             kwargs["tool_choice"]="auto"
 
-        response=self.client.responses.create(**kwargs)
+        max_attempts=max(1, int(os.getenv("RRT_API_MAX_ATTEMPTS", "3")))
+        base_delay=max(1.0, float(os.getenv("RRT_API_RETRY_BASE_SECONDS", "2")))
+        response=None
+        last_error=None
+        for attempt in range(1, max_attempts + 1):
+            try:
+                response=self.client.responses.create(**kwargs)
+                break
+            except Exception as exc:
+                last_error=exc
+                if attempt >= max_attempts or not _is_retryable_error(exc):
+                    raise
+                time.sleep(base_delay * (2 ** (attempt - 1)))
+        if response is None:
+            raise last_error or RuntimeError("OpenAI call failed without response")
 
         text=getattr(response,"output_text",None)
         if not text:
