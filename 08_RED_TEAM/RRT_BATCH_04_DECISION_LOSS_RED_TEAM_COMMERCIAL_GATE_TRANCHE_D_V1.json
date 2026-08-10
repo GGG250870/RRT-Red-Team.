@@ -1,84 +1,55 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "batch": "04_calibration",
   "tranche": "D",
   "stage": "DECISION_LOSS_RED_TEAM_COMMERCIAL_GATE",
   "evaluated_at": "2026-08-10",
   "policy_ref": "03_RULES/RRT_EXTERNAL_ONLY_COMMERCIAL_SIGNAL_POLICY_V1.json",
+  "prominence_gate_ref": "03_RULES/RRT_PROMINENCE_DISCOVERABILITY_GATE_V1.json",
   "benchmark_ref": "06_BENCHMARKS/RRT_BATCH_04_TARGET_MATCH_BENCHMARK_FREEZE_TRANCHE_D_V1.json",
   "principle": "Only externally defensible comparative differences may survive. No economic loss, conversion loss, CAC disadvantage or causal business impact is inferred without L3/L4 evidence.",
+  "verification_note": "External re-check confirmed strong public D1-D5 coverage for all three cases. Presence alone is not sufficient to confirm absence of commercial opportunity; prominence, clarity and frozen-query discoverability must be tested separately.",
   "cases": {
     "B04-34": {
       "company": "Centro Odontoiatrico Gioia",
-      "decision_loss": {
-        "state": "NO_MATERIAL_EXTERNAL_GAP_CONFIRMED",
-        "observed_basis": [
-          "Prospect already covers D1-D5 with direct official-domain evidence.",
-          "Frozen high-fit benchmarks also cover D1-D5.",
-          "No material decision-job dimension can be declared inferior from the currently persisted evidence without adding unverified comparative scoring."
-        ]
-      },
-      "red_team": {
-        "result": "FALSIFIED_AS_OPPORTUNITY_SIGNAL",
-        "reason": "Current evidence does not establish a robust commercially relevant deficit relative to both frozen comparables. Any stronger claim would depend on unpersisted discoverability, messaging prominence, behavioral or economic evidence."
-      },
+      "decision_loss": {"state":"NO_MATERIAL_EXTERNAL_GAP_CONFIRMED_AT_PRESENCE_LAYER"},
+      "red_team": {"result":"SURVIVES_ONLY_AS_PROVISIONAL_NEGATIVE_CONTROL"},
       "commercial_gate": {
-        "state": "NO_SIGNAL",
-        "evidence_ladder_max": "L0_MESSAGE_DIFFERENCE_NOT_ESTABLISHED",
-        "missing_requirements": ["L1 repeated competitive pressure on an actionable dimension", "L2 frozen-query discoverability proxy", "human review only if promoted later"],
-        "forbidden_claims": ["lost revenue", "lost leads", "conversion loss", "CAC disadvantage", "causal economic loss"]
+        "state":"NO_SIGNAL_PROVISIONAL",
+        "reason":"Strong D1-D5 coverage externally confirmed, but P1-P8 prominence/discoverability gate not yet completed.",
+        "required_next_tests":["P1 homepage prominence","P2 message clarity","P3 path depth","P4 CTA proximity","P5 frozen-query discoverability","P6 repeated competitive pressure","P7 proof density","P8 cross-channel consistency"],
+        "forbidden_claims":["lost revenue","lost leads","conversion loss","CAC disadvantage","causal economic loss"]
       }
     },
     "B04-37": {
       "company": "Studio Dentistico Dott. Pietro Leone",
-      "decision_loss": {
-        "state": "NO_MATERIAL_EXTERNAL_GAP_CONFIRMED",
-        "observed_basis": [
-          "Prospect already covers D1-D5 with direct official-domain evidence.",
-          "Frozen high-fit benchmarks also cover D1-D5.",
-          "No material decision-job dimension can be declared inferior from the currently persisted evidence without adding unverified comparative scoring."
-        ]
-      },
-      "red_team": {
-        "result": "FALSIFIED_AS_OPPORTUNITY_SIGNAL",
-        "reason": "The current record supports broad proposition completeness, not a defensible commercial deficit. Stronger conclusions would require frozen-query discoverability and/or granular prominence/clarity evidence."
-      },
+      "decision_loss": {"state":"NO_MATERIAL_EXTERNAL_GAP_CONFIRMED_AT_PRESENCE_LAYER"},
+      "red_team": {"result":"SURVIVES_ONLY_AS_PROVISIONAL_NEGATIVE_CONTROL"},
       "commercial_gate": {
-        "state": "NO_SIGNAL",
-        "evidence_ladder_max": "L0_MESSAGE_DIFFERENCE_NOT_ESTABLISHED",
-        "missing_requirements": ["L1 repeated competitive pressure on an actionable dimension", "L2 frozen-query discoverability proxy", "human review only if promoted later"],
-        "forbidden_claims": ["lost revenue", "lost leads", "conversion loss", "CAC disadvantage", "causal economic loss"]
+        "state":"NO_SIGNAL_PROVISIONAL",
+        "reason":"Strong D1-D5 coverage externally confirmed, but P1-P8 prominence/discoverability gate not yet completed.",
+        "required_next_tests":["P1 homepage prominence","P2 message clarity","P3 path depth","P4 CTA proximity","P5 frozen-query discoverability","P6 repeated competitive pressure","P7 proof density","P8 cross-channel consistency"],
+        "forbidden_claims":["lost revenue","lost leads","conversion loss","CAC disadvantage","causal economic loss"]
       }
     },
     "B04-48": {
       "company": "Savasta & Partners",
-      "decision_loss": {
-        "state": "NO_MATERIAL_EXTERNAL_GAP_CONFIRMED",
-        "observed_basis": [
-          "Prospect already covers D1-D5 with direct official-domain evidence.",
-          "Frozen high-fit benchmarks also cover D1-D5.",
-          "Current persisted evidence does not justify declaring a material inferiority on a decision job."
-        ]
-      },
-      "red_team": {
-        "result": "FALSIFIED_AS_OPPORTUNITY_SIGNAL",
-        "reason": "No defensible external opportunity survives at the current evidence level. A future finding would need a separately frozen discoverability or prominence test, not retrospective benchmark cherry-picking."
-      },
+      "decision_loss": {"state":"NO_MATERIAL_EXTERNAL_GAP_CONFIRMED_AT_PRESENCE_LAYER"},
+      "red_team": {"result":"SURVIVES_ONLY_AS_PROVISIONAL_NEGATIVE_CONTROL"},
       "commercial_gate": {
-        "state": "NO_SIGNAL",
-        "evidence_ladder_max": "L0_MESSAGE_DIFFERENCE_NOT_ESTABLISHED",
-        "missing_requirements": ["L1 repeated competitive pressure on an actionable dimension", "L2 frozen-query discoverability proxy", "human review only if promoted later"],
-        "forbidden_claims": ["lost revenue", "lost leads", "conversion loss", "CAC disadvantage", "causal economic loss"]
+        "state":"NO_SIGNAL_PROVISIONAL",
+        "reason":"Strong D1-D5 coverage externally confirmed, but P1-P8 prominence/discoverability gate not yet completed.",
+        "required_next_tests":["P1 homepage prominence","P2 message clarity","P3 path depth","P4 CTA proximity","P5 frozen-query discoverability","P6 repeated competitive pressure","P7 proof density","P8 cross-channel consistency"],
+        "forbidden_claims":["lost revenue","lost leads","conversion loss","CAC disadvantage","causal economic loss"]
       }
     }
   },
   "summary": {
-    "cases_evaluated": 3,
-    "no_signal": 3,
-    "watchlist": 0,
-    "opportunity_signal_candidate": 0,
-    "opportunity_signal": 0,
-    "validated_signal": 0
+    "cases_evaluated":3,
+    "no_signal_provisional":3,
+    "no_signal_confirmed":0,
+    "watchlist":0,
+    "opportunity_signal_candidate":0
   },
-  "next_step": "Design and freeze an independent L2 discoverability/prominence test before any further commercial promotion. Current NO_SIGNAL states remain valid negative controls for calibration."
+  "next_step":"Run and freeze P1-P8 prominence/discoverability tests. Only then may NO_SIGNAL become confirmed or a commercial difference advance to WATCHLIST/OPPORTUNITY_SIGNAL_CANDIDATE."
 }
