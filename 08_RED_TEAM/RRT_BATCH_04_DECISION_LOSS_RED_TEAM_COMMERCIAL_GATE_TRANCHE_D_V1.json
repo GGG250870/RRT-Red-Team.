@@ -1,0 +1,84 @@
+{
+  "version": "1.0",
+  "batch": "04_calibration",
+  "tranche": "D",
+  "stage": "DECISION_LOSS_RED_TEAM_COMMERCIAL_GATE",
+  "evaluated_at": "2026-08-10",
+  "policy_ref": "03_RULES/RRT_EXTERNAL_ONLY_COMMERCIAL_SIGNAL_POLICY_V1.json",
+  "benchmark_ref": "06_BENCHMARKS/RRT_BATCH_04_TARGET_MATCH_BENCHMARK_FREEZE_TRANCHE_D_V1.json",
+  "principle": "Only externally defensible comparative differences may survive. No economic loss, conversion loss, CAC disadvantage or causal business impact is inferred without L3/L4 evidence.",
+  "cases": {
+    "B04-34": {
+      "company": "Centro Odontoiatrico Gioia",
+      "decision_loss": {
+        "state": "NO_MATERIAL_EXTERNAL_GAP_CONFIRMED",
+        "observed_basis": [
+          "Prospect already covers D1-D5 with direct official-domain evidence.",
+          "Frozen high-fit benchmarks also cover D1-D5.",
+          "No material decision-job dimension can be declared inferior from the currently persisted evidence without adding unverified comparative scoring."
+        ]
+      },
+      "red_team": {
+        "result": "FALSIFIED_AS_OPPORTUNITY_SIGNAL",
+        "reason": "Current evidence does not establish a robust commercially relevant deficit relative to both frozen comparables. Any stronger claim would depend on unpersisted discoverability, messaging prominence, behavioral or economic evidence."
+      },
+      "commercial_gate": {
+        "state": "NO_SIGNAL",
+        "evidence_ladder_max": "L0_MESSAGE_DIFFERENCE_NOT_ESTABLISHED",
+        "missing_requirements": ["L1 repeated competitive pressure on an actionable dimension", "L2 frozen-query discoverability proxy", "human review only if promoted later"],
+        "forbidden_claims": ["lost revenue", "lost leads", "conversion loss", "CAC disadvantage", "causal economic loss"]
+      }
+    },
+    "B04-37": {
+      "company": "Studio Dentistico Dott. Pietro Leone",
+      "decision_loss": {
+        "state": "NO_MATERIAL_EXTERNAL_GAP_CONFIRMED",
+        "observed_basis": [
+          "Prospect already covers D1-D5 with direct official-domain evidence.",
+          "Frozen high-fit benchmarks also cover D1-D5.",
+          "No material decision-job dimension can be declared inferior from the currently persisted evidence without adding unverified comparative scoring."
+        ]
+      },
+      "red_team": {
+        "result": "FALSIFIED_AS_OPPORTUNITY_SIGNAL",
+        "reason": "The current record supports broad proposition completeness, not a defensible commercial deficit. Stronger conclusions would require frozen-query discoverability and/or granular prominence/clarity evidence."
+      },
+      "commercial_gate": {
+        "state": "NO_SIGNAL",
+        "evidence_ladder_max": "L0_MESSAGE_DIFFERENCE_NOT_ESTABLISHED",
+        "missing_requirements": ["L1 repeated competitive pressure on an actionable dimension", "L2 frozen-query discoverability proxy", "human review only if promoted later"],
+        "forbidden_claims": ["lost revenue", "lost leads", "conversion loss", "CAC disadvantage", "causal economic loss"]
+      }
+    },
+    "B04-48": {
+      "company": "Savasta & Partners",
+      "decision_loss": {
+        "state": "NO_MATERIAL_EXTERNAL_GAP_CONFIRMED",
+        "observed_basis": [
+          "Prospect already covers D1-D5 with direct official-domain evidence.",
+          "Frozen high-fit benchmarks also cover D1-D5.",
+          "Current persisted evidence does not justify declaring a material inferiority on a decision job."
+        ]
+      },
+      "red_team": {
+        "result": "FALSIFIED_AS_OPPORTUNITY_SIGNAL",
+        "reason": "No defensible external opportunity survives at the current evidence level. A future finding would need a separately frozen discoverability or prominence test, not retrospective benchmark cherry-picking."
+      },
+      "commercial_gate": {
+        "state": "NO_SIGNAL",
+        "evidence_ladder_max": "L0_MESSAGE_DIFFERENCE_NOT_ESTABLISHED",
+        "missing_requirements": ["L1 repeated competitive pressure on an actionable dimension", "L2 frozen-query discoverability proxy", "human review only if promoted later"],
+        "forbidden_claims": ["lost revenue", "lost leads", "conversion loss", "CAC disadvantage", "causal economic loss"]
+      }
+    }
+  },
+  "summary": {
+    "cases_evaluated": 3,
+    "no_signal": 3,
+    "watchlist": 0,
+    "opportunity_signal_candidate": 0,
+    "opportunity_signal": 0,
+    "validated_signal": 0
+  },
+  "next_step": "Design and freeze an independent L2 discoverability/prominence test before any further commercial promotion. Current NO_SIGNAL states remain valid negative controls for calibration."
+}
