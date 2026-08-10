@@ -6,9 +6,11 @@ try:
 except Exception:
     OpenAI=None
 
+from cost_control import estimate_cost_usd, check_call_budget
+
 MODEL_BY_AGENT={
-    "A1_DISCOVERY":"gpt-5.6-terra",
-    "A2_ENTITY_SCOPE":"gpt-5.6-terra",
+    "A1_DISCOVERY":"gpt-5.6-luna",
+    "A2_ENTITY_SCOPE":"gpt-5.6-luna",
     "A3_DEEP_SCAN":"gpt-5.6-terra",
     "A4_EVIDENCE_AUDITOR":"gpt-5.6-sol",
     "A5_TARGET_MATCH":"gpt-5.6-terra",
@@ -20,7 +22,7 @@ MODEL_BY_AGENT={
 
 REASONING_BY_AGENT={
     "A1_DISCOVERY":"low",
-    "A2_ENTITY_SCOPE":"medium",
+    "A2_ENTITY_SCOPE":"low",
     "A3_DEEP_SCAN":"medium",
     "A4_EVIDENCE_AUDITOR":"high",
     "A5_TARGET_MATCH":"medium",
@@ -33,7 +35,8 @@ REASONING_BY_AGENT={
 class LLMProvider:
     def __init__(self, dry_run=True):
         self.dry_run=dry_run
-        self.api_key=os.getenv("OPENAI_API_KEY")
+        raw_key=os.getenv("OPENAI_API_KEY")
+        self.api_key=raw_key.strip() if raw_key else None
         self.client=OpenAI(api_key=self.api_key) if (not dry_run and self.api_key and OpenAI) else None
 
     def readiness(self):
@@ -61,11 +64,19 @@ class LLMProvider:
             raise RuntimeError("Live mode requested but OPENAI_API_KEY or openai SDK is unavailable.")
 
         user_input=json.dumps(payload,ensure_ascii=False)
+        max_output_tokens=int(os.getenv("RRT_MAX_OUTPUT_TOKENS", "1200"))
+        estimated_input_tokens=max(1, len(system_prompt + user_input)//4)
+        estimated_usd=estimate_cost_usd(model, estimated_input_tokens, max_output_tokens)
+        allowed, reason=check_call_budget(estimated_usd)
+        if not allowed:
+            raise RuntimeError(f"BUDGET_BLOCK: {reason}")
+
         response=self.client.responses.create(
             model=model,
             reasoning={"effort":reasoning},
             instructions=system_prompt,
             input=user_input,
+            max_output_tokens=max_output_tokens,
         )
 
         text=getattr(response,"output_text",None)
@@ -80,6 +91,7 @@ class LLMProvider:
             parse_status="FAIL_JSON"
 
         usage={}
+        actual_cost_usd=0.0
         try:
             u=response.usage
             usage={
@@ -87,6 +99,7 @@ class LLMProvider:
               "output_tokens":getattr(u,"output_tokens",None),
               "total_tokens":getattr(u,"total_tokens",None),
             }
+            actual_cost_usd=estimate_cost_usd(model, usage.get("input_tokens") or 0, usage.get("output_tokens") or 0)
         except Exception:
             pass
 
@@ -98,5 +111,7 @@ class LLMProvider:
           "response_id":getattr(response,"id",None),
           "parse_status":parse_status,
           "output":parsed,
-          "usage":usage
+          "usage":usage,
+          "estimated_cost_usd":round(estimated_usd,6),
+          "actual_cost_usd":round(actual_cost_usd,6),
         }
