@@ -1,0 +1,13 @@
+{
+  "version": "1.0",
+  "batch": "04_calibration",
+  "stage": "DEEP_SCAN_TRANCHE_D",
+  "cases": {
+    "B04-34": {"company":"Centro Odontoiatrico Gioia","state":"SATURATED_MULTI_TARGET","verified":["D1 sedazione cosciente/ansia zero/odontofobia","D2 metodi di pagamento rateizzati anche senza interessi; costi contenuti/personalizzati","D3 implantologia guidata, 3D, casi complessi","D4 carico immediato stessa seduta/24h, talvolta ~60 minuti","D5 storia ventennale, supporto, CTA, casi clinici"],"unresolved":[],"confidence":99},
+    "B04-37": {"company":"Studio Dentistico Dott. Pietro Leone","state":"SATURATED_MULTI_TARGET","verified":["D1 sedazione cosciente/ansia","D2 pagamenti rateizzati/flexible solutions","D3 specialisti implantologia avanzata e rigenerativa","D4 riabilitazione completa in una sola giornata","D5 casi clinici, team specialistico, decision support"],"unresolved":[],"confidence":99},
+    "B04-42": {"company":"Studio Dentistico Dr. Paolo Mazzotta","state":"PARTIALLY_SATURATED","verified":["D1 assenza dolore/fastidio in intervento e post con protocollo farmacologico","D3 implantologia e diagnostica TAC","D4 arcata in 24h / unica seduta / carico immediato","D5 forte educational content"],"unresolved":["D2 pricing/financing","D1 formal sedation/anxiety pathway"],"confidence":96},
+    "B04-48": {"company":"Savasta & Partners","state":"SATURATED_MULTI_TARGET","verified":["D1 anestesista esperto, sedazione avanzata, protocollo anti-paura","D2 dilazioni e finanziamenti a tasso zero","D3 implantologia computer-guidata/zigomatica/team 30+","D4 denti fissi in 24 ore / carico immediato","D5 orari estesi, navetta, team, CTA"],"unresolved":[],"confidence":99}
+  },
+  "summary":{"cases":4,"saturated_multi_target":3,"partially_saturated":1,"downstream_candidates":["B04-34","B04-37","B04-48"],"blocked":["B04-42"]},
+  "rule":"Only cases with all intended targets terminal may proceed to re-audit."
+}
