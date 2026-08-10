@@ -19,6 +19,15 @@ def load_deep_scan_spec(repo_root: Path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def extract_a3_output(record):
+    return (((record or {}).get("result") or {}).get("output") or {})
+
+
+def is_repair_output(record):
+    out = extract_a3_output(record)
+    return bool(out.get("repaired_evidence") or out.get("execution_trace") or out.get("still_unresolved"))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--case-id", required=True)
@@ -37,11 +46,21 @@ def main():
         print(json.dumps({"case_id": args.case_id, "current_run_status": {"status": "BLOCKED", "reason": "NO_A3_OUTPUT"}}, ensure_ascii=False, indent=2))
         return 2
 
-    latest_a3 = a3_outputs[-1]
+    baseline_candidates = [o for o in a3_outputs if not is_repair_output(o)]
+    repair_candidates = [o for o in a3_outputs if is_repair_output(o)]
+    baseline_a3 = baseline_candidates[-1] if baseline_candidates else a3_outputs[0]
+    latest_repair = repair_candidates[-1] if repair_candidates else None
+
+    audited_input = {
+        "baseline_deep_scan": baseline_a3,
+        "repair_overlay": latest_repair,
+        "merge_rule": "Audit baseline D1-D5 plus latest repair. Repair overrides only evidence IDs and dimensions it explicitly repairs; baseline evidence remains valid unless explicitly downgraded, contradicted, or superseded. COLLECTION_RESTRICTED in repair must remain restricted and must not erase unrelated baseline PASS evidence."
+    }
+
     a4_payload = {
         "case_id": args.case_id,
         "purpose": "controlled Wave 3 evidence audit",
-        "audited_input": latest_a3,
+        "audited_input": audited_input,
         "target_terms": spec.get("target_terms", {}),
         "saturation_strategy": spec.get("saturation_strategy", []),
         "saturation_pass_conditions": spec.get("saturation_pass_conditions", []),
@@ -54,7 +73,7 @@ def main():
         "output_contract": {
             "format": "compact_json_only",
             "required_keys": ["verdict", "overall_state", "dimensions", "downgraded_evidence_ids", "unresolved", "reason"],
-            "dimensions_shape": "D1-D5 => PASS|DOWNGRADE|REJECT|UNRESOLVED",
+            "dimensions_shape": "D1-D5 => PASS|DOWNGRADE|REJECT|UNRESOLVED|COLLECTION_RESTRICTED",
             "reason_max_words": 80,
             "per_dimension_notes_max_words": 18,
             "forbidden": ["long prose", "repeat evidence claims", "repeat source URLs", "narrative restatement of input"]
@@ -62,6 +81,8 @@ def main():
         "constraints": [
             "A4 may PASS, DOWNGRADE or REJECT but cannot add new evidence",
             "preserve unresolved and contradiction states",
+            "audit baseline and repair together using the supplied merge_rule",
+            "do not mark D1 or D2 unresolved merely because the repair overlay does not repeat them",
             "evaluate D1-D5 against supplied target terms and pass conditions",
             "search-result snippets are weaker than acquired page content and may be downgraded",
             "do not certify SATURATED unless supplied trace demonstrates the protocol",
