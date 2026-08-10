@@ -68,10 +68,14 @@ class StateStore:
                task.get("status","PENDING"),task.get("attempts",0),now))
             self.log("ENQUEUE", task["task_id"], task["agent_id"], task["case_id"], {"stage":task["stage"]}, conn=c)
 
-    def claim_next(self, agent_id):
+    def claim_next(self, agent_id, case_id=None):
         with self._conn() as c:
-            row=c.execute("""SELECT * FROM tasks WHERE agent_id=? AND status='PENDING'
-                             ORDER BY created_at LIMIT 1""",(agent_id,)).fetchone()
+            if case_id:
+                row=c.execute("""SELECT * FROM tasks WHERE agent_id=? AND case_id=? AND status='PENDING'
+                                 ORDER BY created_at LIMIT 1""",(agent_id,case_id)).fetchone()
+            else:
+                row=c.execute("""SELECT * FROM tasks WHERE agent_id=? AND status='PENDING'
+                                 ORDER BY created_at LIMIT 1""",(agent_id,)).fetchone()
             if not row:
                 return None
             now=time.time()
