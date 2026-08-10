@@ -9,6 +9,7 @@ updated: 2026-08-10
 
 ## Navigazione
 - [[01_ARCHITECTURE/Architecture Overview]]
+- [[01_ARCHITECTURE/Integrated Knowledge Model]]
 - [[02_AGENTS/Multi-Agent System]]
 - [[03_RULES/Rules Index]]
 - [[04_PROSPECTS/Prospects Index]]
@@ -23,14 +24,16 @@ updated: 2026-08-10
 
 ## Stato progetto
 - Core metodologico: avanzato.
+- Knowledge model integrato: il framework operativo persistito è stato unificato con le librerie consolidate di Problem, Pattern, Blind Spot, Question, Evidence e Insight/Revenue Trigger.
 - Multi-agent architecture: 9 ruoli separati + runtime, SQLite state store e audit log.
 - Provider live: adapter predisposto; i worker restano dry-run finché non è configurata una credenziale live.
 - Batch 04 Calibration: 50 prospect congelati; Entity Resolution chiusa in stati terminali; Deep Scan in corso per tranche.
-- Ultimo avanzamento: Deep Scan Tranche D completata su 4 casi; 3 `SATURATED_MULTI_TARGET`, 1 `PARTIALLY_SATURATED`.
+- Ultimo avanzamento operativo: Deep Scan Tranche D completata su 4 casi; 3 `SATURATED_MULTI_TARGET`, 1 `PARTIALLY_SATURATED`.
 - Candidati al prossimo Saturation Evidence Re-Audit: B04-34 Centro Odontoiatrico Gioia, B04-37 Pietro Leone, B04-48 Savasta & Partners.
 - Human review: obbligatorio per ogni Opportunity Signal.
 
 ## Ultimi artefatti
+- [[01_ARCHITECTURE/Integrated Knowledge Model]]
 - `09_VALIDATION/RRT_BATCH_04_DEEP_SCAN_TRANCHE_D_V1.json`
 - [[10_REPORTS/RRT_BATCH_04_DEEP_SCAN_TRANCHE_D_REPORT_V1]]
 
@@ -47,6 +50,7 @@ updated: 2026-08-10
 7. Validated Signal richiede comportamento o dati economici verificabili.
 8. `SATURATED_MULTI_TARGET` è vietato con target ancora `UNRESOLVED`.
 9. I progressi operativi vengono letti dal ledger persistito, non da riepiloghi conversazionali.
+10. Le librerie metodologiche conversazionali possono essere integrate solo se non contraddicono il repository e non introducono claim empirici non verificati.
 
 ## Obiettivo validazione
 Vedi [[09_VALIDATION/Validation Dashboard]] e `03_RULES/RRT_98_PERCENT_VALIDATION_FRAMEWORK_V1.json`.
