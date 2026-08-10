@@ -51,9 +51,12 @@ def _normalize_url(value):
     if not value or not isinstance(value, str):
         return value
     value=value.strip().replace("\\", "")
+    md=re.fullmatch(r"\s*\[(https?://[^\]]+)\]\((https?://[^)]+)\)\s*", value)
+    if md:
+        return md.group(2).rstrip(".,)")
     urls=re.findall(r"https?://[^\s\]\)]+", value)
     if urls:
-        value=urls[-1]
+        return urls[0].rstrip(".,)")
     return value.rstrip(".,)")
 
 
