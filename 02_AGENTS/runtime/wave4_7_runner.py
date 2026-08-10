@@ -49,12 +49,15 @@ def stage_gate(agent_id, output):
         return False, "CONTRADICTIONS_PRESENT"
 
     if agent_id == "A6_BENCHMARK":
-        state = output.get("overall_state") or output.get("state") or output.get("benchmark_state")
-        if state in {"BLOCKED", "REJECT", "CONTRADICTORY"}:
+        state = output.get("overall_state") or output.get("state") or output.get("benchmark_state") or output.get("benchmark_selection_state")
+        benchmarks = output.get("benchmarks") or output.get("comparables") or output.get("top_comparables") or []
+        fit_basis = output.get("fit_basis") or []
+        if state in {"BLOCKED", "REJECT", "CONTRADICTORY", "UNRESOLVED", "COLLECTION_RESTRICTED"}:
             return False, f"A6_{state}"
-        benchmarks = output.get("benchmarks") or output.get("comparables") or output.get("top_comparables")
-        if not benchmarks and state not in {"UNRESOLVED", "COLLECTION_RESTRICTED"}:
+        if not benchmarks:
             return False, "A6_NO_BENCHMARKS"
+        if not fit_basis:
+            return False, "A6_NO_FIT_BASIS"
         return True, "PASS"
 
     if agent_id == "A7_RED_TEAM":
@@ -96,14 +99,17 @@ def build_payload(agent_id, case_id, upstream, a5_record):
     if agent_id == "A6_BENCHMARK":
         return {
             **common,
-            "purpose": "freeze defensible comparable benchmark before gap evaluation",
+            "purpose": "discover and freeze defensible comparable benchmark before gap evaluation",
             "target_match": a5_output,
             "requirements": [
-                "Use same vertical and same decision job.",
+                "Actively discover a candidate benchmark universe using web_search before declaring UNRESOLVED.",
+                "Use same vertical, same geography when practical, and same decision job.",
+                "Prefer official domains and public verifiable pages for each candidate.",
+                "Collect at least 2 candidate comparables when available; retain only candidates with verifiable fit.",
+                "For each retained comparable include name, official_domain, fit_basis, source_provenance and covered decision dimensions.",
                 "Freeze benchmark selection before interpreting any gap.",
-                "Keep top comparables, fit_basis, scope_warnings and source provenance.",
-                "Prefer official/publicly verifiable sources; web search is allowed for A6.",
-                "If comparability is insufficient, return UNRESOLVED rather than choosing a convenient competitor."
+                "Do not choose the competitor that maximizes the gap.",
+                "If no defensible comparable survives discovery, return UNRESOLVED and explain search trace; downstream must stop."
             ]
         }
 
@@ -115,8 +121,9 @@ def build_payload(agent_id, case_id, upstream, a5_record):
             "benchmark_output": provider_output(upstream["A6_BENCHMARK"]),
             "requirements": [
                 "Act independently from benchmark selection.",
+                "Falsify only explicitly formulated benchmark-relative gaps; never invent a generic gap.",
                 "Search for alternative explanations, scope errors, prominence/discoverability confusion and overclaim.",
-                "No web tool: falsify only from persisted audited material and benchmark packet.",
+                "No web tool: falsify only from persisted audited material and frozen benchmark packet.",
                 "Return one of FALSIFIED, SURVIVES, WEAK_SURVIVAL plus concise reasons and unresolved items."
             ]
         }
