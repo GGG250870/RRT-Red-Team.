@@ -7,26 +7,29 @@ import urllib.request
 from html import unescape
 from pathlib import Path
 
-USER_AGENT = "Mozilla/5.0 (compatible; RRT-BatchBuilder/1.3; +public-web-research)"
+USER_AGENT = "Mozilla/5.0 (compatible; RRT-BatchBuilder/1.4; +public-web-research)"
 TIMEOUT = 8
 MAX_BYTES = 750_000
 
 BLOCKED_DOMAINS = {
-    "facebook.com", "instagram.com", "linkedin.com", "youtube.com",
-    "wikipedia.org"
+    "instagram.com", "linkedin.com", "youtube.com", "wikipedia.org"
 }
 
-REVIEW_DOMAINS = [
-    "google.com",
-    "miodottore.it",
-    "paginegialle.it",
-    "trustpilot.com",
-    "trustpilot.it",
-    "dentisti-italia.it",
-    "yelp.it",
-    "yelp.com",
-    "facebook.com",
-]
+# Dentale v1: massimo 10 fonti, ordinate per priorita' operativa.
+REVIEW_DOMAINS_BY_VERTICAL = {
+    "dentale": [
+        "google.com",
+        "miodottore.it",
+        "paginegialle.it",
+        "facebook.com",
+        "trustpilot.com",
+        "dentisti-italia.it",
+        "yelp.it",
+        "doctolib.it",
+        "guidamedicina.it",
+        "whatclinic.com",
+    ],
+}
 
 VERTICAL_TERMS = {
     "dentale": [
@@ -121,18 +124,23 @@ def search_query(query):
     return "none", []
 
 
+def review_domains(vertical):
+    return REVIEW_DOMAINS_BY_VERTICAL.get(vertical, [])[:10]
+
+
 def review_queries(area, vertical):
     terms = VERTICAL_TERMS.get(vertical, [vertical])
+    domains = review_domains(vertical)
     queries = []
     for term in terms:
         queries.append(f'{term} {area} recensioni')
-        for domain in REVIEW_DOMAINS:
+        for domain in domains:
             queries.append(f'site:{domain} {term} {area}')
     return queries
 
 
-def infer_source(domain):
-    for review_domain in REVIEW_DOMAINS:
+def infer_source(domain, vertical):
+    for review_domain in review_domains(vertical):
         if domain == review_domain or domain.endswith("." + review_domain):
             return review_domain
     return "official_or_other"
@@ -150,7 +158,7 @@ def discover_area(area, limit, vertical):
             if not domain or url in seen_urls:
                 continue
             seen_urls.add(url)
-            review_source = infer_source(domain)
+            review_source = infer_source(domain, vertical)
             if review_source == "official_or_other" and not allowed_domain(domain):
                 continue
             out.append({
@@ -170,7 +178,7 @@ def discover_area(area, limit, vertical):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="RRT free batch builder with review-source harvesting")
+    ap = argparse.ArgumentParser(description="RRT free batch builder with top-10 review-source harvesting")
     ap.add_argument("output_csv")
     ap.add_argument("--areas", default="Milano Navigli,Roma Prati,Torino Crocetta,Genova Albaro,Bologna Centro")
     ap.add_argument("--target", type=int, default=100)
@@ -181,6 +189,9 @@ def main():
     if not areas:
         print("Nessuna area specificata")
         return 2
+
+    domains = review_domains(args.vertical)
+    print("Review portals (max 10): " + " | ".join(domains))
 
     per_area = max(5, (args.target + len(areas) - 1) // len(areas))
     rows, seen = [], set()
