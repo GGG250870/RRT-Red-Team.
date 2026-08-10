@@ -20,7 +20,9 @@ def load_deep_scan_spec(repo_root: Path):
 
 
 def extract_a3_output(record):
-    return (((record or {}).get("result") or {}).get("output") or {})
+    result = (record or {}).get("result") or {}
+    output = result.get("output")
+    return output if isinstance(output, dict) else {}
 
 
 def is_repair_output(record):
@@ -36,10 +38,8 @@ def audit_gate_decision(a4_output):
 
     if verdict != "PASS":
         return False, "AUDIT_VERDICT_NOT_PASS"
-
     if state == "PASS":
         return True, "PASS"
-
     if state != "COLLECTION_RESTRICTED":
         return False, "AUDIT_STATE_BLOCKING"
 
@@ -76,13 +76,15 @@ def main():
 
     baseline_candidates = [o for o in a3_outputs if not is_repair_output(o)]
     repair_candidates = [o for o in a3_outputs if is_repair_output(o)]
-    baseline_a3 = baseline_candidates[-1] if baseline_candidates else a3_outputs[0]
-    latest_repair = repair_candidates[-1] if repair_candidates else None
+    baseline_record = baseline_candidates[-1] if baseline_candidates else a3_outputs[0]
+    repair_record = repair_candidates[-1] if repair_candidates else None
+    baseline_output = extract_a3_output(baseline_record)
+    repair_output = extract_a3_output(repair_record) if repair_record else None
 
     audited_input = {
-        "baseline_deep_scan": baseline_a3,
-        "repair_overlay": latest_repair,
-        "merge_rule": "Audit baseline D1-D5 plus latest repair. Repair overrides only evidence IDs and dimensions it explicitly repairs; baseline evidence remains valid unless explicitly downgraded, contradicted, or superseded. COLLECTION_RESTRICTED in repair must remain restricted and must not erase unrelated baseline PASS evidence."
+        "baseline_deep_scan_output": baseline_output,
+        "repair_overlay_output": repair_output,
+        "merge_rule": "Audit baseline D1-D5 plus latest repair. Repair overrides only evidence IDs and dimensions it explicitly repairs. Baseline D1/D2 remain valid unless explicitly downgraded, contradicted or superseded. COLLECTION_RESTRICTED remains restricted and never becomes positive evidence."
     }
 
     a4_payload = {
@@ -109,8 +111,9 @@ def main():
         "constraints": [
             "A4 may PASS, DOWNGRADE or REJECT but cannot add new evidence",
             "preserve unresolved and contradiction states",
-            "audit baseline and repair together using the supplied merge_rule",
-            "do not mark D1 or D2 unresolved merely because the repair overlay does not repeat them",
+            "audit baseline_deep_scan_output and repair_overlay_output together using merge_rule",
+            "baseline_deep_scan_output is authoritative for untouched D1/D2 evidence",
+            "repair_overlay_output supersedes only explicitly repaired evidence IDs",
             "evaluate D1-D5 against supplied target terms and pass conditions",
             "search-result snippets are weaker than acquired page content and may be downgraded",
             "do not certify SATURATED unless supplied trace demonstrates the protocol",
@@ -128,13 +131,7 @@ def main():
     a4_ok = a4_worker.get("returncode") == 0 and a4_parsed.get("status") == "PASS"
 
     if not a4_ok:
-        print(json.dumps({
-            "case_id": args.case_id,
-            "run_started_at": started_at,
-            "current_run_status": {"status": "BLOCKED", "reason": "A4_GATE_FAILED", "agents": {"A4_EVIDENCE_AUDITOR": {"returncode": a4_worker.get("returncode"), "status": a4_parsed.get("status")}}},
-            "result": a4_result,
-            "historical_store_status": orch.status()
-        }, ensure_ascii=False, indent=2))
+        print(json.dumps({"case_id": args.case_id, "run_started_at": started_at, "current_run_status": {"status": "BLOCKED", "reason": "A4_GATE_FAILED"}, "result": a4_result, "historical_store_status": orch.status()}, ensure_ascii=False, indent=2))
         return 1
 
     a4_output = ((a4_parsed.get("result") or {}).get("output") or {})
@@ -143,23 +140,7 @@ def main():
     audit_gate_pass, audit_gate_reason = audit_gate_decision(a4_output)
 
     if args.live and not audit_gate_pass:
-        print(json.dumps({
-            "case_id": args.case_id,
-            "run_started_at": started_at,
-            "current_run_status": {
-                "status": "BLOCKED",
-                "reason": "A4_AUDIT_NOT_CERTIFIED",
-                "gate_reason": audit_gate_reason,
-                "required_action": "REOPEN_A3_ON_DOWNGRADED_OR_UNRESOLVED_EVIDENCE",
-                "a4_verdict": a4_verdict,
-                "a4_state": a4_state,
-                "downgraded_evidence_ids": a4_output.get("downgraded_evidence_ids", []),
-                "unresolved": a4_output.get("unresolved", []),
-                "agents": {"A4_EVIDENCE_AUDITOR": {"returncode": a4_worker.get("returncode"), "status": a4_parsed.get("status")}}
-            },
-            "result": a4_result,
-            "historical_store_status": orch.status()
-        }, ensure_ascii=False, indent=2))
+        print(json.dumps({"case_id": args.case_id, "run_started_at": started_at, "current_run_status": {"status": "BLOCKED", "reason": "A4_AUDIT_NOT_CERTIFIED", "gate_reason": audit_gate_reason, "required_action": "REOPEN_A3_ON_DOWNGRADED_OR_UNRESOLVED_EVIDENCE", "a4_verdict": a4_verdict, "a4_state": a4_state, "downgraded_evidence_ids": a4_output.get("downgraded_evidence_ids", []), "unresolved": a4_output.get("unresolved", [])}, "result": a4_result, "historical_store_status": orch.status()}, ensure_ascii=False, indent=2))
         return 4
 
     latest_outputs = orch.store.outputs_for_case(args.case_id)
@@ -197,20 +178,7 @@ def main():
     combined.update(a4_result)
     combined.update(a5_result)
 
-    print(json.dumps({
-        "case_id": args.case_id,
-        "run_started_at": started_at,
-        "current_run_status": {
-            "status": "PASS" if a5_ok else "BLOCKED",
-            "audit_gate_reason": audit_gate_reason,
-            "agents": {
-                "A4_EVIDENCE_AUDITOR": {"returncode": a4_worker.get("returncode"), "status": a4_parsed.get("status")},
-                "A5_TARGET_MATCH": {"returncode": a5_worker.get("returncode"), "status": a5_parsed.get("status")}
-            }
-        },
-        "result": combined,
-        "historical_store_status": orch.status()
-    }, ensure_ascii=False, indent=2))
+    print(json.dumps({"case_id": args.case_id, "run_started_at": started_at, "current_run_status": {"status": "PASS" if a5_ok else "BLOCKED", "audit_gate_reason": audit_gate_reason, "agents": {"A4_EVIDENCE_AUDITOR": {"returncode": a4_worker.get("returncode"), "status": a4_parsed.get("status")}, "A5_TARGET_MATCH": {"returncode": a5_worker.get("returncode"), "status": a5_parsed.get("status")}}}, "result": combined, "historical_store_status": orch.status()}, ensure_ascii=False, indent=2))
     return 0 if a5_ok else 1
 
 
