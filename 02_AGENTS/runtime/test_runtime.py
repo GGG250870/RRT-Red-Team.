@@ -7,6 +7,7 @@ from granularity_loop import LoopPolicy, should_continue
 from llm_provider import LLMProvider, _normalize_url, MAX_OUTPUT_BY_AGENT
 from state_store import StateStore
 from wave2_a3_runner import load_deep_scan_spec
+from wave3_a4_a5_runner import extract_a3_output, is_repair_output
 
 
 def test_cost_control():
@@ -84,6 +85,20 @@ def test_wave3_dependency_guard():
         assert [o for o in s.outputs_for_case("NOCASE") if o.get("agent_id") == "A3_DEEP_SCAN"] == []
 
 
+def test_wave3_persisted_a3_extraction():
+    baseline = {
+        "agent_id": "A3_DEEP_SCAN",
+        "output": {"dimensions": {"D1": {"state": "PASS"}}, "saturation_state": "SATURATED"},
+    }
+    repair = {
+        "agent_id": "A3_DEEP_SCAN",
+        "output": {"repaired_evidence": [{"target": "E05", "state": "FOUND"}], "execution_trace": {"pages_checked": []}},
+    }
+    assert extract_a3_output(baseline).get("dimensions", {}).get("D1", {}).get("state") == "PASS"
+    assert not is_repair_output(baseline)
+    assert is_repair_output(repair)
+
+
 def main():
     tests = [
         test_cost_control,
@@ -94,6 +109,7 @@ def main():
         test_output_policy,
         test_deep_scan_spec_loading,
         test_wave3_dependency_guard,
+        test_wave3_persisted_a3_extraction,
     ]
     for test in tests:
         test()
