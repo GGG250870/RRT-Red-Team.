@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "batch": "04_calibration",
+  "tranche": "D",
+  "stage": "TARGET_MATCH_AND_BENCHMARK_FREEZE",
+  "frozen_at": "2026-08-10",
+  "selection_principle": "Benchmarks selected by same vertical and decision-job comparability before any Decision Loss calculation. No benchmark selected to maximize gap.",
+  "decision_jobs": {
+    "D1": "reduce fear/anxiety and perceived procedural risk",
+    "D2": "reduce economic friction through pricing/payment accessibility",
+    "D3": "increase confidence in advanced implantology/complex-case capability",
+    "D4": "reduce time-to-fixed-teeth through immediate-load/rapid rehabilitation proposition",
+    "D5": "increase trust and decision support through proof, team, service and CTA"
+  },
+  "cases": {
+    "B04-34": {
+      "company": "Centro Odontoiatrico Gioia",
+      "eligible_targets": ["D1","D2","D3","D4","D5"],
+      "target_match_state": "PASS",
+      "benchmark_candidates_frozen": [
+        {"benchmark_id":"BM-B04-D-001","company":"Savasta & Partners","official_domain":"https://studiosavasta.com/","fit_basis":["same dental vertical","implantology-led proposition","D1-D5 public decision support","advanced service proposition"],"geography":"Italy","fit_state":"HIGH"},
+        {"benchmark_id":"BM-B04-D-002","company":"Studio Dentistico Dott. Pietro Leone","official_domain":"https://www.studiodentisticoleone.it/","fit_basis":["same dental vertical","implantology-led proposition","D1-D5 public decision support","specialist team proposition"],"geography":"Italy","fit_state":"HIGH"}
+      ],
+      "benchmark_count": 2,
+      "benchmark_state": "FROZEN_PARTIAL_TOPSET",
+      "note": "Only two independent high-fit comparables are currently verified in the audited tranche. A third benchmark remains UNRESOLVED rather than being invented."
+    },
+    "B04-37": {
+      "company": "Studio Dentistico Dott. Pietro Leone",
+      "eligible_targets": ["D1","D2","D3","D4","D5"],
+      "target_match_state": "PASS",
+      "benchmark_candidates_frozen": [
+        {"benchmark_id":"BM-B04-D-003","company":"Centro Odontoiatrico Gioia","official_domain":"https://www.studio-gioia.it/","fit_basis":["same dental vertical","implantology-led proposition","D1-D5 public decision support","complex-case proposition"],"geography":"Italy","fit_state":"HIGH"},
+        {"benchmark_id":"BM-B04-D-004","company":"Savasta & Partners","official_domain":"https://studiosavasta.com/","fit_basis":["same dental vertical","implantology-led proposition","D1-D5 public decision support","advanced service proposition"],"geography":"Italy","fit_state":"HIGH"}
+      ],
+      "benchmark_count": 2,
+      "benchmark_state": "FROZEN_PARTIAL_TOPSET",
+      "note": "Only two independent high-fit comparables are currently verified in the audited tranche. A third benchmark remains UNRESOLVED rather than being invented."
+    },
+    "B04-48": {
+      "company": "Savasta & Partners",
+      "eligible_targets": ["D1","D2","D3","D4","D5"],
+      "target_match_state": "PASS",
+      "benchmark_candidates_frozen": [
+        {"benchmark_id":"BM-B04-D-005","company":"Centro Odontoiatrico Gioia","official_domain":"https://www.studio-gioia.it/","fit_basis":["same dental vertical","implantology-led proposition","D1-D5 public decision support","complex-case proposition"],"geography":"Italy","fit_state":"HIGH"},
+        {"benchmark_id":"BM-B04-D-006","company":"Studio Dentistico Dott. Pietro Leone","official_domain":"https://www.studiodentisticoleone.it/","fit_basis":["same dental vertical","implantology-led proposition","D1-D5 public decision support","specialist team proposition"],"geography":"Italy","fit_state":"HIGH"}
+      ],
+      "benchmark_count": 2,
+      "benchmark_state": "FROZEN_PARTIAL_TOPSET",
+      "note": "Only two independent high-fit comparables are currently verified in the audited tranche. A third benchmark remains UNRESOLVED rather than being invented."
+    }
+  },
+  "global_state": "TARGET_MATCH_PASS_BENCHMARK_FREEZE_PARTIAL",
+  "downstream_rule": "Decision Loss may proceed only against the frozen verified benchmark set. Missing third benchmark remains UNRESOLVED and cannot be synthesized or substituted post-gap."
+}
