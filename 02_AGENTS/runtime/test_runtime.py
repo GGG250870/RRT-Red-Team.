@@ -7,7 +7,7 @@ from granularity_loop import LoopPolicy, should_continue
 from llm_provider import LLMProvider, _normalize_url, MAX_OUTPUT_BY_AGENT
 from state_store import StateStore
 from wave2_a3_runner import load_deep_scan_spec
-from wave3_a4_a5_runner import extract_a3_output, is_repair_output
+from wave3_a4_a5_runner import extract_a3_output, is_repair_output, audit_gate_decision
 
 
 def test_cost_control():
@@ -99,6 +99,25 @@ def test_wave3_persisted_a3_extraction():
     assert is_repair_output(repair)
 
 
+def test_wave3_nonblocking_restrictions_gate():
+    a4 = {
+        "verdict": "DOWNGRADE",
+        "overall_state": "COLLECTION_RESTRICTED",
+        "dimensions": {
+            "D1": {"state": "PASS", "note": "supporto ufficiale"},
+            "D2": {"state": "PASS", "note": "supporto ufficiale"},
+            "D3": {"state": "PASS", "note": "supporto diretto"},
+            "D4": {"state": "DOWNGRADE", "note": "Supporto generale diretto disponibile, E08 resta non verificabile."},
+            "D5": {"state": "DOWNGRADE", "note": "E09-E10 restano validi; E11 resta limitata."},
+        },
+        "downgraded_evidence_ids": ["E08", "E11"],
+        "unresolved": [{"item": "E08"}, {"item": "E11"}],
+    }
+    ok, reason = audit_gate_decision(a4)
+    assert ok is True
+    assert reason == "PASS_WITH_NONBLOCKING_COLLECTION_RESTRICTIONS"
+
+
 def main():
     tests = [
         test_cost_control,
@@ -110,6 +129,7 @@ def main():
         test_deep_scan_spec_loading,
         test_wave3_dependency_guard,
         test_wave3_persisted_a3_extraction,
+        test_wave3_nonblocking_restrictions_gate,
     ]
     for test in tests:
         test()
