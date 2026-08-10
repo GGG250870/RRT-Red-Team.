@@ -35,7 +35,7 @@ REASONING_BY_AGENT={
 MAX_OUTPUT_BY_AGENT={
     "A1_DISCOVERY":2200,
     "A2_ENTITY_SCOPE":1600,
-    "A3_DEEP_SCAN":2400,
+    "A3_DEEP_SCAN":4200,
     "A4_EVIDENCE_AUDITOR":1800,
     "A5_TARGET_MATCH":1600,
     "A6_BENCHMARK":2200,
@@ -65,6 +65,15 @@ def _normalize_payload(payload):
     if "official_domain" in clean:
         clean["official_domain"]=_normalize_url(clean.get("official_domain"))
     return clean
+
+
+def _response_incomplete_reason(response):
+    details=getattr(response,"incomplete_details",None)
+    if not details:
+        return None
+    if isinstance(details, dict):
+        return details.get("reason") or str(details)
+    return getattr(details,"reason",None) or str(details)
 
 
 class LLMProvider:
@@ -146,12 +155,13 @@ class LLMProvider:
         if not text:
             text=str(response)
 
+        incomplete_reason=_response_incomplete_reason(response)
         try:
             parsed=json.loads(text)
             parse_status="PASS"
         except Exception:
             parsed={"raw_output":text}
-            parse_status="FAIL_JSON"
+            parse_status="TRUNCATED_JSON" if incomplete_reason in {"max_output_tokens","max_tokens"} else "FAIL_JSON"
 
         usage={}
         actual_cost_usd=0.0
@@ -175,6 +185,7 @@ class LLMProvider:
           "normalized_official_domain":payload.get("official_domain"),
           "response_id":getattr(response,"id",None),
           "parse_status":parse_status,
+          "incomplete_reason":incomplete_reason,
           "output":parsed,
           "usage":usage,
           "estimated_cost_usd":round(estimated_usd,6),
