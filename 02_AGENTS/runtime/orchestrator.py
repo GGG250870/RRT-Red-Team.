@@ -51,6 +51,8 @@ class Orchestrator:
         for aid in agent_ids:
             cmd=[sys.executable,str(self.runtime/"worker.py"),
                  "--agent",aid,"--db",str(self.db),"--registry",str(self.registry)]
+            if case_id:
+                cmd.extend(["--case-id",case_id])
             if live:
                 cmd.append("--live")
             procs.append((aid,subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)))
