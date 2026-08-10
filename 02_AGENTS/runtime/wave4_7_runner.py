@@ -1,0 +1,230 @@
+import argparse
+import json
+import time
+from pathlib import Path
+
+from orchestrator import Orchestrator
+
+SEQUENCE = [
+    ("A6_BENCHMARK", "BENCHMARK"),
+    ("A7_RED_TEAM", "RED_TEAM"),
+    ("A8_COMMERCIAL_GATE", "COMMERCIAL_GATE"),
+    ("A9_QA_ORCHESTRATOR", "QA_ORCHESTRATION"),
+]
+
+
+def parse_worker_stdout(worker_result):
+    raw = (worker_result or {}).get("stdout") or ""
+    try:
+        return json.loads(raw)
+    except Exception:
+        return {"status": "UNPARSEABLE", "raw": raw}
+
+
+def provider_output(record):
+    record = record or {}
+    if isinstance(record.get("output"), dict):
+        return record.get("output") or {}
+    nested = record.get("result") or {}
+    if isinstance(nested, dict) and isinstance(nested.get("output"), dict):
+        return nested.get("output") or {}
+    return {}
+
+
+def latest_agent_output(store, case_id, agent_id):
+    rows = [o for o in store.outputs_for_case(case_id) if o.get("agent_id") == agent_id]
+    return rows[-1] if rows else None
+
+
+def latest_a5(store, case_id):
+    return latest_agent_output(store, case_id, "A5_TARGET_MATCH")
+
+
+def stage_gate(agent_id, output):
+    if not output:
+        return False, "EMPTY_OUTPUT"
+
+    contradictions = output.get("contradictions") or []
+    if contradictions:
+        return False, "CONTRADICTIONS_PRESENT"
+
+    if agent_id == "A6_BENCHMARK":
+        state = output.get("overall_state") or output.get("state") or output.get("benchmark_state")
+        if state in {"BLOCKED", "REJECT", "CONTRADICTORY"}:
+            return False, f"A6_{state}"
+        benchmarks = output.get("benchmarks") or output.get("comparables") or output.get("top_comparables")
+        if not benchmarks and state not in {"UNRESOLVED", "COLLECTION_RESTRICTED"}:
+            return False, "A6_NO_BENCHMARKS"
+        return True, "PASS"
+
+    if agent_id == "A7_RED_TEAM":
+        verdict = output.get("verdict") or output.get("outcome") or output.get("state")
+        if verdict == "FALSIFIED":
+            return False, "A7_FALSIFIED"
+        if verdict not in {"SURVIVES", "WEAK_SURVIVAL"}:
+            return False, "A7_UNCERTIFIED"
+        return True, verdict
+
+    if agent_id == "A8_COMMERCIAL_GATE":
+        signal = output.get("signal_class") or output.get("classification") or output.get("state")
+        allowed = {"NO_SIGNAL", "WATCHLIST", "OPPORTUNITY_SIGNAL_CANDIDATE"}
+        if signal not in allowed:
+            return False, "A8_INVALID_SIGNAL_CLASS"
+        return True, signal
+
+    if agent_id == "A9_QA_ORCHESTRATOR":
+        verdict = output.get("verdict") or output.get("state") or output.get("overall_state")
+        return (verdict == "READY"), (verdict or "A9_UNCERTIFIED")
+
+    return False, "UNKNOWN_AGENT"
+
+
+def build_payload(agent_id, case_id, upstream, a5_record):
+    a5_output = provider_output(a5_record)
+    common = {
+        "case_id": case_id,
+        "source_of_truth": "persisted_agent_outputs",
+        "constraints": [
+            "Never invent missing facts.",
+            "Preserve COLLECTION_RESTRICTED, UNRESOLVED, CONTRADICTORY and rejected evidence states.",
+            "Do not resurrect E08 or E11 as positive evidence for B04-34 unless a later audited source explicitly supersedes their restriction.",
+            "Do not infer ROI, lost revenue, lost leads, conversion loss or economic causality without explicit audited evidence.",
+            "Return compact JSON only."
+        ]
+    }
+
+    if agent_id == "A6_BENCHMARK":
+        return {
+            **common,
+            "purpose": "freeze defensible comparable benchmark before gap evaluation",
+            "target_match": a5_output,
+            "requirements": [
+                "Use same vertical and same decision job.",
+                "Freeze benchmark selection before interpreting any gap.",
+                "Keep top comparables, fit_basis, scope_warnings and source provenance.",
+                "Prefer official/publicly verifiable sources; web search is allowed for A6.",
+                "If comparability is insufficient, return UNRESOLVED rather than choosing a convenient competitor."
+            ]
+        }
+
+    if agent_id == "A7_RED_TEAM":
+        return {
+            **common,
+            "purpose": "attempt to falsify candidate gaps before commercial use",
+            "target_match": a5_output,
+            "benchmark_output": provider_output(upstream["A6_BENCHMARK"]),
+            "requirements": [
+                "Act independently from benchmark selection.",
+                "Search for alternative explanations, scope errors, prominence/discoverability confusion and overclaim.",
+                "No web tool: falsify only from persisted audited material and benchmark packet.",
+                "Return one of FALSIFIED, SURVIVES, WEAK_SURVIVAL plus concise reasons and unresolved items."
+            ]
+        }
+
+    if agent_id == "A8_COMMERCIAL_GATE":
+        return {
+            **common,
+            "purpose": "classify commercial signal conservatively after red-team",
+            "target_match": a5_output,
+            "benchmark_output": provider_output(upstream["A6_BENCHMARK"]),
+            "red_team_output": provider_output(upstream["A7_RED_TEAM"]),
+            "requirements": [
+                "Allowed classes only: NO_SIGNAL, WATCHLIST, OPPORTUNITY_SIGNAL_CANDIDATE.",
+                "Do not promote a falsified finding.",
+                "Do not convert COLLECTION_RESTRICTED evidence into a positive signal.",
+                "Separate observable evidence, hypothesis and commercial question."
+            ]
+        }
+
+    if agent_id == "A9_QA_ORCHESTRATOR":
+        return {
+            **common,
+            "purpose": "final cross-agent consistency and provenance QA",
+            "a5_target_match": a5_output,
+            "a6_benchmark": provider_output(upstream["A6_BENCHMARK"]),
+            "a7_red_team": provider_output(upstream["A7_RED_TEAM"]),
+            "a8_commercial_gate": provider_output(upstream["A8_COMMERCIAL_GATE"]),
+            "requirements": [
+                "Return READY or BLOCKED only.",
+                "Do not silently rewrite upstream outputs.",
+                "Emit conflict_ledger and unresolved_states.",
+                "Block on provenance breaks, resurrected restricted evidence, unsupported economic inference or cross-agent contradictions."
+            ]
+        }
+
+    raise ValueError(agent_id)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--case-id", required=True)
+    ap.add_argument("--live", action="store_true")
+    ap.add_argument("--resume", action="store_true")
+    args = ap.parse_args()
+
+    runtime = Path(__file__).resolve().parent
+    orch = Orchestrator(runtime)
+    started_at = time.time()
+
+    a5_record = latest_a5(orch.store, args.case_id)
+    if not a5_record:
+        print(json.dumps({"case_id": args.case_id, "current_run_status": {"status": "BLOCKED", "reason": "NO_A5_OUTPUT"}}, ensure_ascii=False, indent=2))
+        return 2
+
+    upstream = {}
+    stage_results = {}
+
+    for agent_id, stage in SEQUENCE:
+        if args.resume:
+            existing = latest_agent_output(orch.store, args.case_id, agent_id)
+            existing_output = provider_output(existing) if existing else {}
+            ok, reason = stage_gate(agent_id, existing_output) if existing else (False, "NO_EXISTING_OUTPUT")
+            if existing and ok:
+                upstream[agent_id] = existing
+                stage_results[agent_id] = {"status": "REUSED", "gate_reason": reason}
+                continue
+
+        payload = build_payload(agent_id, args.case_id, upstream, a5_record)
+        orch.enqueue_agent_task(args.case_id, agent_id, stage, payload)
+        result = orch.run_agents_parallel([agent_id], live=args.live, case_id=args.case_id)
+        worker = result.get(agent_id, {})
+        parsed = parse_worker_stdout(worker)
+        technical_ok = worker.get("returncode") == 0 and parsed.get("status") == "PASS"
+        if not technical_ok:
+            print(json.dumps({
+                "case_id": args.case_id,
+                "run_started_at": started_at,
+                "current_run_status": {"status": "BLOCKED", "stage": agent_id, "reason": "TECHNICAL_STAGE_FAILURE"},
+                "result": result,
+                "historical_store_status": orch.status()
+            }, ensure_ascii=False, indent=2))
+            return 3
+
+        persisted = latest_agent_output(orch.store, args.case_id, agent_id)
+        output = provider_output(persisted)
+        gate_ok, gate_reason = stage_gate(agent_id, output)
+        stage_results[agent_id] = {"status": "PASS" if gate_ok else "BLOCKED", "gate_reason": gate_reason, "worker": result.get(agent_id)}
+        upstream[agent_id] = persisted
+
+        if not gate_ok:
+            print(json.dumps({
+                "case_id": args.case_id,
+                "run_started_at": started_at,
+                "current_run_status": {"status": "BLOCKED", "stage": agent_id, "reason": gate_reason},
+                "stages": stage_results,
+                "historical_store_status": orch.status()
+            }, ensure_ascii=False, indent=2))
+            return 4
+
+    print(json.dumps({
+        "case_id": args.case_id,
+        "run_started_at": started_at,
+        "current_run_status": {"status": "PASS", "final_stage": "A9_QA_ORCHESTRATOR", "qa_state": stage_results.get("A9_QA_ORCHESTRATOR", {}).get("gate_reason")},
+        "stages": stage_results,
+        "historical_store_status": orch.status()
+    }, ensure_ascii=False, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
