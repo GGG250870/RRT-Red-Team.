@@ -1,0 +1,130 @@
+{
+  "version": "1.0",
+  "batch": "04_calibration",
+  "tranche": "D",
+  "observed_at": "2026-08-10",
+  "method": "Atomic evidence pack built from verified official-domain public sources. No missing value is converted to zero.",
+  "cases": {
+    "B04-34": {
+      "company": "Centro Odontoiatrico Gioia",
+      "official_domain": "https://www.studio-gioia.it/",
+      "entity_state": "VERIFIED_OFFICIAL_DOMAIN",
+      "targets": {
+        "D1": {
+          "state": "FOUND",
+          "evidence": [
+            {"evidence_id":"EV-B04-34-D1-001","source_url":"https://www.studio-gioia.it/specializzazioni/trattamenti-generali/paura-del-dentista.html","claim":"Sedazione cosciente esplicitamente proposta per pazienti ansiosi/odontofobici.","level":"A_OBSERVABLE"},
+            {"evidence_id":"EV-B04-34-D1-002","source_url":"https://www.studio-gioia.it/specializzazioni/implantologia-dentale/implantologia-per-odontofobici.html","claim":"Percorso dedicato all'odontofobia con sedazione cosciente e sedazione profonda.","level":"A_OBSERVABLE"}
+          ]
+        },
+        "D2": {
+          "state": "FOUND",
+          "evidence": [
+            {"evidence_id":"EV-B04-34-D2-001","source_url":"https://www.studio-gioia.it/lo-studio/pianifica-e-trasparenza.html","claim":"Pagamento anticipato con sconto 5%, tranche mensili, finanziamento senza interessi fino a 18 mesi, agevolato fino a 60 mesi e Pagodil fino a 5000 euro/12 mesi.","level":"A_OBSERVABLE"}
+          ]
+        },
+        "D3": {
+          "state": "FOUND",
+          "evidence": [
+            {"evidence_id":"EV-B04-34-D3-001","source_url":"https://www.studio-gioia.it/impianti-dentali.html","claim":"Implantologia computer-guidata, imaging 3D, scanner e gestione di casi complessi con poco osso.","level":"A_OBSERVABLE"}
+          ]
+        },
+        "D4": {
+          "state": "FOUND",
+          "evidence": [
+            {"evidence_id":"EV-B04-34-D4-001","source_url":"https://www.studio-gioia.it/specializzazioni/implantologia-dentale/implantologia-per-odontofobici.html","claim":"Carico immediato: denti fissi provvisori inseriti insieme agli impianti nella maggior parte dei casi.","level":"A_OBSERVABLE"},
+            {"evidence_id":"EV-B04-34-D4-002","source_url":"https://www.studio-gioia.it/impianti-dentali.html","claim":"Denti fissi con un solo intervento e tempi ridotti tramite tecniche computer-guidate.","level":"A_OBSERVABLE"}
+          ]
+        },
+        "D5": {
+          "state": "FOUND",
+          "evidence": [
+            {"evidence_id":"EV-B04-34-D5-001","source_url":"https://www.studio-gioia.it/","claim":"Casi clinici, staff specialistico, modalità di pagamento agevolate, CTA e messaggi di supporto/continuità del percorso.","level":"A_OBSERVABLE"}
+          ]
+        }
+      },
+      "saturation_pre_audit": "SATURATED_MULTI_TARGET"
+    },
+    "B04-37": {
+      "company": "Studio Dentistico Dott. Pietro Leone",
+      "official_domain": "https://www.studiodentisticoleone.it/",
+      "entity_state": "VERIFIED_OFFICIAL_DOMAIN",
+      "targets": {
+        "D1": {
+          "state": "FOUND",
+          "evidence": [
+            {"evidence_id":"EV-B04-37-D1-001","source_url":"https://www.studiodentisticoleone.it/terapie/implantologia.html","claim":"Sedazione cosciente dichiarata come soluzione per ridurre al minimo l'ansia durante l'intervento.","level":"A_OBSERVABLE"},
+            {"evidence_id":"EV-B04-37-D1-002","source_url":"https://www.studiodentisticoleone.it/staff.html","claim":"Presenza nel team di anestesista dedicato a sedazione cosciente/analgesia sedativa.","level":"A_OBSERVABLE"}
+          ]
+        },
+        "D2": {
+          "state": "FOUND",
+          "evidence": [
+            {"evidence_id":"EV-B04-37-D2-001","source_url":"https://www.studiodentisticoleone.it/terapie/implantologia.html","claim":"Soluzioni flessibili e pagamenti rateizzati dichiarati esplicitamente.","level":"A_OBSERVABLE"}
+          ]
+        },
+        "D3": {
+          "state": "FOUND",
+          "evidence": [
+            {"evidence_id":"EV-B04-37-D3-001","source_url":"https://www.studiodentisticoleone.it/terapie/implantologia.html","claim":"Implantologia a carico immediato, strumentazioni moderne e computerizzate, trattamento di casi complessi anche con poco osso.","level":"A_OBSERVABLE"},
+            {"evidence_id":"EV-B04-37-D3-002","source_url":"https://www.studiodentisticoleone.it/staff.html","claim":"Team con specialista in implantologia e tecniche rigenerative avanzate.","level":"A_OBSERVABLE"}
+          ]
+        },
+        "D4": {
+          "state": "FOUND",
+          "evidence": [
+            {"evidence_id":"EV-B04-37-D4-001","source_url":"https://www.studiodentisticoleone.it/terapie/implantologia.html","claim":"Possibilità di riabilitare un'intera arcata nell'arco di una sola giornata; carico immediato come scelta primaria quando clinicamente possibile.","level":"A_OBSERVABLE"}
+          ]
+        },
+        "D5": {
+          "state": "FOUND",
+          "evidence": [
+            {"evidence_id":"EV-B04-37-D5-001","source_url":"https://www.studiodentisticoleone.it/","claim":"Percorso di cura in tre passaggi, piano di cure visivo, supporto continuativo e videorecensioni/recensioni.","level":"A_OBSERVABLE"}
+          ]
+        }
+      },
+      "saturation_pre_audit": "SATURATED_MULTI_TARGET"
+    },
+    "B04-48": {
+      "company": "Savasta & Partners",
+      "official_domain": "https://studiosavasta.com/",
+      "entity_state": "VERIFIED_OFFICIAL_DOMAIN",
+      "targets": {
+        "D1": {
+          "state": "FOUND",
+          "evidence": [
+            {"evidence_id":"EV-B04-48-D1-001","source_url":"https://studiosavasta.com/","claim":"Anestesista esperto e sedazione avanzata presentati come soluzione a dolore e ansia.","level":"A_OBSERVABLE"},
+            {"evidence_id":"EV-B04-48-D1-002","source_url":"https://studiosavasta.com/trattamenti-generali/","claim":"Protocollo Anti-Paura dedicato all'ansia del dentista.","level":"A_OBSERVABLE"}
+          ]
+        },
+        "D2": {
+          "state": "FOUND",
+          "evidence": [
+            {"evidence_id":"EV-B04-48-D2-001","source_url":"https://studiosavasta.com/","claim":"Dilazioni e finanziamenti a tasso zero dichiarati esplicitamente.","level":"A_OBSERVABLE"}
+          ]
+        },
+        "D3": {
+          "state": "FOUND",
+          "evidence": [
+            {"evidence_id":"EV-B04-48-D3-001","source_url":"https://studiosavasta.com/","claim":"Team di oltre 30 professionisti e offerta implantologica avanzata.","level":"A_OBSERVABLE"},
+            {"evidence_id":"EV-B04-48-D3-002","source_url":"https://studiosavasta.com/trattamenti-generali/","claim":"Protocollo Toronto per implantologia e gestione anche di casi con poco osso.","level":"A_OBSERVABLE"}
+          ]
+        },
+        "D4": {
+          "state": "FOUND",
+          "evidence": [
+            {"evidence_id":"EV-B04-48-D4-001","source_url":"https://studiosavasta.com/trattamenti-generali/","claim":"Denti fissi, naturali e sicuri in 24 ore secondo il Protocollo Toronto.","level":"A_OBSERVABLE"}
+          ]
+        },
+        "D5": {
+          "state": "FOUND",
+          "evidence": [
+            {"evidence_id":"EV-B04-48-D5-001","source_url":"https://studiosavasta.com/","claim":"Orari estesi, navetta, team numeroso, CTA e proposition differenziate per esigenze specifiche.","level":"A_OBSERVABLE"}
+          ]
+        }
+      },
+      "saturation_pre_audit": "SATURATED_MULTI_TARGET"
+    }
+  },
+  "audit_status": "READY_FOR_SATURATION_REAUDIT"
+}
