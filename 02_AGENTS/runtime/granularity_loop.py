@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -8,7 +9,7 @@ class LoopPolicy:
     stop_on_terminal: bool = True
 
 
-def should_continue(iteration: int, terminal_state: bool, unresolved_material: int, new_material_evidence: int, policy: LoopPolicy | None = None):
+def should_continue(iteration: int, terminal_state: bool, unresolved_material: int, new_material_evidence: int, policy: Optional[LoopPolicy] = None):
     policy = policy or LoopPolicy()
     if policy.stop_on_terminal and terminal_state:
         return False, "TERMINAL_STATE"
