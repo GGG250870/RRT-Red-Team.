@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import base64
 import csv
 import re
 import urllib.parse
@@ -8,17 +7,19 @@ import urllib.request
 from html import unescape
 from pathlib import Path
 
-USER_AGENT = "Mozilla/5.0 (compatible; RRT-BatchBuilder/1.6; +public-web-research)"
+USER_AGENT = "Mozilla/5.0 (compatible; RRT-BatchBuilder/2.0; +public-web-research)"
 TIMEOUT = 8
-MAX_BYTES = 750_000
+MAX_BYTES = 1_000_000
 
-BLOCKED_DOMAINS = {
-    "instagram.com", "linkedin.com", "youtube.com", "wikipedia.org",
-    "bing.com", "zhihu.com", "treccani.it", "shopify.com", "salehoo.com",
-    "fluentcart.com", "hostadvice.com", "avada.io"
+PRIMARY_PORTALS_BY_VERTICAL = {
+    "dentale": [
+        ("miodottore.it", "https://www.miodottore.it/dentista/{area_slug}"),
+        ("dentisti-italia.it", "https://www.dentisti-italia.it/dentista-liguria/dentista-{area_slug}/"),
+        ("docdental.it", "https://docdental.it/cliniche-dentali/{area_slug}/"),
+    ]
 }
 
-ITALY_REVIEW_DOMAINS_BY_VERTICAL = {
+REVIEW_PORTALS_BY_VERTICAL = {
     "dentale": [
         "google.com",
         "miodottore.it",
@@ -33,27 +34,9 @@ ITALY_REVIEW_DOMAINS_BY_VERTICAL = {
     ],
 }
 
-VERTICAL_TERMS = {
-    "dentale": [
-        "studio dentistico",
-        "dentista",
-        "centro odontoiatrico",
-        "clinica dentale",
-        "implantologia dentale",
-        "ortodonzia",
-    ],
-}
-
 VERTICAL_HINTS = {
-    "dentale": ["dent", "odont", "implant", "ortodonz", "stomatolog", "oral", "dental"],
+    "dentale": ["dent", "odont", "implant", "ortodonz", "stomatolog", "dental"],
 }
-
-ITALY_HINTS = [
-    ".it", "italia", "italy", "liguria", "piemonte", "lombardia", "veneto", "toscana",
-    "emilia", "romagna", "lazio", "campania", "puglia", "sicilia", "sardegna", "calabria",
-    "abruzzo", "marche", "umbria", "molise", "basilicata", "friuli", "trentino", "alto adige",
-    "valle d'aosta"
-]
 
 
 def fetch(url):
@@ -67,6 +50,12 @@ def fetch(url):
         return None, None
 
 
+def slugify_area(area):
+    s = area.strip().lower()
+    s = re.sub(r"[^a-z0-9à-ÿ]+", "-", s)
+    return s.strip("-")
+
+
 def normalize_domain(url):
     if not url:
         return ""
@@ -75,150 +64,83 @@ def normalize_domain(url):
     return host[4:] if host.startswith("www.") else host
 
 
-def clean_title(title):
-    title = unescape(re.sub(r"\s+", " ", title or "")).strip(" -|–—")
-    return title[:160]
+def clean_text(value):
+    value = unescape(re.sub(r"(?s)<[^>]+>", " ", value or ""))
+    return re.sub(r"\s+", " ", value).strip()
 
 
-def decode_ddg_href(href):
-    href = unescape(href or "")
-    p = urllib.parse.urlparse(href)
-    qs = urllib.parse.parse_qs(p.query)
-    return qs.get("uddg", [href])[0]
+def looks_vertical(text, vertical):
+    hay = (text or "").lower()
+    return any(h in hay for h in VERTICAL_HINTS.get(vertical, [vertical.lower()]))
 
 
-def decode_bing_href(href):
-    href = unescape(href or "")
-    p = urllib.parse.urlparse(href)
-    if "bing.com" not in (p.netloc or "").lower():
-        return href
-    raw = urllib.parse.parse_qs(p.query).get("u", [""])[0]
-    if raw.startswith("a1"):
-        token = raw[2:]
-        try:
-            token += "=" * (-len(token) % 4)
-            decoded = base64.urlsafe_b64decode(token.encode()).decode("utf-8", errors="ignore")
-            if decoded.startswith("http"):
-                return decoded
-        except Exception:
-            pass
-    return ""
-
-
-def extract_ddg_results(html):
-    results = []
-    patterns = [
-        r'(?is)<a[^>]+class="[^"]*result__a[^"]*"[^>]+href="([^"]+)"[^>]*>(.*?)</a>',
-        r"(?is)<a[^>]+class='[^']*result__a[^']*'[^>]+href='([^']+)'[^>]*>(.*?)</a>",
-    ]
-    for pattern in patterns:
-        for m in re.finditer(pattern, html or ""):
-            href, title_html = m.groups()
-            title = clean_title(re.sub(r"(?s)<[^>]+>", " ", title_html))
-            results.append((title, decode_ddg_href(href)))
-    return results
-
-
-def extract_bing_results(html):
-    results = []
-    for m in re.finditer(r'(?is)<li[^>]+class="[^"]*b_algo[^"]*"[^>]*>.*?<h2[^>]*>\s*<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>', html or ""):
-        href, title_html = m.groups()
-        target = decode_bing_href(href)
-        if target:
-            title = clean_title(re.sub(r"(?s)<[^>]+>", " ", title_html))
-            results.append((title, target))
-    return results
-
-
-def search_query(query):
-    localized = query + " Italia"
-    attempts = [
-        ("ddg_html", "https://html.duckduckgo.com/html/?kl=it-it&q=" + urllib.parse.quote_plus(localized), extract_ddg_results),
-        ("ddg_lite", "https://lite.duckduckgo.com/lite/?kl=it-it&q=" + urllib.parse.quote_plus(localized), extract_ddg_results),
-        ("bing", "https://www.bing.com/search?cc=it&setlang=it&q=" + urllib.parse.quote_plus(localized), extract_bing_results),
-    ]
-    for source, url, parser in attempts:
-        _, html = fetch(url)
-        if not html:
-            continue
-        results = parser(html)
-        if results:
-            return source, results
-    return "none", []
-
-
-def review_domains(vertical):
-    return ITALY_REVIEW_DOMAINS_BY_VERTICAL.get(vertical, [])[:10]
-
-
-def infer_source(domain, vertical):
-    for review_domain in review_domains(vertical):
-        if domain == review_domain or domain.endswith("." + review_domain):
-            return review_domain
-    return "official_or_other"
-
-
-def is_italy_candidate(title, url, domain, area, vertical, review_source):
-    if not domain or any(domain == d or domain.endswith("." + d) for d in BLOCKED_DOMAINS):
-        return False
-    haystack = f"{title} {url} {domain} {area}".lower()
-    area_tokens = [t for t in re.findall(r"[a-zà-ÿ]+", area.lower()) if len(t) >= 4]
-    vertical_ok = any(h in haystack for h in VERTICAL_HINTS.get(vertical, [vertical.lower()]))
-    area_ok = not area_tokens or any(t in haystack for t in area_tokens)
-    if review_source != "official_or_other":
-        return area_ok and vertical_ok
-    italy_ok = domain.endswith(".it") or any(h in haystack for h in ITALY_HINTS) or area_ok
-    return italy_ok and area_ok and vertical_ok
-
-
-def review_queries(area, vertical):
-    terms = VERTICAL_TERMS.get(vertical, [vertical])
-    queries = []
-    for term in terms:
-        queries.append(f'{term} {area} recensioni')
-        for domain in review_domains(vertical):
-            queries.append(f'site:{domain} {term} {area}')
-    return queries
-
-
-def discover_area(area, limit, vertical):
-    terms = VERTICAL_TERMS.get(vertical, [vertical])
-    queries = [f"{term} {area}" for term in terms] + review_queries(area, vertical)
-    out, seen_urls = [], set()
-    for query in queries:
-        source, results = search_query(query)
-        accepted = 0
-        for title, url in results:
-            domain = normalize_domain(url)
-            review_source = infer_source(domain, vertical)
-            if not url or url in seen_urls or not is_italy_candidate(title, url, domain, area, vertical, review_source):
-                continue
-            seen_urls.add(url)
-            out.append({
-                "company": title or domain,
-                "domain": domain,
-                "source_url": url,
-                "area": area,
-                "city": area,
-                "country": "IT",
-                "vertical": vertical,
-                "discovery_source": source,
-                "review_source": review_source,
-                "discovery_query": query,
-            })
-            accepted += 1
-            if len(out) >= limit:
-                break
-        print(f"[DISCOVERY] {area} | {query} | source={source} | raw={len(results)} | accepted_it={accepted}")
-        if len(out) >= limit:
-            break
+def extract_links(html, base_url):
+    out = []
+    seen = set()
+    for href, label in re.findall(r'(?is)<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)</a>', html or ""):
+        url = urllib.parse.urljoin(base_url, unescape(href))
+        text = clean_text(label)
+        key = (url, text)
+        if key not in seen:
+            seen.add(key)
+            out.append((url, text))
     return out
 
 
+def discover_portal(area, vertical, portal, template, limit):
+    slug = slugify_area(area)
+    url = template.format(area_slug=slug)
+    final_url, html = fetch(url)
+    if not html:
+        print(f"[PORTAL] {portal} | {area} | fetch=FAIL")
+        return []
+
+    results = []
+    for link, label in extract_links(html, final_url or url):
+        hay = f"{label} {link} {area}".lower()
+        if area.lower() not in hay and slug not in link.lower():
+            continue
+        if not looks_vertical(hay, vertical):
+            continue
+        results.append({
+            "company": label or normalize_domain(link),
+            "domain": normalize_domain(link),
+            "source_url": link,
+            "area": area,
+            "city": area,
+            "country": "IT",
+            "vertical": vertical,
+            "discovery_source": "portal_direct",
+            "review_source": portal,
+            "discovery_query": url,
+        })
+        if len(results) >= limit:
+            break
+
+    print(f"[PORTAL] {portal} | {area} | fetch=OK | accepted={len(results)}")
+    return results
+
+
+def discover_area(area, vertical, limit):
+    rows = []
+    seen = set()
+    portals = PRIMARY_PORTALS_BY_VERTICAL.get(vertical, [])
+    for portal, template in portals:
+        for row in discover_portal(area, vertical, portal, template, limit):
+            key = (row["company"].lower(), row["source_url"])
+            if key in seen:
+                continue
+            seen.add(key)
+            rows.append(row)
+            if len(rows) >= limit:
+                return rows
+    return rows
+
+
 def main():
-    ap = argparse.ArgumentParser(description="RRT Italy-only free batch builder")
+    ap = argparse.ArgumentParser(description="RRT Italy-only portal-first batch builder")
     ap.add_argument("output_csv")
-    ap.add_argument("--areas", default="Milano Navigli,Roma Prati,Torino Crocetta,Genova Albaro,Bologna Centro")
+    ap.add_argument("--areas", required=True)
     ap.add_argument("--target", type=int, default=100)
     ap.add_argument("--vertical", default="dentale")
     args = ap.parse_args()
@@ -229,18 +151,21 @@ def main():
         return 2
 
     print("COUNTRY_SCOPE: ITALIA ONLY")
-    print("Review portals (max 10): " + " | ".join(review_domains(args.vertical)))
+    print("DISCOVERY_MODE: PORTAL_FIRST")
+    print("Primary portals: " + " | ".join(p for p, _ in PRIMARY_PORTALS_BY_VERTICAL.get(args.vertical, [])))
+    print("Review portals (max 10): " + " | ".join(REVIEW_PORTALS_BY_VERTICAL.get(args.vertical, [])[:10]))
 
+    rows = []
+    seen = set()
     per_area = max(5, (args.target + len(areas) - 1) // len(areas))
-    rows, seen = [], set()
     for area in areas:
-        for row in discover_area(area, per_area * 4, args.vertical):
-            key = (row["company"].lower(), row["domain"], row["review_source"])
+        for row in discover_area(area, args.vertical, per_area * 3):
+            key = (row["company"].lower(), row["source_url"])
             if key in seen:
                 continue
             seen.add(key)
             rows.append(row)
-            print(f"[{len(rows)}/{args.target}] {area}: {row['company']} -> {row['domain']} [{row['review_source']}]")
+            print(f"[{len(rows)}/{args.target}] {area}: {row['company']} [{row['review_source']}]")
             if len(rows) >= args.target:
                 break
         if len(rows) >= args.target:
@@ -255,9 +180,8 @@ def main():
         writer.writerows(rows)
 
     print(f"Creati {len(rows)} record-source ITALIA in {path}")
-    print("Aree richieste: " + " | ".join(areas))
     if not rows:
-        print("DISCOVERY_EMPTY: nessuna fonte italiana/pubblica ha restituito prospect utilizzabili.")
+        print("DISCOVERY_EMPTY: nessun portale primario ha restituito prospect utilizzabili.")
         return 3
     if len(rows) < args.target:
         print("ATTENZIONE: target non raggiunto; il batch parziale resta valido.")
