@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+from typing import Optional
 
 
 DEFAULT_MODEL_PRICES = {
@@ -26,7 +27,7 @@ def estimate_cost_usd(model: str, input_tokens: int = 0, output_tokens: int = 0)
     )
 
 
-def check_call_budget(estimated_usd: float, policy: BudgetPolicy | None = None):
+def check_call_budget(estimated_usd: float, policy: Optional[BudgetPolicy] = None):
     policy = policy or BudgetPolicy()
     if estimated_usd > policy.per_call_usd:
         return False, f"Estimated call cost ${estimated_usd:.4f} exceeds per-call budget ${policy.per_call_usd:.4f}"
