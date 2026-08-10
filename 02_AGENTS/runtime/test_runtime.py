@@ -4,7 +4,7 @@ from pathlib import Path
 
 from cost_control import BudgetPolicy, check_call_budget, estimate_cost_usd
 from granularity_loop import LoopPolicy, should_continue
-from llm_provider import LLMProvider
+from llm_provider import LLMProvider, _normalize_url, MAX_OUTPUT_BY_AGENT
 from state_store import StateStore
 
 
@@ -54,12 +54,25 @@ def test_web_tool_routing():
     assert p._tools_for_agent("A7_RED_TEAM", {"official_domain": "https://www.example.com/"}) == []
 
 
+def test_url_normalization():
+    dirty = "[https://www.studio-gioia.it/](https://www.studio-gioia.it/)"
+    assert _normalize_url(dirty) == "https://www.studio-gioia.it/"
+    assert _normalize_url("https://www.studio-gioia.it/") == "https://www.studio-gioia.it/"
+
+
+def test_output_policy():
+    assert MAX_OUTPUT_BY_AGENT["A1_DISCOVERY"] >= 2000
+    assert MAX_OUTPUT_BY_AGENT["A2_ENTITY_SCOPE"] >= 1500
+
+
 def main():
     test_cost_control()
     test_loop_controller()
     test_state_store_roundtrip()
     test_web_tool_routing()
-    print(json.dumps({"status": "PASS", "tests": 4}))
+    test_url_normalization()
+    test_output_policy()
+    print(json.dumps({"status": "PASS", "tests": 6}))
 
 
 if __name__ == "__main__":
