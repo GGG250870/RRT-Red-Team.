@@ -32,6 +32,8 @@ REASONING_BY_AGENT={
     "A9_QA_ORCHESTRATOR":"high",
 }
 
+WEB_ENABLED_AGENTS={"A1_DISCOVERY","A2_ENTITY_SCOPE","A3_DEEP_SCAN","A6_BENCHMARK"}
+
 class LLMProvider:
     def __init__(self, dry_run=True):
         self.dry_run=dry_run
@@ -46,9 +48,28 @@ class LLMProvider:
             "live_ready": bool(OpenAI is not None and self.api_key),
         }
 
+    def _tools_for_agent(self, agent_id: str, payload: Dict[str,Any]):
+        if agent_id not in WEB_ENABLED_AGENTS:
+            return []
+        domain=payload.get("official_domain")
+        tool={"type":"web_search","search_context_size":"low"}
+        if domain:
+            try:
+                from urllib.parse import urlparse
+                host=urlparse(domain).netloc or domain
+                host=host.split(":")[0].strip().lower()
+                if host.startswith("www."):
+                    host=host[4:]
+                if host:
+                    tool["filters"]={"allowed_domains":[host]}
+            except Exception:
+                pass
+        return [tool]
+
     def run(self, agent_id: str, system_prompt: str, payload: Dict[str,Any]):
         model=os.getenv(f"RRT_MODEL_{agent_id}", MODEL_BY_AGENT.get(agent_id,"gpt-5.6-terra"))
         reasoning=REASONING_BY_AGENT.get(agent_id,"medium")
+        tools=self._tools_for_agent(agent_id,payload)
 
         if self.dry_run:
             return {
@@ -56,6 +77,7 @@ class LLMProvider:
               "agent_id":agent_id,
               "model_planned":model,
               "reasoning_effort_planned":reasoning,
+              "tools_planned":[t.get("type") for t in tools],
               "received_payload_keys":sorted(payload.keys()),
               "message":"Task accepted. Live OpenAI call not executed."
             }
@@ -71,13 +93,18 @@ class LLMProvider:
         if not allowed:
             raise RuntimeError(f"BUDGET_BLOCK: {reason}")
 
-        response=self.client.responses.create(
-            model=model,
-            reasoning={"effort":reasoning},
-            instructions=system_prompt,
-            input=user_input,
-            max_output_tokens=max_output_tokens,
-        )
+        kwargs={
+            "model":model,
+            "reasoning":{"effort":reasoning},
+            "instructions":system_prompt,
+            "input":user_input,
+            "max_output_tokens":max_output_tokens,
+        }
+        if tools:
+            kwargs["tools"]=tools
+            kwargs["tool_choice"]="auto"
+
+        response=self.client.responses.create(**kwargs)
 
         text=getattr(response,"output_text",None)
         if not text:
@@ -108,6 +135,7 @@ class LLMProvider:
           "agent_id":agent_id,
           "model":model,
           "reasoning_effort":reasoning,
+          "tools_enabled":[t.get("type") for t in tools],
           "response_id":getattr(response,"id",None),
           "parse_status":parse_status,
           "output":parsed,
