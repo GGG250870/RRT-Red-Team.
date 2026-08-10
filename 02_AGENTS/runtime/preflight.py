@@ -16,7 +16,8 @@ def main():
         "granularity_loop_exists": (runtime / "granularity_loop.py").exists(),
     }
 
-    readiness = LLMProvider(dry_run=False).readiness()
+    provider = LLMProvider(dry_run=False)
+    readiness = provider.readiness()
     checks.update(readiness)
 
     try:
@@ -25,6 +26,14 @@ def main():
         checks["registry_has_9_agents"] = len(agents) == 9
     except Exception:
         checks["registry_has_9_agents"] = False
+
+    try:
+        web_tools = provider._tools_for_agent("A1_DISCOVERY", {"official_domain": "https://example.com/"})
+        checks["web_search_routing_ready"] = bool(web_tools and web_tools[0].get("type") == "web_search")
+        checks["web_domain_filter_ready"] = bool(web_tools and web_tools[0].get("filters",{}).get("allowed_domains") == ["example.com"])
+    except Exception:
+        checks["web_search_routing_ready"] = False
+        checks["web_domain_filter_ready"] = False
 
     status = "PASS" if all(bool(v) for v in checks.values()) else "BLOCKED"
     print(json.dumps({"status": status, "checks": checks}, ensure_ascii=False, indent=2))
