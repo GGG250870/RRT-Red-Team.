@@ -14,6 +14,11 @@ def parse_worker_stdout(worker_result):
         return {"status": "UNPARSEABLE", "raw": raw}
 
 
+def load_deep_scan_spec(repo_root: Path):
+    path = repo_root / "03_RULES" / "RRT_TARGET_SPECIFIC_DEEP_SCAN_SPEC_V1_1.json"
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--case-id", required=True)
@@ -21,6 +26,8 @@ def main():
     args = ap.parse_args()
 
     runtime = Path(__file__).resolve().parent
+    repo_root = runtime.parents[1]
+    spec = load_deep_scan_spec(repo_root)
     orch = Orchestrator(runtime)
     started_at = time.time()
 
@@ -38,9 +45,21 @@ def main():
         "case_id": args.case_id,
         "purpose": "controlled Wave 3 evidence audit",
         "audited_input": latest_a3,
+        "target_terms": spec.get("target_terms", {}),
+        "saturation_strategy": spec.get("saturation_strategy", []),
+        "saturation_pass_conditions": spec.get("saturation_pass_conditions", []),
+        "adaptive_query_budget": spec.get("adaptive_query_budget", {}),
+        "freshness_context": {
+            "audit_run_started_at": started_at,
+            "collection_is_current_runtime_run": True,
+            "rule": "Do not infer page freshness from collection time; distinguish collection timestamp from page publication/update timestamp."
+        },
         "constraints": [
             "A4 may PASS, DOWNGRADE or REJECT but cannot add new evidence",
             "preserve unresolved and contradiction states",
+            "evaluate D1-D5 against the supplied target_terms and pass conditions",
+            "search-result snippets are weaker than acquired page content and may be downgraded",
+            "do not certify SATURATED unless the supplied trace demonstrates the protocol",
             "no benchmark selection",
             "no economic inference",
         ],
@@ -66,6 +85,28 @@ def main():
         }, ensure_ascii=False, indent=2))
         return 1
 
+    a4_output = ((a4_parsed.get("result") or {}).get("output") or {})
+    a4_verdict = a4_output.get("verdict")
+    a4_state = a4_output.get("overall_state") or a4_output.get("final_saturation_state")
+    audit_gate_pass = a4_verdict == "PASS" and a4_state == "PASS"
+
+    if args.live and not audit_gate_pass:
+        print(json.dumps({
+            "case_id": args.case_id,
+            "run_started_at": started_at,
+            "current_run_status": {
+                "status": "BLOCKED",
+                "reason": "A4_AUDIT_NOT_CERTIFIED",
+                "required_action": "REOPEN_A3_ON_DOWNGRADED_OR_UNRESOLVED_EVIDENCE",
+                "a4_verdict": a4_verdict,
+                "a4_state": a4_state,
+                "agents": {"A4_EVIDENCE_AUDITOR": {"returncode": a4_worker.get("returncode"), "status": a4_parsed.get("status")}}
+            },
+            "result": a4_result,
+            "historical_store_status": orch.status(),
+        }, ensure_ascii=False, indent=2))
+        return 4
+
     latest_outputs = orch.store.outputs_for_case(args.case_id)
     a4_outputs = [o for o in latest_outputs if o.get("agent_id") == "A4_EVIDENCE_AUDITOR"]
     if not a4_outputs:
@@ -78,11 +119,13 @@ def main():
     latest_a4 = a4_outputs[-1]
     a5_payload = {
         "case_id": args.case_id,
-        "purpose": "controlled Wave 3 target match after evidence audit",
+        "purpose": "controlled Wave 3 target match after certified evidence audit",
         "audited_input": latest_a4,
+        "target_terms": spec.get("target_terms", {}),
         "constraints": [
             "A5 must use only A4-audited persisted evidence",
             "do not resurrect evidence downgraded or rejected by A4",
+            "map only against the supplied D1-D5 target definitions",
             "no benchmark selection",
             "no economic inference",
             "preserve unresolved and contradiction states",
