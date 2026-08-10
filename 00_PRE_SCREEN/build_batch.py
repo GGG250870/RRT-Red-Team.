@@ -7,15 +7,26 @@ import urllib.request
 from html import unescape
 from pathlib import Path
 
-USER_AGENT = "Mozilla/5.0 (compatible; RRT-BatchBuilder/1.2; +public-web-research)"
+USER_AGENT = "Mozilla/5.0 (compatible; RRT-BatchBuilder/1.3; +public-web-research)"
 TIMEOUT = 8
 MAX_BYTES = 750_000
 
 BLOCKED_DOMAINS = {
     "facebook.com", "instagram.com", "linkedin.com", "youtube.com",
-    "paginegialle.it", "miodottore.it", "doctolib.it", "yelp.it",
-    "tripadvisor.it", "wikipedia.org"
+    "wikipedia.org"
 }
+
+REVIEW_DOMAINS = [
+    "google.com",
+    "miodottore.it",
+    "paginegialle.it",
+    "trustpilot.com",
+    "trustpilot.it",
+    "dentisti-italia.it",
+    "yelp.it",
+    "yelp.com",
+    "facebook.com",
+]
 
 VERTICAL_TERMS = {
     "dentale": [
@@ -24,7 +35,7 @@ VERTICAL_TERMS = {
         "centro odontoiatrico",
         "clinica dentale",
         "implantologia dentale",
-        "ortodonzia"
+        "ortodonzia",
     ],
 }
 
@@ -110,25 +121,47 @@ def search_query(query):
     return "none", []
 
 
+def review_queries(area, vertical):
+    terms = VERTICAL_TERMS.get(vertical, [vertical])
+    queries = []
+    for term in terms:
+        queries.append(f'{term} {area} recensioni')
+        for domain in REVIEW_DOMAINS:
+            queries.append(f'site:{domain} {term} {area}')
+    return queries
+
+
+def infer_source(domain):
+    for review_domain in REVIEW_DOMAINS:
+        if domain == review_domain or domain.endswith("." + review_domain):
+            return review_domain
+    return "official_or_other"
+
+
 def discover_area(area, limit, vertical):
     terms = VERTICAL_TERMS.get(vertical, [vertical])
-    queries = [f"{term} {area}" for term in terms]
-    out, seen = [], set()
+    queries = [f"{term} {area}" for term in terms] + review_queries(area, vertical)
+    out, seen_urls = [], set()
     for query in queries:
         source, results = search_query(query)
         print(f"[DISCOVERY] {area} | {query} | source={source} | results={len(results)}")
         for title, url in results:
             domain = normalize_domain(url)
-            if not allowed_domain(domain) or domain in seen:
+            if not domain or url in seen_urls:
                 continue
-            seen.add(domain)
+            seen_urls.add(url)
+            review_source = infer_source(domain)
+            if review_source == "official_or_other" and not allowed_domain(domain):
+                continue
             out.append({
                 "company": title or domain,
                 "domain": domain,
+                "source_url": url,
                 "area": area,
                 "city": area,
                 "vertical": vertical,
                 "discovery_source": source,
+                "review_source": review_source,
                 "discovery_query": query,
             })
             if len(out) >= limit:
@@ -137,7 +170,7 @@ def discover_area(area, limit, vertical):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="RRT free batch builder with neighborhood-level targeting")
+    ap = argparse.ArgumentParser(description="RRT free batch builder with review-source harvesting")
     ap.add_argument("output_csv")
     ap.add_argument("--areas", default="Milano Navigli,Roma Prati,Torino Crocetta,Genova Albaro,Bologna Centro")
     ap.add_argument("--target", type=int, default=100)
@@ -152,12 +185,13 @@ def main():
     per_area = max(5, (args.target + len(areas) - 1) // len(areas))
     rows, seen = [], set()
     for area in areas:
-        for row in discover_area(area, per_area, args.vertical):
-            if row["domain"] in seen:
+        for row in discover_area(area, per_area * 4, args.vertical):
+            key = (row["company"].lower(), row["domain"], row["review_source"])
+            if key in seen:
                 continue
-            seen.add(row["domain"])
+            seen.add(key)
             rows.append(row)
-            print(f"[{len(rows)}/{args.target}] {area}: {row['company']} -> {row['domain']}")
+            print(f"[{len(rows)}/{args.target}] {area}: {row['company']} -> {row['domain']} [{row['review_source']}]")
             if len(rows) >= args.target:
                 break
         if len(rows) >= args.target:
@@ -165,16 +199,19 @@ def main():
 
     path = Path(args.output_csv)
     path.parent.mkdir(parents=True, exist_ok=True)
-    fields = ["company", "domain", "area", "city", "vertical", "discovery_source", "discovery_query"]
+    fields = [
+        "company", "domain", "source_url", "area", "city", "vertical",
+        "discovery_source", "review_source", "discovery_query"
+    ]
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
         writer.writerows(rows)
 
-    print(f"Creati {len(rows)} prospect in {path}")
+    print(f"Creati {len(rows)} record-source in {path}")
     print("Aree richieste: " + " | ".join(areas))
     if not rows:
-        print("DISCOVERY_EMPTY: nessuna SERP gratuita ha restituito prospect utilizzabili. Non eseguire il pre-screen.")
+        print("DISCOVERY_EMPTY: nessuna fonte pubblica ha restituito prospect utilizzabili. Non eseguire il pre-screen.")
         return 3
     if len(rows) < args.target:
         print("ATTENZIONE: target non raggiunto; il batch parziale resta comunque valido.")
