@@ -60,9 +60,6 @@ def audit_gate_decision(a4_output):
             return False, "DOWNGRADED_OUTSIDE_NONBLOCKING_ALLOWLIST"
         return False, "AUDIT_RESTRICTIONS_NOT_NONBLOCKING"
 
-    # Deterministic non-blocking exception: D4/D5 may be labelled DOWNGRADE by A4
-    # only because optional evidence E08/E11 could not be directly acquired.
-    # D1-D3 must remain PASS; D4/D5 must retain positive supporting evidence in A4 notes.
     if state in {"COLLECTION_RESTRICTED", "PARTIALLY_SATURATED"} and verdict in {"PASS", "DOWNGRADE"}:
         required_pass = {"D1", "D2", "D3"}
         if not all((dimensions.get(d) or {}).get("state") == "PASS" for d in required_pass):
@@ -207,15 +204,23 @@ def main():
     a5_payload = {
         "case_id": args.case_id,
         "purpose": "controlled Wave 3 target match after certified evidence audit",
-        "audited_input": latest_a4,
+        "audited_input": {
+            "a4_certification": a4_output,
+            "baseline_deep_scan": baseline_output,
+            "repair_overlay": repair_output,
+            "exclusion_rule": "A5 may inspect A3 evidence only to perform term-to-evidence mapping. A4 remains authoritative for admissibility. Any evidence downgraded, rejected, unresolved, or collection-restricted by A4 is excluded from positive matching."
+        },
         "target_terms": spec.get("target_terms", {}),
         "audit_gate_reason": audit_gate_reason,
         "constraints": [
-            "A5 must use only A4-audited persisted evidence",
+            "A5 must treat A4 certification as authoritative",
+            "A5 may inspect baseline and repair evidence only for granular term-to-evidence mapping",
             "do not resurrect evidence downgraded or rejected by A4",
             "preserve any COLLECTION_RESTRICTED evidence exactly as restricted",
             "non-blocking collection restrictions may not be promoted to positive target evidence",
             "E08 and E11 are excluded from positive target evidence when the gate passes with non-blocking collection restrictions",
+            "for each observed target dimension, cite the admissible evidence IDs and matched terms when present in the supplied A3 evidence",
+            "do not infer a matched term solely from A4 prose when the underlying A3 evidence is available",
             "map only against supplied D1-D5 target definitions",
             "no benchmark selection",
             "no economic inference",
