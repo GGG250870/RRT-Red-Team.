@@ -15,9 +15,9 @@ cd "$ROOT"
 export RRT_BUDGET_PER_CASE_USD="${RRT_BUDGET_PER_CASE_USD:-3.00}"
 
 printf '\n[RRT] Pull aggiornamenti...\n'
-# If only the launcher itself has local edits, preserve them automatically so
-# Git can fast-forward. Do not auto-stash unrelated project files.
-local_changes="$(git status --porcelain)"
+# Runtime state is intentionally local and ignored by Git. If only the launcher
+# itself has local edits, preserve them automatically so Git can fast-forward.
+local_changes="$(git status --porcelain --untracked-files=normal | grep -vE '^\?\? 02_AGENTS/runtime/state/' || true)"
 if [[ -n "$local_changes" ]]; then
   non_launcher="$(printf '%s\n' "$local_changes" | grep -vE '^.. rrt_run\.sh$' || true)"
   if [[ -n "$non_launcher" ]]; then
@@ -46,7 +46,15 @@ while (( attempt <= MAX_ATTEMPTS )); do
     exit 0
   fi
 
-  if grep -Eq 'TECHNICAL_STAGE_FAILURE|TRUNCATED_JSON|FAIL_JSON|Error code: 5(02|03|04|20)|retryable[^A-Za-z0-9]*(true|True)|rate limit|timeout|temporarily unavailable|connection error' "$tmpfile"; then
+  # Never retry budget or logical gate failures. These cannot heal by repetition.
+  if grep -Eq 'CASE_BUDGET_EXCEEDED|BUDGET_BLOCK|A6_(UNRESOLVED|COLLECTION_RESTRICTED|NO_BENCHMARKS|NO_FIT_BASIS)|A7_(FALSIFIED|UNCERTIFIED)|A8_INVALID_SIGNAL_CLASS|CONTRADICTIONS_PRESENT' "$tmpfile"; then
+    printf '\n[RRT] Blocco logico/budget: nessun retry automatico.\n'
+    rm -f "$tmpfile"
+    exit "$rc"
+  fi
+
+  # Retry only concrete transient/parse failures.
+  if grep -Eq 'TRUNCATED_JSON|FAIL_JSON|Error code: 5(02|03|04|20)|retryable[^A-Za-z0-9]*(true|True)|rate limit|timeout|temporarily unavailable|connection error' "$tmpfile"; then
     if (( attempt < MAX_ATTEMPTS )); then
       printf '\n[RRT] Errore tecnico recuperabile. Riprovo dal checkpoint tra %ss...\n' "$RETRY_DELAY"
       rm -f "$tmpfile"
@@ -59,7 +67,7 @@ while (( attempt <= MAX_ATTEMPTS )); do
     exit "$rc"
   fi
 
-  printf '\n[RRT] Blocco logico/non recuperabile: nessun retry automatico.\n'
+  printf '\n[RRT] Blocco non classificato: nessun retry automatico.\n'
   rm -f "$tmpfile"
   exit "$rc"
 done
