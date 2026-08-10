@@ -18,6 +18,8 @@ status: active
 - Creato [[01_ARCHITECTURE/RRT_GRANULAR_TRACEABILITY_STANDARD_V1]] per introdurre granularità atomica e tracciabilità end-to-end su prospect, evidence, target, search trace, benchmark, finding, Red Team, Commercial Gate, Signal, Human Review e Validation.
 - Definiti identificatori canonici, state machine estesa, temporal integrity, contradiction ledger, audit trail e Definition of Done per ogni blocco.
 - Aggiornato [[01_ARCHITECTURE/Integrated Knowledge Model]] alla v1.1 per rendere il Granular Traceability Standard parte ufficiale dell'architettura.
+- Creato `05_EVIDENCE/B04_TRANCHE_D_ATOMIC_EVIDENCE_PACK_V1.json`: evidence pack atomico per B04-34 Centro Odontoiatrico Gioia, B04-37 Studio Dentistico Dott. Pietro Leone e B04-48 Savasta & Partners, con evidence_id per D1-D5 e provenance su dominio ufficiale.
+- Creato `09_VALIDATION/RRT_BATCH_04_SATURATION_REAUDIT_TRANCHE_D_V1.json`: Saturation Evidence Re-Audit completato sui tre candidati; 3 PASS, 0 downgrade, 0 reject. I tre casi avanzano a Target Match e Benchmark Selection Freeze. Il PASS certifica la saturazione evidenziale, non una perdita economica.
 
 ## 2026-08-09
 - Repository GitHub inizializzato come vault Obsidian RRT.
