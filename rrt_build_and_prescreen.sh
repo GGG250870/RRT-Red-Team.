@@ -1,11 +1,12 @@
 #!/bin/zsh
 set -e
 TARGET="${1:-100}"
-BATCH="${2:-00_PRE_SCREEN/batch_dentale.csv}"
-RESULTS="${3:-00_PRE_SCREEN/batch_dentale_results.csv}"
-SHORTLIST="${4:-00_PRE_SCREEN/batch_dentale_shortlist.csv}"
+AREAS="${2:-Milano Navigli,Roma Prati,Torino Crocetta,Genova Albaro,Bologna Centro}"
+BATCH="${3:-00_PRE_SCREEN/batch_dentale.csv}"
+RESULTS="${4:-00_PRE_SCREEN/batch_dentale_results.csv}"
+SHORTLIST="${5:-00_PRE_SCREEN/batch_dentale_shortlist.csv}"
 
-python3 00_PRE_SCREEN/build_batch.py "$BATCH" --target "$TARGET"
+python3 00_PRE_SCREEN/build_batch.py "$BATCH" --target "$TARGET" --areas "$AREAS"
 python3 00_PRE_SCREEN/pre_screen.py "$BATCH" "$RESULTS"
 python3 - "$RESULTS" "$SHORTLIST" <<'PY'
 import csv, sys
