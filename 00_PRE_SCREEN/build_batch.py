@@ -7,13 +7,33 @@ import urllib.request
 from html import unescape
 from pathlib import Path
 
-USER_AGENT = "Mozilla/5.0 (compatible; RRT-BatchBuilder/1.1; +public-web-research)"
+USER_AGENT = "Mozilla/5.0 (compatible; RRT-BatchBuilder/1.2; +public-web-research)"
 TIMEOUT = 8
-MAX_BYTES = 500_000
+MAX_BYTES = 750_000
+
+BLOCKED_DOMAINS = {
+    "facebook.com", "instagram.com", "linkedin.com", "youtube.com",
+    "paginegialle.it", "miodottore.it", "doctolib.it", "yelp.it",
+    "tripadvisor.it", "wikipedia.org"
+}
+
+VERTICAL_TERMS = {
+    "dentale": [
+        "studio dentistico",
+        "dentista",
+        "centro odontoiatrico",
+        "clinica dentale",
+        "implantologia dentale",
+        "ortodonzia"
+    ],
+}
 
 
 def fetch(url):
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    req = urllib.request.Request(url, headers={
+        "User-Agent": USER_AGENT,
+        "Accept": "text/html,application/xhtml+xml"
+    })
     try:
         with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
             raw = resp.read(MAX_BYTES)
@@ -36,38 +56,81 @@ def clean_title(title):
     return title[:160]
 
 
-def extract_search_results(html):
+def allowed_domain(domain):
+    if not domain:
+        return False
+    return not any(domain == d or domain.endswith("." + d) for d in BLOCKED_DOMAINS)
+
+
+def decode_ddg_href(href):
+    href = unescape(href or "")
+    p = urllib.parse.urlparse(href)
+    qs = urllib.parse.parse_qs(p.query)
+    if "uddg" in qs:
+        return qs["uddg"][0]
+    return href
+
+
+def extract_ddg_results(html):
     results = []
-    for m in re.finditer(r'(?is)<a[^>]+class="[^"]*result__a[^"]*"[^>]+href="([^"]+)"[^>]*>(.*?)</a>', html or ""):
-        href, title_html = m.groups()
-        title = clean_title(re.sub(r"(?s)<[^>]+>", " ", title_html))
-        href = unescape(href)
-        p = urllib.parse.urlparse(href)
-        qs = urllib.parse.parse_qs(p.query)
-        if "uddg" in qs:
-            href = qs["uddg"][0]
-        results.append((title, href))
+    patterns = [
+        r'(?is)<a[^>]+class="[^"]*result__a[^"]*"[^>]+href="([^"]+)"[^>]*>(.*?)</a>',
+        r"(?is)<a[^>]+class='[^']*result__a[^']*'[^>]+href='([^']+)'[^>]*>(.*?)</a>",
+    ]
+    for pattern in patterns:
+        for m in re.finditer(pattern, html or ""):
+            href, title_html = m.groups()
+            title = clean_title(re.sub(r"(?s)<[^>]+>", " ", title_html))
+            results.append((title, decode_ddg_href(href)))
     return results
 
 
+def extract_bing_results(html):
+    results = []
+    for m in re.finditer(r'(?is)<li[^>]+class="[^"]*b_algo[^"]*"[^>]*>.*?<h2[^>]*>\s*<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>', html or ""):
+        href, title_html = m.groups()
+        title = clean_title(re.sub(r"(?s)<[^>]+>", " ", title_html))
+        results.append((title, unescape(href)))
+    return results
+
+
+def search_query(query):
+    attempts = [
+        ("ddg_html", "https://html.duckduckgo.com/html/?q=" + urllib.parse.quote_plus(query), extract_ddg_results),
+        ("ddg_lite", "https://lite.duckduckgo.com/lite/?q=" + urllib.parse.quote_plus(query), extract_ddg_results),
+        ("bing", "https://www.bing.com/search?q=" + urllib.parse.quote_plus(query), extract_bing_results),
+    ]
+    for source, url, parser in attempts:
+        _, html = fetch(url)
+        if not html:
+            continue
+        results = parser(html)
+        if results:
+            return source, results
+    return "none", []
+
+
 def discover_area(area, limit, vertical):
-    vertical_terms = {
-        "dentale": ["studio dentistico", "implantologia dentale", "centro odontoiatrico"],
-    }
-    terms = vertical_terms.get(vertical, [vertical])
+    terms = VERTICAL_TERMS.get(vertical, [vertical])
     queries = [f"{term} {area}" for term in terms]
     out, seen = [], set()
     for query in queries:
-        qurl = "https://html.duckduckgo.com/html/?q=" + urllib.parse.quote_plus(query)
-        _, html = fetch(qurl)
-        for title, url in extract_search_results(html):
+        source, results = search_query(query)
+        print(f"[DISCOVERY] {area} | {query} | source={source} | results={len(results)}")
+        for title, url in results:
             domain = normalize_domain(url)
-            if not domain or domain in seen:
-                continue
-            if any(x in domain for x in ["facebook.com", "instagram.com", "linkedin.com", "youtube.com", "paginegialle.it", "miodottore.it", "doctolib.it"]):
+            if not allowed_domain(domain) or domain in seen:
                 continue
             seen.add(domain)
-            out.append({"company": title or domain, "domain": domain, "area": area, "vertical": vertical})
+            out.append({
+                "company": title or domain,
+                "domain": domain,
+                "area": area,
+                "city": area,
+                "vertical": vertical,
+                "discovery_source": source,
+                "discovery_query": query,
+            })
             if len(out) >= limit:
                 return out
     return out
@@ -82,6 +145,10 @@ def main():
     args = ap.parse_args()
 
     areas = [a.strip() for a in args.areas.split(",") if a.strip()]
+    if not areas:
+        print("Nessuna area specificata")
+        return 2
+
     per_area = max(5, (args.target + len(areas) - 1) // len(areas))
     rows, seen = [], set()
     for area in areas:
@@ -98,15 +165,19 @@ def main():
 
     path = Path(args.output_csv)
     path.parent.mkdir(parents=True, exist_ok=True)
+    fields = ["company", "domain", "area", "city", "vertical", "discovery_source", "discovery_query"]
     with path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["company", "domain", "area", "vertical"])
+        writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
         writer.writerows(rows)
 
     print(f"Creati {len(rows)} prospect in {path}")
     print("Aree richieste: " + " | ".join(areas))
+    if not rows:
+        print("DISCOVERY_EMPTY: nessuna SERP gratuita ha restituito prospect utilizzabili. Non eseguire il pre-screen.")
+        return 3
     if len(rows) < args.target:
-        print("ATTENZIONE: target non raggiunto. Aggiungere aree/query o una fonte discovery alternativa.")
+        print("ATTENZIONE: target non raggiunto; il batch parziale resta comunque valido.")
     return 0
 
 
