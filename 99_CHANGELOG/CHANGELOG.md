@@ -15,6 +15,9 @@ status: active
 - Formalizzati gli stati `UNRESOLVED`, `NOT_FOUND_AFTER_PROTOCOL`, `COLLECTION_RESTRICTED`, `CONTRADICTORY`, `BLOCKED`; un dato mancante non viene trasformato automaticamente in zero.
 - Aggiornata HOME con il nuovo knowledge model integrato.
 - Stabilita la regola operativa ChatGPT ↔ GitHub ↔ Obsidian: GitHub è fonte persistente; prima di sovrascrivere si legge file+SHA; vengono persistiti solo avanzamenti consolidati.
+- Creato [[01_ARCHITECTURE/RRT_GRANULAR_TRACEABILITY_STANDARD_V1]] per introdurre granularità atomica e tracciabilità end-to-end su prospect, evidence, target, search trace, benchmark, finding, Red Team, Commercial Gate, Signal, Human Review e Validation.
+- Definiti identificatori canonici, state machine estesa, temporal integrity, contradiction ledger, audit trail e Definition of Done per ogni blocco.
+- Aggiornato [[01_ARCHITECTURE/Integrated Knowledge Model]] alla v1.1 per rendere il Granular Traceability Standard parte ufficiale dell'architettura.
 
 ## 2026-08-09
 - Repository GitHub inizializzato come vault Obsidian RRT.
