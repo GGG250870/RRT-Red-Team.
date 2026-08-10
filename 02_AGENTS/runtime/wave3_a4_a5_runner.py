@@ -20,8 +20,6 @@ def load_deep_scan_spec(repo_root: Path):
 
 
 def extract_a3_output(record):
-    # StateStore persists the provider result directly, so the useful payload
-    # is record["output"]. Keep a compatibility fallback for older nested records.
     record = record or {}
     if isinstance(record.get("output"), dict):
         return record.get("output") or {}
@@ -41,13 +39,7 @@ def audit_gate_decision(a4_output):
     state = a4_output.get("overall_state") or a4_output.get("final_saturation_state")
     dimensions = a4_output.get("dimensions") or {}
     unresolved = a4_output.get("unresolved") or []
-
-    if verdict != "PASS":
-        return False, "AUDIT_VERDICT_NOT_PASS"
-    if state == "PASS":
-        return True, "PASS"
-    if state != "COLLECTION_RESTRICTED":
-        return False, "AUDIT_STATE_BLOCKING"
+    downgraded = set(a4_output.get("downgraded_evidence_ids") or [])
 
     blocking_dimension_states = {"DOWNGRADE", "REJECT", "UNRESOLVED", "CONTRADICTORY"}
     for dim_id, dim in dimensions.items():
@@ -56,10 +48,24 @@ def audit_gate_decision(a4_output):
 
     allowed_restrictions = {"E08", "E11"}
     unresolved_items = {str((item or {}).get("item")) for item in unresolved}
+    restricted_only = unresolved_items.issubset(allowed_restrictions) and downgraded.issubset(allowed_restrictions)
+    all_dimensions_pass = bool(dimensions) and all((dim or {}).get("state") == "PASS" for dim in dimensions.values())
+
+    if verdict == "PASS" and state == "PASS":
+        return True, "PASS"
+
+    if all_dimensions_pass and restricted_only and state in {"COLLECTION_RESTRICTED", "PARTIALLY_SATURATED"} and verdict in {"PASS", "DOWNGRADE"}:
+        return True, "PASS_WITH_NONBLOCKING_COLLECTION_RESTRICTIONS"
+
+    if verdict not in {"PASS", "DOWNGRADE"}:
+        return False, "AUDIT_VERDICT_NOT_PASS"
+    if state not in {"PASS", "COLLECTION_RESTRICTED", "PARTIALLY_SATURATED"}:
+        return False, "AUDIT_STATE_BLOCKING"
     if unresolved_items and not unresolved_items.issubset(allowed_restrictions):
         return False, "UNRESOLVED_OUTSIDE_NONBLOCKING_ALLOWLIST"
-
-    return True, "PASS_WITH_NONBLOCKING_COLLECTION_RESTRICTIONS"
+    if downgraded and not downgraded.issubset(allowed_restrictions):
+        return False, "DOWNGRADED_OUTSIDE_NONBLOCKING_ALLOWLIST"
+    return False, "AUDIT_NOT_CERTIFIED"
 
 
 def main():
