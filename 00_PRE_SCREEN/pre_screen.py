@@ -16,26 +16,14 @@ TIMEOUT = 8
 MAX_BYTES = 750_000
 
 DIMENSIONS = {
-    "D1": [
-        r"sedazion", r"odontofob", r"ansia", r"paura", r"senza dolore", r"indolor", r"anestes", r"anestesiolog"
-    ],
-    "D2": [
-        r"finanzi", r"rate", r"rateizz", r"pagament", r"dilazion", r"costo", r"prezzo", r"preventivo"
-    ],
-    "D3": [
-        r"implantolog", r"impiant", r"tac", r"cbct", r"scanner", r"3d", r"chirurgia guidata", r"digitale", r"specialist", r"team", r"garanzia"
-    ],
-    "D4": [
-        r"carico immediato", r"24\s*ore", r"in un giorno", r"stessa giornata", r"same day", r"provvisor", r"all[- ]on[- ]4", r"all[- ]on[- ]four"
-    ],
-    "D5": [
-        r"perch[eé] scegliere", r"vantagg", r"testimonianz", r"recension", r"faq", r"garanzia", r"esperienza", r"dicono di noi"
-    ],
+    "D1": [r"sedazion", r"odontofob", r"ansia", r"paura", r"senza dolore", r"indolor", r"anestes", r"anestesiolog"],
+    "D2": [r"finanzi", r"rate", r"rateizz", r"pagament", r"dilazion", r"costo", r"prezzo", r"preventivo"],
+    "D3": [r"implantolog", r"impiant", r"tac", r"cbct", r"scanner", r"3d", r"chirurgia guidata", r"digitale", r"specialist", r"team", r"garanzia"],
+    "D4": [r"carico immediato", r"24\s*ore", r"in un giorno", r"stessa giornata", r"same day", r"provvisor", r"all[- ]on[- ]4", r"all[- ]on[- ]four"],
+    "D5": [r"perch[eé] scegliere", r"vantagg", r"testimonianz", r"recension", r"faq", r"garanzia", r"esperienza", r"dicono di noi"],
 }
 
-PAGE_HINTS = [
-    "implant", "servizi", "trattamenti", "tecnolog", "chi-siamo", "studio", "team", "faq", "recension", "testimon", "contatti", "sedaz", "finanzi"
-]
+PAGE_HINTS = ["implant", "servizi", "trattamenti", "tecnolog", "chi-siamo", "studio", "team", "faq", "recension", "testimon", "contatti", "sedaz", "finanzi"]
 
 CONTACT_PATTERNS = [
     re.compile(r"mailto:", re.I),
@@ -138,9 +126,11 @@ def score_row(website_live, pages_found, hits, contactability):
     return min(score, 100)
 
 
-def decision(score, website_live, observed_dims):
+def decision(score, website_live, observed_dims, fetch_state):
     if not website_live:
-        return "REJECT"
+        if fetch_state == "NO_DOMAIN":
+            return "REJECT"
+        return "COLLECTION_RESTRICTED"
     if score >= 70 and observed_dims >= 3:
         return "ESCALATE"
     if score >= 45 and observed_dims >= 2:
@@ -171,13 +161,7 @@ def scan(domain):
     hits = {d: count_hits(text, pats) for d, pats in DIMENSIONS.items()}
     contactability = sum(1 for p in CONTACT_PATTERNS if p.search(combined_html))
 
-    return {
-        "website_live": 1,
-        "fetch_state": "OK",
-        "pages_found": len(pages),
-        "contactability": contactability,
-        "hits": hits,
-    }
+    return {"website_live": 1, "fetch_state": "OK", "pages_found": len(pages), "contactability": contactability, "hits": hits}
 
 
 def main():
@@ -200,11 +184,7 @@ def main():
         return 2
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    fields = [
-        "company", "domain", "city", "vertical", "website_live", "fetch_state", "pages_found",
-        "D1_hits", "D2_hits", "D3_hits", "D4_hits", "D5_hits", "contactability",
-        "observed_dimensions", "preliminary_score", "decision"
-    ]
+    fields = ["company", "domain", "city", "vertical", "website_live", "fetch_state", "pages_found", "D1_hits", "D2_hits", "D3_hits", "D4_hits", "D5_hits", "contactability", "observed_dimensions", "preliminary_score", "decision"]
 
     with output_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
@@ -218,7 +198,7 @@ def main():
             hits = result["hits"]
             observed_dims = sum(1 for v in hits.values() if v > 0)
             score = score_row(result["website_live"], result["pages_found"], hits, result["contactability"])
-            gate = decision(score, result["website_live"], observed_dims)
+            gate = decision(score, result["website_live"], observed_dims, result["fetch_state"])
             writer.writerow({
                 "company": company,
                 "domain": domain,
