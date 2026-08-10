@@ -1,4 +1,4 @@
-import os, json
+import os, json, re
 from typing import Dict, Any
 
 try:
@@ -32,7 +32,41 @@ REASONING_BY_AGENT={
     "A9_QA_ORCHESTRATOR":"high",
 }
 
+MAX_OUTPUT_BY_AGENT={
+    "A1_DISCOVERY":2200,
+    "A2_ENTITY_SCOPE":1600,
+    "A3_DEEP_SCAN":2400,
+    "A4_EVIDENCE_AUDITOR":1800,
+    "A5_TARGET_MATCH":1600,
+    "A6_BENCHMARK":2200,
+    "A7_RED_TEAM":2000,
+    "A8_COMMERCIAL_GATE":1600,
+    "A9_QA_ORCHESTRATOR":1800,
+}
+
 WEB_ENABLED_AGENTS={"A1_DISCOVERY","A2_ENTITY_SCOPE","A3_DEEP_SCAN","A6_BENCHMARK"}
+
+
+def _normalize_url(value):
+    if not value or not isinstance(value, str):
+        return value
+    value=value.strip().replace("\\", "")
+    md=re.fullmatch(r"\[?(https?://[^\]\s]+)\]?\((https?://[^)]+)\)", value)
+    if md:
+        value=md.group(2)
+    else:
+        m=re.search(r"https?://[^\s\]\)]+", value)
+        if m:
+            value=m.group(0)
+    return value.rstrip(".,")
+
+
+def _normalize_payload(payload):
+    clean=dict(payload or {})
+    if "official_domain" in clean:
+        clean["official_domain"]=_normalize_url(clean.get("official_domain"))
+    return clean
+
 
 class LLMProvider:
     def __init__(self, dry_run=True):
@@ -51,7 +85,7 @@ class LLMProvider:
     def _tools_for_agent(self, agent_id: str, payload: Dict[str,Any]):
         if agent_id not in WEB_ENABLED_AGENTS:
             return []
-        domain=payload.get("official_domain")
+        domain=_normalize_url(payload.get("official_domain"))
         tool={"type":"web_search","search_context_size":"low"}
         if domain:
             try:
@@ -67,6 +101,7 @@ class LLMProvider:
         return [tool]
 
     def run(self, agent_id: str, system_prompt: str, payload: Dict[str,Any]):
+        payload=_normalize_payload(payload)
         model=os.getenv(f"RRT_MODEL_{agent_id}", MODEL_BY_AGENT.get(agent_id,"gpt-5.6-terra"))
         reasoning=REASONING_BY_AGENT.get(agent_id,"medium")
         tools=self._tools_for_agent(agent_id,payload)
@@ -78,6 +113,7 @@ class LLMProvider:
               "model_planned":model,
               "reasoning_effort_planned":reasoning,
               "tools_planned":[t.get("type") for t in tools],
+              "normalized_official_domain":payload.get("official_domain"),
               "received_payload_keys":sorted(payload.keys()),
               "message":"Task accepted. Live OpenAI call not executed."
             }
@@ -86,7 +122,8 @@ class LLMProvider:
             raise RuntimeError("Live mode requested but OPENAI_API_KEY or openai SDK is unavailable.")
 
         user_input=json.dumps(payload,ensure_ascii=False)
-        max_output_tokens=int(os.getenv("RRT_MAX_OUTPUT_TOKENS", "1200"))
+        default_max=MAX_OUTPUT_BY_AGENT.get(agent_id,1600)
+        max_output_tokens=int(os.getenv(f"RRT_MAX_OUTPUT_TOKENS_{agent_id}", os.getenv("RRT_MAX_OUTPUT_TOKENS", str(default_max))))
         estimated_input_tokens=max(1, len(system_prompt + user_input)//4)
         estimated_usd=estimate_cost_usd(model, estimated_input_tokens, max_output_tokens)
         allowed, reason=check_call_budget(estimated_usd)
@@ -136,6 +173,7 @@ class LLMProvider:
           "model":model,
           "reasoning_effort":reasoning,
           "tools_enabled":[t.get("type") for t in tools],
+          "normalized_official_domain":payload.get("official_domain"),
           "response_id":getattr(response,"id",None),
           "parse_status":parse_status,
           "output":parsed,
