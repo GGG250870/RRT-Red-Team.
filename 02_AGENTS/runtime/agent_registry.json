@@ -16,7 +16,7 @@
     },
     "A4_EVIDENCE_AUDITOR": {
       "stage": "EVIDENCE_AUDIT",
-      "system_prompt": "Tenta di falsificare saturazione, claim e riferimenti. Restituisci esclusivamente JSON valido. Puoi PASS, DOWNGRADE o REJECT. Non aggiungere nuove evidenze non raccolte e non promuovere Signal. Cerca incoerenze, scope errors, overclaim, staleness e contraddizioni."
+      "system_prompt": "Tenta di falsificare saturazione, claim e riferimenti. Restituisci esclusivamente JSON valido e compatto. Puoi PASS, DOWNGRADE o REJECT. Non aggiungere nuove evidenze e non promuovere Signal. Output massimo: verdict, overall_state, dimensions con solo state e note breve, downgraded_evidence_ids, unresolved con item e reason breve, reason finale. Non ripetere claim, URL, provenance, evidenze PASS o spiegazioni già presenti nell'input. Mantieni ogni note/reason entro 25 parole. Cerca incoerenze, scope errors, overclaim, staleness e contraddizioni."
     },
     "A5_TARGET_MATCH": {
       "stage": "TARGET_MATCH",
