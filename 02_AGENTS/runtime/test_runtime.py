@@ -4,6 +4,7 @@ from pathlib import Path
 
 from cost_control import BudgetPolicy, check_call_budget, estimate_cost_usd
 from granularity_loop import LoopPolicy, should_continue
+from llm_provider import LLMProvider
 from state_store import StateStore
 
 
@@ -45,11 +46,20 @@ def test_state_store_roundtrip():
         assert s.stats().get("PASS") == 1
 
 
+def test_web_tool_routing():
+    p = LLMProvider(dry_run=True)
+    tools = p._tools_for_agent("A1_DISCOVERY", {"official_domain": "https://www.example.com/"})
+    assert tools and tools[0]["type"] == "web_search"
+    assert tools[0]["filters"]["allowed_domains"] == ["example.com"]
+    assert p._tools_for_agent("A7_RED_TEAM", {"official_domain": "https://www.example.com/"}) == []
+
+
 def main():
     test_cost_control()
     test_loop_controller()
     test_state_store_roundtrip()
-    print(json.dumps({"status": "PASS", "tests": 3}))
+    test_web_tool_routing()
+    print(json.dumps({"status": "PASS", "tests": 4}))
 
 
 if __name__ == "__main__":
