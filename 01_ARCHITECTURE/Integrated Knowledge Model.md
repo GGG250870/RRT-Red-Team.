@@ -1,6 +1,6 @@
 ---
 type: architecture-extension
-version: v1
+version: v1.1
 status: active
 updated: 2026-08-10
 ---
@@ -26,11 +26,25 @@ PUNTO ZERO / PROBLEMA PERCEPITO
 → SATURATION
 → TARGET MATCH
 → BENCHMARK
+→ FINDING
 → RED TEAM
 → COMMERCIAL GATE
 → SIGNAL
 → HUMAN REVIEW
 → VALIDATION
+
+## Granularità canonica
+Lo standard operativo di dettaglio è [[01_ARCHITECTURE/RRT_GRANULAR_TRACEABILITY_STANDARD_V1]].
+
+Ogni oggetto rilevante deve essere atomico, identificabile, versionabile e ricostruibile a ritroso. In particolare:
+- ogni evidence sostiene un solo claim materiale;
+- source, observation, interpretation e claim restano separati;
+- ogni target conserva evidence accettate/rifiutate, unresolved e search trace;
+- ogni benchmark viene congelato prima del gap;
+- ogni finding separa factual difference, interpretation e commercial hypothesis;
+- ogni Red Team packet conserva controevidenza e alternative explanations;
+- ogni promozione di Signal richiede catena completa di refs;
+- ogni decisione materiale entra nell'audit trail.
 
 ## Librerie metodologiche consolidate
 
@@ -68,6 +82,8 @@ Informazione interna non inferibile in modo affidabile dall’esterno, inclusi l
 - `COLLECTION_RESTRICTED`
 - `CONTRADICTORY`
 - `BLOCKED`
+- `STALE`
+- `REJECTED_BY_AUDIT`
 
 Un dato mancante non viene mai trasformato automaticamente in zero.
 
@@ -89,8 +105,11 @@ Ogni risultato importante deve poter essere ricostruito come:
 → [[05_EVIDENCE/Evidence Index|evidence]]
 → target
 → [[06_BENCHMARKS/Benchmarks Index|benchmark]]
+→ finding
 → [[08_RED_TEAM/Red Team Index|red-team]]
 → commercial gate
+→ signal
+→ human review
 → [[09_VALIDATION/Validation Dashboard|validation]]
 
 ## Regole operative ChatGPT ↔ GitHub ↔ Obsidian
@@ -100,10 +119,12 @@ Ogni risultato importante deve poter essere ricostruito come:
 4. Salvare solo avanzamenti consolidati.
 5. Appunti temporanei e ragionamenti intermedi non vanno persistiti.
 6. In caso di conflitto tra conversazione e repository, prevale lo stato persistito verificabile.
+7. Ogni nuovo blocco operativo deve rispettare il Granular Traceability Standard prima di essere considerato consolidato.
 
 ## Related
 - [[00_HOME/HOME]]
 - [[01_ARCHITECTURE/Architecture Overview]]
+- [[01_ARCHITECTURE/RRT_GRANULAR_TRACEABILITY_STANDARD_V1]]
 - [[03_RULES/Rules Index]]
 - [[05_EVIDENCE/Evidence Index]]
 - [[09_VALIDATION/Validation Dashboard]]
