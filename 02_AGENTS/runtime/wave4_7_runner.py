@@ -57,7 +57,6 @@ def stage_gate(agent_id, output):
         if not benchmarks:
             return False, "A6_NO_BENCHMARKS"
         if not fit_basis:
-            # Accept per-benchmark fit_basis when the compact A6 packet omits a duplicate top-level summary.
             fit_basis = [b.get("fit_basis") for b in benchmarks if isinstance(b, dict) and b.get("fit_basis")]
         if not fit_basis:
             return False, "A6_NO_FIT_BASIS"
@@ -164,11 +163,21 @@ def build_payload(agent_id, case_id, upstream, a5_record):
             "a6_benchmark": provider_output(upstream["A6_BENCHMARK"]),
             "a7_red_team": provider_output(upstream["A7_RED_TEAM"]),
             "a8_commercial_gate": provider_output(upstream["A8_COMMERCIAL_GATE"]),
+            "output_contract": {
+                "required_keys": ["case_id", "verdict", "conflict_ledger", "unresolved_states", "qa_checks"],
+                "verdict_values": ["READY", "BLOCKED"],
+                "max_conflicts": 5,
+                "max_unresolved": 5,
+                "per_note_max_words": 18,
+                "forbidden": ["long prose", "restating full upstream outputs", "new findings", "new commercial inference"]
+            },
             "requirements": [
                 "Return READY or BLOCKED only.",
                 "Do not silently rewrite upstream outputs.",
-                "Emit conflict_ledger and unresolved_states.",
-                "Block on provenance breaks, resurrected restricted evidence, unsupported economic inference or cross-agent contradictions."
+                "Check only provenance continuity, restricted-evidence resurrection, unsupported economic inference, cross-agent contradictions and allowed state transitions.",
+                "Emit compact conflict_ledger and unresolved_states; do not repeat upstream evidence text.",
+                "READY is allowed with nonblocking unresolved states if they are explicitly preserved and do not support the commercial signal.",
+                "BLOCK only on a material QA failure, not merely because unresolved states exist."
             ]
         }
 
