@@ -8,6 +8,7 @@ from llm_provider import LLMProvider, _normalize_url, MAX_OUTPUT_BY_AGENT
 from state_store import StateStore
 from wave2_a3_runner import load_deep_scan_spec
 from wave3_a4_a5_runner import extract_a3_output, is_repair_output, audit_gate_decision
+from wave4_7_runner import stage_gate
 
 
 def test_cost_control():
@@ -118,6 +119,21 @@ def test_wave3_nonblocking_restrictions_gate():
     assert reason == "PASS_WITH_NONBLOCKING_COLLECTION_RESTRICTIONS"
 
 
+def test_wave4_7_stage_gates():
+    ok, _ = stage_gate("A6_BENCHMARK", {"overall_state": "PASS", "benchmarks": [{"id": "B1"}], "contradictions": []})
+    assert ok
+    ok, reason = stage_gate("A7_RED_TEAM", {"verdict": "FALSIFIED", "contradictions": []})
+    assert not ok and reason == "A7_FALSIFIED"
+    ok, reason = stage_gate("A7_RED_TEAM", {"verdict": "WEAK_SURVIVAL", "contradictions": []})
+    assert ok and reason == "WEAK_SURVIVAL"
+    ok, reason = stage_gate("A8_COMMERCIAL_GATE", {"signal_class": "WATCHLIST", "contradictions": []})
+    assert ok and reason == "WATCHLIST"
+    ok, reason = stage_gate("A8_COMMERCIAL_GATE", {"signal_class": "OPPORTUNITY_SIGNAL", "contradictions": []})
+    assert not ok and reason == "A8_INVALID_SIGNAL_CLASS"
+    ok, reason = stage_gate("A9_QA_ORCHESTRATOR", {"verdict": "READY", "contradictions": []})
+    assert ok and reason == "READY"
+
+
 def main():
     tests = [
         test_cost_control,
@@ -130,6 +146,7 @@ def main():
         test_wave3_dependency_guard,
         test_wave3_persisted_a3_extraction,
         test_wave3_nonblocking_restrictions_gate,
+        test_wave4_7_stage_gates,
     ]
     for test in tests:
         test()
