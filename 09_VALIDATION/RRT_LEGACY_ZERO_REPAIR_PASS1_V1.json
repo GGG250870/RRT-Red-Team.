@@ -1,0 +1,217 @@
+{
+  "version": "1.0",
+  "stage": "LEGACY_ZERO_REPAIR_PASS1",
+  "performed_at": "2026-08-12",
+  "input_queue": "09_VALIDATION/RRT_LEGACY_ZERO_REPAIR_QUEUE_V2.json",
+  "method": [
+    "Target-specific scan on queued official source_url.",
+    "Light official-domain crawl of target-relevant internal pages when source_url was accessible.",
+    "No automatic conversion of missing evidence to zero.",
+    "NOT_FOUND_AFTER_PROTOCOL not used in this pass because the full adaptive protocol, including external site queries for unresolved dimensions, was not exhausted."
+  ],
+  "summary": {
+    "items_reviewed": 15,
+    "found": 4,
+    "collection_restricted": 3,
+    "unresolved": 8,
+    "not_found_after_protocol": 0,
+    "contradictory": 0,
+    "closed_for_scoring": 4,
+    "still_blocking_scoring": 11
+  },
+  "results": [
+    {
+      "company": "DentalBio Alessandria",
+      "target": "D2",
+      "dimension": "rata",
+      "source_url": "https://dentalbio.it/dentista-alessandria/",
+      "terminal_state": "UNRESOLVED",
+      "evidence_state": "NO_TARGET_HIT_IN_PASS1",
+      "protocol_trace": [
+        "Fetched official source_url: HTTP 200.",
+        "Crawled one target-relevant official internal page.",
+        "No explicit rate/payment-installment evidence found with target-specific word-boundary terms."
+      ],
+      "blocking_reason": "Full absence protocol not exhausted; do not convert to zero."
+    },
+    {
+      "company": "DentalBio Alessandria",
+      "target": "D4",
+      "dimension": "tempo_provvisorio",
+      "source_url": "https://dentalbio.it/dentista-alessandria/",
+      "terminal_state": "FOUND",
+      "evidence_state": "FOUND_ON_OFFICIAL_DOMAIN",
+      "evidence_url": "https://dentalbio.it/servizi-dentistici-dentalbio/",
+      "normalized_claim": "Official service page states that immediate-load implantology can reduce waiting time and allow the patient to leave with a stable provisional smile.",
+      "scope": "official_domain",
+      "scoring_note": "Legacy zero should not be used for this dimension."
+    },
+    {
+      "company": "DentalBio Alessandria",
+      "target": "D4",
+      "dimension": "numero_passaggi",
+      "source_url": "https://dentalbio.it/dentista-alessandria/",
+      "terminal_state": "UNRESOLVED",
+      "evidence_state": "NO_TARGET_HIT_IN_PASS1",
+      "protocol_trace": [
+        "Fetched official source_url: HTTP 200.",
+        "Crawled one target-relevant official internal page.",
+        "Generic mentions of appointments/sessions were not accepted as evidence for number of immediate-load steps."
+      ],
+      "blocking_reason": "No explicit target-specific evidence and absence protocol not exhausted."
+    },
+    {
+      "company": "FIOCCODENT Alessandria/Tortona",
+      "target": "D2",
+      "dimension": "prezzo",
+      "source_url": "https://fioccodent.it/implantologia/",
+      "terminal_state": "COLLECTION_RESTRICTED",
+      "evidence_state": "OFFICIAL_SOURCE_BLOCKED",
+      "fetch_state": "HTTP_403",
+      "blocking_reason": "Official source denied automated acquisition; do not infer absence."
+    },
+    {
+      "company": "FIOCCODENT Alessandria/Tortona",
+      "target": "D2",
+      "dimension": "rata",
+      "source_url": "https://fioccodent.it/implantologia/",
+      "terminal_state": "COLLECTION_RESTRICTED",
+      "evidence_state": "OFFICIAL_SOURCE_BLOCKED",
+      "fetch_state": "HTTP_403",
+      "blocking_reason": "Official source denied automated acquisition; do not infer absence."
+    },
+    {
+      "company": "FIOCCODENT Alessandria/Tortona",
+      "target": "D4",
+      "dimension": "numero_passaggi",
+      "source_url": "https://fioccodent.it/implantologia/",
+      "terminal_state": "COLLECTION_RESTRICTED",
+      "evidence_state": "OFFICIAL_SOURCE_BLOCKED",
+      "fetch_state": "HTTP_403",
+      "blocking_reason": "Official source denied automated acquisition; do not infer absence."
+    },
+    {
+      "company": "DentalPro Alessandria Panorama",
+      "target": "D1",
+      "dimension": "sedazione",
+      "source_url": "https://www.dentalpro.it/sedazione-cosciente/",
+      "terminal_state": "FOUND",
+      "evidence_state": "FOUND_ON_OFFICIAL_DOMAIN",
+      "evidence_url": "https://www.dentalpro.it/sedazione-cosciente/",
+      "normalized_claim": "Official DentalPro page describes conscious sedation, anxiety/fear reduction and pain comfort benefits.",
+      "scope": "official_network_page_not_center_specific",
+      "scoring_note": "Positive D1 evidence exists at official network scope; local-center applicability should retain scope warning."
+    },
+    {
+      "company": "DentalPro Alessandria Panorama",
+      "target": "D4",
+      "dimension": "carico_immediato",
+      "source_url": "https://www.dentalpro.it/?p=1495&post_type=centro",
+      "terminal_state": "UNRESOLVED",
+      "evidence_state": "NO_TARGET_HIT_IN_PASS1",
+      "protocol_trace": [
+        "Fetched official center page using TLS-relaxed curl due local certificate verification failure.",
+        "No explicit carico immediato / 24h / fixed-teeth evidence found on the acquired center page."
+      ],
+      "blocking_reason": "No target-specific absence protocol across official site/search was completed."
+    },
+    {
+      "company": "DentalPro Alessandria Panorama",
+      "target": "D4",
+      "dimension": "tempo_provvisorio",
+      "source_url": "https://www.dentalpro.it/?p=1495&post_type=centro",
+      "terminal_state": "UNRESOLVED",
+      "evidence_state": "NO_TARGET_HIT_IN_PASS1",
+      "protocol_trace": [
+        "Fetched official center page using TLS-relaxed curl due local certificate verification failure.",
+        "No provisional/temporary-teeth target evidence found on the acquired center page."
+      ],
+      "blocking_reason": "No target-specific absence protocol across official site/search was completed."
+    },
+    {
+      "company": "DentalPro Alessandria Panorama",
+      "target": "D4",
+      "dimension": "chiarezza_temporale",
+      "source_url": "https://www.dentalpro.it/?p=1495&post_type=centro",
+      "terminal_state": "UNRESOLVED",
+      "evidence_state": "NO_TARGET_HIT_IN_PASS1",
+      "protocol_trace": [
+        "Fetched official center page using TLS-relaxed curl due local certificate verification failure.",
+        "A generic 'giornata' navigation/topic hit was rejected as non-target-specific."
+      ],
+      "blocking_reason": "No target-specific absence protocol across official site/search was completed."
+    },
+    {
+      "company": "Odontoiatrika Savona",
+      "target": "D2",
+      "dimension": "prezzo",
+      "source_url": "https://odontoiatrika.it/prestazione-implantologia-a-carico-immediato-11",
+      "terminal_state": "FOUND",
+      "evidence_state": "FOUND_LIMITED_ON_OFFICIAL_DOMAIN",
+      "evidence_url": "https://odontoiatrika.it/prestazione-implantologia-a-carico-immediato-11",
+      "normalized_claim": "Official immediate-load implantology page states the initial specialist visit has no additional costs.",
+      "scope": "official_domain",
+      "scoring_note": "Evidence supports a limited cost-related claim; it does not disclose full treatment price."
+    },
+    {
+      "company": "Odontoiatrika Savona",
+      "target": "D2",
+      "dimension": "finanziamento",
+      "source_url": "https://odontoiatrika.it/prestazione-implantologia-a-carico-immediato-11",
+      "terminal_state": "UNRESOLVED",
+      "evidence_state": "NO_TARGET_HIT_IN_PASS1",
+      "protocol_trace": [
+        "Fetched official source_url: HTTP 200.",
+        "Crawled two target-relevant official internal pages.",
+        "No explicit financing evidence found in pass 1."
+      ],
+      "blocking_reason": "Absence protocol not exhausted; do not convert to zero."
+    },
+    {
+      "company": "Odontoiatrika Savona",
+      "target": "D2",
+      "dimension": "rata",
+      "source_url": "https://odontoiatrika.it/prestazione-implantologia-a-carico-immediato-11",
+      "terminal_state": "UNRESOLVED",
+      "evidence_state": "NO_TARGET_HIT_IN_PASS1",
+      "protocol_trace": [
+        "Fetched official source_url: HTTP 200.",
+        "Crawled two target-relevant official internal pages.",
+        "False substring hits such as words ending in '-rata' were rejected."
+      ],
+      "blocking_reason": "Absence protocol not exhausted; do not convert to zero."
+    },
+    {
+      "company": "Odontoiatrika Savona",
+      "target": "D2",
+      "dimension": "trasparenza_economica",
+      "source_url": "https://odontoiatrika.it/prestazione-implantologia-a-carico-immediato-11",
+      "terminal_state": "FOUND",
+      "evidence_state": "FOUND_LIMITED_ON_OFFICIAL_DOMAIN",
+      "evidence_url": "https://odontoiatrika.it/prestazione-implantologia-a-carico-immediato-11",
+      "normalized_claim": "Official immediate-load implantology page states the initial specialist visit has no additional costs.",
+      "scope": "official_domain",
+      "scoring_note": "Evidence supports limited economic transparency for the visit step; it does not resolve financing or installment dimensions."
+    },
+    {
+      "company": "Odontoiatrika Savona",
+      "target": "D5",
+      "dimension": "prezzo_valore",
+      "source_url": "https://odontoiatrika.it/prestazione-implantologia-a-carico-immediato-11",
+      "terminal_state": "UNRESOLVED",
+      "evidence_state": "NO_TARGET_HIT_IN_PASS1",
+      "protocol_trace": [
+        "Fetched official source_url: HTTP 200.",
+        "Crawled two target-relevant official internal pages.",
+        "Cost mentions for free visit were not accepted as price-value positioning evidence."
+      ],
+      "blocking_reason": "Absence protocol not exhausted; do not convert to zero."
+    }
+  ],
+  "next_required_actions": [
+    "Run external site: queries for the 8 UNRESOLVED items before any NOT_FOUND_AFTER_PROTOCOL state.",
+    "Use browser/manual acquisition or alternate public cache for 3 FIOCCODENT COLLECTION_RESTRICTED items.",
+    "Confirm DentalPro center-level scope for network-level D1 sedation evidence before downstream scoring.",
+    "Update any historical scoring matrix only after Evidence Audit accepts the terminal_state and scope."
+  ]
+}
