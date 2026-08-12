@@ -14,6 +14,7 @@ status: active
 - Red Team obbligatorio prima di Signal
 - Nessuna stima di perdita economica senza evidenza L3/L4
 - Human Review obbligatoria per Opportunity Signal
+- AI gratuite esterne solo come assistenza non autoritativa: [[03_RULES/RRT_FREE_AI_ASSISTANCE_POLICY_V1]]
 
 ## Scoring Integrity V2
 - Una dimensione mancante mantiene il target `UNRESOLVED`.
@@ -35,3 +36,4 @@ status: active
 - [[01_ARCHITECTURE/Knowledge Graph Flow]]
 - [[09_VALIDATION/Validation Dashboard]]
 - [[09_VALIDATION/Scoring Integrity V2]]
+- [[03_RULES/RRT_FREE_AI_ASSISTANCE_POLICY_V1]]

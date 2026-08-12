@@ -18,6 +18,7 @@ updated: 2026-08-12
 - [[01_ARCHITECTURE/RRT_ARCHITECTURE_ECONOMIC_SUSTAINABILITY_AUDIT_V1]]
 - [[02_AGENTS/Multi-Agent System]]
 - [[03_RULES/Rules Index]]
+- [[03_RULES/RRT_FREE_AI_ASSISTANCE_POLICY_V1]]
 - [[04_PROSPECTS/Prospects Index]]
 - [[05_EVIDENCE/Evidence Index]]
 - [[06_BENCHMARKS/Benchmarks Index]]
@@ -67,6 +68,7 @@ Vedi [[01_ARCHITECTURE/Knowledge Graph Flow]] per la mappa navigabile.
 13. `level = 0` è valido solo con `NOT_FOUND_AFTER_PROTOCOL`.
 14. Gli agent team A1→A9 restano `AGENT_TEAM_LOCKED` finche l'utente non autorizza esplicitamente il run e il budget in EUR.
 15. Regola aurea: eseguire prima tutto cio che e gratuito, legalmente accessibile e realisticamente utile; mai inventare, mai spendere senza consenso.
+16. AI gratuite esterne sono ammesse solo come assistenza non autoritativa su dati pubblici/non sensibili; non sono fonti primarie e non sbloccano A1→A9.
 
 ## Casi runtime di riferimento
 - [[04_PROSPECTS/B04-37 - Studio Dentistico Pietro Leone]]
