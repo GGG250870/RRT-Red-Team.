@@ -39,6 +39,21 @@ Template disponibili:
 
 Runbook: `11_DASHBOARD/PILOT_RUNBOOK.md`.
 
+## Review intelligence
+
+Google Maps e TripAdvisor possono essere usati come fonti primarie di reputazione solo tramite:
+- link di verifica/search generati dalla dashboard;
+- API ufficiali con consenso, chiavi e cost ledger;
+- export autorizzati/import manuali.
+
+Non viene fatto scraping massivo di nomi, indirizzi o recensioni.
+
+Per aggregare export autorizzati:
+
+```bash
+python3 11_DASHBOARD/review_intelligence.py reviews_export.csv review_summary.csv --output-json review_summary.json
+```
+
 Output:
 - `index.html`: dashboard apribile nel browser;
 - `dashboard_payload.json`: payload standardizzato;

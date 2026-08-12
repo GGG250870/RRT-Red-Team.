@@ -40,6 +40,7 @@ status: active
 - Esteso `00_PRE_SCREEN/build_batch.py` con discovery open data city-first via fonte cartografica pubblica per ristorazione, hospitality, benessere/estetica, servizi casa, formazione e PMI best effort; geocoding pubblico usato solo per bounding box citta con User-Agent e limiti.
 - Creata `03_RULES/RRT_FREE_AI_ASSISTANCE_POLICY_V1.md`: AI gratuite esterne ammesse solo come assistenza non autoritativa, a costo `EUR 0.0000`, su dati pubblici/non sensibili e senza sbloccare A1-A9.
 - Rafforzata discovery open data con cache bbox, opzione `--bbox` manuale, retry leggero JSON e filtro `addr:city` per ridurre ambiguita geografiche.
+- Aggiunti link di verifica Google Maps/TripAdvisor nei seed di ristorazione e `11_DASHBOARD/review_intelligence.py` per aggregare recensioni/rating da API o export autorizzati senza scraping.
 
 ## 2026-08-10
 - Integrato il framework persistito del repository con le librerie metodologiche consolidate emerse nel lavoro conversazionale.

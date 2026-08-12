@@ -566,6 +566,7 @@ def osm_row_from_element(element, area, vertical, target_segment, bbox):
     domain = normalize_domain(website)
     lat, lon = element_lat_lon(element)
     source_url = osm_object_url(element)
+    search_query = " ".join(p for p in [company, area] if p)
     return {
         "company": company,
         "domain": domain,
@@ -586,7 +587,9 @@ def osm_row_from_element(element, area, vertical, target_segment, bbox):
         "discovery_query": bbox.get("display_name", area),
         "official_domain_state": "RESOLVED_FROM_OPEN_DATA_WEBSITE" if domain else "UNRESOLVED",
         "official_domain_source": website,
-        "google_url": "https://www.google.com/maps/search/" + urllib.parse.quote_plus(" ".join(p for p in [company, area] if p)),
+        "google_url": "https://www.google.com/maps/search/" + urllib.parse.quote_plus(search_query),
+        "google_maps_search_url": "https://www.google.com/maps/search/" + urllib.parse.quote_plus(search_query),
+        "tripadvisor_search_url": "https://www.tripadvisor.it/Search?q=" + urllib.parse.quote_plus(search_query),
         "registroimprese_url": "https://www.registroimprese.it/ricerca-libera?p_p_id=ricercalibera&search=" + urllib.parse.quote_plus(company),
     }
 
@@ -867,7 +870,7 @@ def main():
     fields = [
         "company", "domain", "source_url", "area", "city", "country", "vertical", "target_segment",
         "phone", "mobile_phone", "email", "address", "latitude", "longitude",
-        "google_url", "registroimprese_url",
+        "google_url", "google_maps_search_url", "tripadvisor_search_url", "registroimprese_url",
         "discovery_source", "review_source", "discovery_query", "official_domain_state", "official_domain_source",
     ]
     with path.open("w", newline="", encoding="utf-8") as f:

@@ -74,6 +74,8 @@ def main():
         assert row["address"] == "Via Roma 10 20100 Milano"
         assert row["official_domain_state"] == "RESOLVED_FROM_OPEN_DATA_WEBSITE"
         assert row["google_url"].startswith("https://www.google.com/maps/search/")
+        assert row["google_maps_search_url"].startswith("https://www.google.com/maps/search/")
+        assert row["tripadvisor_search_url"].startswith("https://www.tripadvisor.it/Search")
         manual_bbox = build_batch.parse_bbox("45.40,9.05,45.55,9.30", label="manual_bbox:Milano")
         manual_rows = build_batch.discover_area_auto(
             "Milano", "ristorazione", "pizzeria", 10, bbox_override=manual_bbox, bbox_cache_path=None
@@ -85,7 +87,7 @@ def main():
             fields = [
                 "company", "domain", "source_url", "area", "city", "country", "vertical", "target_segment",
                 "phone", "mobile_phone", "email", "address", "latitude", "longitude",
-                "google_url", "registroimprese_url",
+                "google_url", "google_maps_search_url", "tripadvisor_search_url", "registroimprese_url",
                 "discovery_source", "review_source", "discovery_query", "official_domain_state", "official_domain_source",
             ]
             with output.open("w", newline="", encoding="utf-8") as f:

@@ -13,8 +13,8 @@ DECISION_ORDER = ["ESCALATE", "SHORTLIST", "COLLECTION_RESTRICTED", "REJECT"]
 SOURCE_COLUMNS = {
     "official_website": ["domain", "website_live"],
     "contacts": ["phone", "telefono", "mobile_phone", "mobile", "cellulare", "whatsapp", "email", "mail", "address", "indirizzo"],
-    "google": ["google_url", "google_rating", "google_review_count", "google_place_id"],
-    "review_portals": ["source_url", "review_source", "review_portal_url"],
+    "google": ["google_url", "google_maps_search_url", "google_rating", "google_review_count", "google_place_id"],
+    "review_portals": ["source_url", "review_source", "review_portal_url", "tripadvisor_search_url", "tripadvisor_url", "tripadvisor_rating", "tripadvisor_review_count"],
     "social": ["facebook_url", "instagram_url", "linkedin_url", "tiktok_url"],
     "public_financials": ["financial_source_url", "balance_sheet_url", "registroimprese_url", "vat_id", "piva"],
 }
@@ -22,7 +22,9 @@ EXPORT_COLUMNS = [
     "rank", "company", "domain", "city", "vertical", "target_segment", "decision",
     "phone", "mobile_phone", "email", "address",
     "preliminary_score", "fetch_state", "online_enrichment_state", "google_state",
-    "google_rating", "google_review_count", "social_presence_count",
+    "google_rating", "google_review_count", "google_maps_search_url",
+    "tripadvisor_rating", "tripadvisor_review_count", "tripadvisor_search_url",
+    "social_presence_count",
     "public_financials_state", "next_best_action", "operation_cost_eur",
 ]
 COST_LEDGER_COLUMNS = [
@@ -841,6 +843,10 @@ def export_row(item):
         "google_state": norm(item.get("google_state")),
         "google_rating": norm(item.get("google_rating")),
         "google_review_count": norm(item.get("google_review_count")),
+        "google_maps_search_url": norm(item.get("google_maps_search_url")) or norm(item.get("google_url")),
+        "tripadvisor_rating": norm(item.get("tripadvisor_rating")),
+        "tripadvisor_review_count": norm(item.get("tripadvisor_review_count")),
+        "tripadvisor_search_url": norm(item.get("tripadvisor_search_url")),
         "social_presence_count": norm(item.get("social_presence_count")),
         "public_financials_state": norm(item.get("public_financials_state")),
         "next_best_action": item["_next_best_action"],
