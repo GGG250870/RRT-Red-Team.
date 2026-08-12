@@ -8,6 +8,7 @@ created: 2026-08-12
 # RRT Final Dashboard Product Spec V1
 
 Research companion: [[01_ARCHITECTURE/RRT_DASHBOARD_ONLINE_RESEARCH_NOTES_V1]]
+Delivery roadmap: [[01_ARCHITECTURE/RRT_DASHBOARD_DELIVERY_ROADMAP_V1]]
 
 ## Intento
 

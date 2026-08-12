@@ -13,6 +13,7 @@ updated: 2026-08-12
 - [[01_ARCHITECTURE/Integrated Knowledge Model]]
 - [[01_ARCHITECTURE/Knowledge Graph Flow]]
 - [[01_ARCHITECTURE/RRT_FINAL_DASHBOARD_PRODUCT_SPEC_V1]]
+- [[01_ARCHITECTURE/RRT_DASHBOARD_DELIVERY_ROADMAP_V1]]
 - [[01_ARCHITECTURE/RRT_DASHBOARD_ONLINE_RESEARCH_NOTES_V1]]
 - [[01_ARCHITECTURE/RRT_ARCHITECTURE_ECONOMIC_SUSTAINABILITY_AUDIT_V1]]
 - [[02_AGENTS/Multi-Agent System]]
@@ -43,6 +44,7 @@ updated: 2026-08-12
 - Obsidian: interfaccia umana del second brain e knowledge graph.
 - Dashboard finale: specificata in [[01_ARCHITECTURE/RRT_FINAL_DASHBOARD_PRODUCT_SPEC_V1]], con categorie/citta/export/report e contatore costi in EUR.
 - Dashboard V1 locale: [[11_DASHBOARD/README]], generabile da CSV pre-screen senza API, costi o agent team.
+- Roadmap tempi dashboard: [[01_ARCHITECTURE/RRT_DASHBOARD_DELIVERY_ROADMAP_V1]], con pilot in 24 ore dal dataset reale e calibrazione batch in 3-5 giorni.
 
 ## Knowledge flow
 PUNTO ZERO / PROBLEMA PERCEPITO → PATTERN → BLIND SPOT → EVIDENCE → TARGET → SATURATION → TARGET MATCH → BENCHMARK → FINDING → RED TEAM → COMMERCIAL GATE → SIGNAL → HUMAN REVIEW → VALIDATION.
