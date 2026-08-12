@@ -17,6 +17,15 @@ Per creare e scremare un batch dentale in un solo comando:
 zsh rrt_build_and_prescreen.sh 100
 ```
 
+Per una categoria esplicita:
+
+```bash
+zsh rrt_build_and_prescreen.sh 20 "Milano,Roma" dentale
+zsh rrt_build_and_prescreen.sh 20 "Milano,Roma" ristorazione
+zsh rrt_build_and_prescreen.sh 20 "Milano,Roma" ristorazione pizzeria
+zsh rrt_build_and_prescreen.sh 20 "Milano,Roma" pmi
+```
+
 Il comando:
 1. usa ricerche web pubbliche senza API key per costruire un CSV di prospect;
 2. deduplica i record-source per profilo/entity del portale;
@@ -25,15 +34,46 @@ Il comando:
 5. crea un CSV separato con soli `SHORTLIST` e `ESCALATE`.
 
 File predefiniti:
-- `00_PRE_SCREEN/batch_dentale.csv`
-- `00_PRE_SCREEN/batch_dentale_results.csv`
-- `00_PRE_SCREEN/batch_dentale_shortlist.csv`
+- `00_PRE_SCREEN/batch_<vertical>.csv`
+- `00_PRE_SCREEN/batch_<vertical>_results.csv`
+- `00_PRE_SCREEN/batch_<vertical>_shortlist.csv`
+- `00_PRE_SCREEN/batch_<vertical>_<target_segment>.csv` quando viene passato un target segment.
 
 La discovery gratuita è volutamente sostituibile: `build_batch.py` è separato da `pre_screen.py`. Se una fonte pubblica cambia o limita l'accesso, il motore di scoring non va modificato.
 
 Nota: i profili di portale non sono domini ufficiali. Quando `build_batch.py` scopre una scheda su MioDottore/Dentisti-Italia/DocDental ma non risolve un dominio ufficiale, lascia `domain` vuoto e imposta `official_domain_state = UNRESOLVED`. Il pre-screen deve fermare questi record come `COLLECTION_RESTRICTED`, non calcolare lo score sul dominio del portale.
 
-Primary discovery release-safe corrente: MioDottore. Dentisti-Italia e DocDental restano nella backlog sorgenti ma sono disabilitati come primary discovery finché il parser profili non è validato contro righe di navigazione.
+Primary discovery release-safe corrente:
+- `dentale`: MioDottore.
+- `ristorazione`: nessuna fonte automatica ancora validata; usare CSV manuale con domini ufficiali.
+- `pmi`: nessuna fonte automatica ancora validata; usare CSV manuale con domini ufficiali.
+- `hospitality`: nessuna fonte automatica ancora validata; usare CSV manuale con domini ufficiali.
+- `benessere_estetica`: nessuna fonte automatica ancora validata; usare CSV manuale con domini ufficiali.
+- `servizi_casa`: nessuna fonte automatica ancora validata; usare CSV manuale con domini ufficiali.
+- `formazione`: nessuna fonte automatica ancora validata; usare CSV manuale con domini ufficiali.
+- `generic`: nessuna fonte automatica; usare CSV manuale con domini ufficiali.
+
+Primary intelligence per tutte le categorie:
+- Google Business Profile, Google Reviews e Google Maps come fonte primaria di reputazione/local presence.
+- Portali recensioni verticali e generalisti rilevanti per categoria.
+- Social ufficiali e profili pubblici: Facebook, Instagram, LinkedIn, TikTok dove pertinenti.
+- Bilanci pubblici e informazioni societarie: Registro Imprese, Telemaco/InfoCamere e documenti economico-finanziari pubblicati sul sito ufficiale dell'azienda.
+
+Queste fonti sono primarie per segnali, reputazione, contesto e solidita dell'impresa. Non sono automaticamente domini ufficiali del prospect e non autorizzano claim economici senza pipeline RRT completa.
+
+Per `ristorazione`, TripAdvisor e altri portali recensioni sono previsti come fonti di intelligence per target:
+- `fine_dining`: TripAdvisor, TheFork, Michelin, Gambero Rosso.
+- `pizzeria`: TripAdvisor, TheFork, RestaurantGuru, PagineGialle.
+- `trattoria_osteria`: TripAdvisor, RestaurantGuru, TheFork, PagineGialle.
+- `sushi_etnico`: TripAdvisor, TheFork, RestaurantGuru.
+- `delivery_asporto`: TripAdvisor, TheFork, RestaurantGuru.
+- `eventi_catering`: TripAdvisor, TheFork, PagineGialle.
+- `enoteca_wine_bar`: TripAdvisor, TheFork, Gambero Rosso.
+- `bar_cafe`: TripAdvisor, RestaurantGuru, PagineGialle.
+
+Questi portali possono essere usati come review intelligence e URL di ricerca/provenance. Non vengono usati come dominio ufficiale e non vengono scraperati aggirando blocchi o API ufficiali.
+
+Dentisti-Italia, DocDental, TheFork, TripAdvisor, Booking, Treatwell, ProntoPro e Habitissimo restano nella backlog sorgenti ma sono disabilitati come primary discovery finché il parser profili e la risoluzione dominio ufficiale non sono validati contro righe di navigazione.
 
 Il targeting geografico resta city-first nella sorgente validata corrente. Quartieri o zone sono accettati come input, ma se il portale non li supporta il builder deve restituire `DISCOVERY_EMPTY` invece di allargare silenziosamente o usare fonti sporche.
 
@@ -43,6 +83,7 @@ Colonne consigliate:
 - `domain`
 - `city`
 - `vertical`
+- `target_segment`
 
 Sono accettati anche `name`, `website`, `official_domain` come alias.
 
@@ -53,6 +94,7 @@ Sono accettati anche `name`, `website`, `official_domain` come alias.
 - official_domain_state
 - city
 - vertical
+- target_segment
 - website_live
 - fetch_state
 - pages_found
@@ -73,11 +115,38 @@ Sono accettati anche `name`, `website`, `official_domain` come alias.
 - D4: carico immediato / 24h / un giorno / stessa giornata / All-on-4
 - D5: perché scegliere / vantaggi / testimonianze / recensioni / FAQ / esperienza
 
+## Dimensioni ristorazione v1
+- D1: prenotazione / contatto / tavolo
+- D2: menu / prezzi / degustazione / asporto / delivery
+- D3: cucina / chef / ingredienti / territorio / cantina
+- D4: orari / pranzo / cena / giorni di apertura
+- D5: recensioni / guide / storia / esperienza / gallery
+
+## Dimensioni PMI v1
+Target: piccole e medie imprese fino a circa 200 persone, con uso consigliato su CSV manuali che riportano domini ufficiali.
+
+- D1: contatto / preventivo / consulenza
+- D2: servizi / soluzioni / prodotti / catalogo
+- D3: certificazioni / referenze / clienti / case study
+- D4: team / sede / produzione / laboratorio / stabilimento
+- D5: innovazione / digitale / sostenibilità / export / assistenza
+
+## Nicchie interessanti v1
+Queste categorie sono utili perché hanno segnali pubblici leggibili, valore commerciale potenziale e frequenti gap di comunicazione sul sito:
+
+- `hospitality`: hotel, B&B, agriturismi e strutture ricettive.
+- `benessere_estetica`: centri estetici, spa, wellness, beauty, parrucchieri/barber.
+- `servizi_casa`: impianti, serramenti, fotovoltaico, edilizia e ristrutturazioni.
+- `formazione`: corsi, academy, scuole professionali e training.
+- `pmi`: aziende B2B/locali fino a circa 200 persone.
+
+Le dimensioni sono profili zero-LLM per filtro operativo. Non sono confrontabili tra categorie come metriche statistiche e non producono Opportunity Signal.
+
 ## Decisione v1
 - `COLLECTION_RESTRICTED`: dominio presente ma sito non acquisibile; non equivale a prospect debole.
 - `REJECT`: score insufficiente o assenza di dominio utile.
-- `SHORTLIST`: score >= 45 e almeno 2 dimensioni osservate.
-- `ESCALATE`: score >= 70 e almeno 3 dimensioni osservate.
+- `SHORTLIST`: score >= 45 e almeno 2 dimensioni osservate, oppure almeno 1 indicatore high-value.
+- `ESCALATE`: score >= 70 e almeno 3 dimensioni osservate, con eventuale gate high-value definito dal profilo categoria.
 
 Lo score è solo un filtro operativo. Non rappresenta un Opportunity Signal e non sostituisce A1→A9.
 
@@ -85,6 +154,8 @@ Lo score è solo un filtro operativo. Non rappresenta un Opportunity Signal e no
 
 ```bash
 python3 00_PRE_SCREEN/pre_screen.py 00_PRE_SCREEN/prospects_example.csv 00_PRE_SCREEN/output.csv
+python3 00_PRE_SCREEN/pre_screen.py 00_PRE_SCREEN/prospects_ristorazione_example.csv 00_PRE_SCREEN/output_ristorazione.csv
+python3 00_PRE_SCREEN/pre_screen.py 00_PRE_SCREEN/prospects_pmi_example.csv 00_PRE_SCREEN/output_pmi.csv
 ```
 
 Solo `SHORTLIST` e `ESCALATE` devono entrare normalmente nel runtime costoso:
@@ -103,3 +174,4 @@ zsh rrt_e2e.sh CASE-ID "Company" https://domain.it/
 7. Il motore usa solo librerie Python standard e HTTP pubblico; nessuna API LLM.
 8. Nessuna chiamata A1→A9 viene eseguita automaticamente dal batch gratuito.
 9. Un dominio di portale non può essere usato come dominio ufficiale del prospect.
+10. Ogni categoria deve avere profilo esplicito o fallback `generic`; nuovi verticali vanno calibrati prima di essere dichiarati release-safe.

@@ -12,6 +12,8 @@ updated: 2026-08-12
 - [[01_ARCHITECTURE/Architecture Overview]]
 - [[01_ARCHITECTURE/Integrated Knowledge Model]]
 - [[01_ARCHITECTURE/Knowledge Graph Flow]]
+- [[01_ARCHITECTURE/RRT_FINAL_DASHBOARD_PRODUCT_SPEC_V1]]
+- [[01_ARCHITECTURE/RRT_DASHBOARD_ONLINE_RESEARCH_NOTES_V1]]
 - [[01_ARCHITECTURE/RRT_ARCHITECTURE_ECONOMIC_SUSTAINABILITY_AUDIT_V1]]
 - [[02_AGENTS/Multi-Agent System]]
 - [[03_RULES/Rules Index]]
@@ -25,6 +27,7 @@ updated: 2026-08-12
 - [[09_VALIDATION/Scoring Integrity V2]]
 - [[09_VALIDATION/Legacy Zero Repair Queue]]
 - [[10_REPORTS/Reports Index]]
+- [[11_DASHBOARD/README]]
 - [[99_CHANGELOG/CHANGELOG]]
 
 ## Stato progetto
@@ -38,6 +41,8 @@ updated: 2026-08-12
 - Human review: obbligatorio per ogni Opportunity Signal.
 - GitHub: fonte persistente e auditabile.
 - Obsidian: interfaccia umana del second brain e knowledge graph.
+- Dashboard finale: specificata in [[01_ARCHITECTURE/RRT_FINAL_DASHBOARD_PRODUCT_SPEC_V1]], con categorie/citta/export/report e contatore costi in EUR.
+- Dashboard V1 locale: [[11_DASHBOARD/README]], generabile da CSV pre-screen senza API, costi o agent team.
 
 ## Knowledge flow
 PUNTO ZERO / PROBLEMA PERCEPITO → PATTERN → BLIND SPOT → EVIDENCE → TARGET → SATURATION → TARGET MATCH → BENCHMARK → FINDING → RED TEAM → COMMERCIAL GATE → SIGNAL → HUMAN REVIEW → VALIDATION.
@@ -58,6 +63,8 @@ Vedi [[01_ARCHITECTURE/Knowledge Graph Flow]] per la mappa navigabile.
 11. Cheap-first, escalate-on-uncertainty.
 12. Ogni finding deve mantenere la catena prospect → evidence → target → benchmark → red-team → commercial gate → validation.
 13. `level = 0` è valido solo con `NOT_FOUND_AFTER_PROTOCOL`.
+14. Gli agent team A1→A9 restano `AGENT_TEAM_LOCKED` finche l'utente non autorizza esplicitamente il run e il budget in EUR.
+15. Regola aurea: eseguire prima tutto cio che e gratuito, legalmente accessibile e realisticamente utile; mai inventare, mai spendere senza consenso.
 
 ## Casi runtime di riferimento
 - [[04_PROSPECTS/B04-37 - Studio Dentistico Pietro Leone]]

@@ -20,6 +20,17 @@ status: active
 - Riallineate le note Obsidian di Tranche D al ledger machine-readable `09_VALIDATION/RRT_BATCH_04_SATURATION_REAUDIT_TRANCHE_D_V1.json`: B04-34, B04-37 e B04-48 risultano re-audit PASS 3/3.
 - Aggiornate le schede B04-34 e B04-48: benchmark freeze parziale e `NO_SIGNAL_PROVISIONAL`; P1-P8 prominence/discoverability resta il gate aperto prima di qualunque conclusione commerciale.
 - La Legacy Zero Repair Queue resta aperta con 15 item: nessuno zero legacy è stato convertito automaticamente.
+- Reso il pre-screen adattabile per categoria: profili `dentale`, `ristorazione`, `pmi`, `hospitality`, `benessere_estetica`, `servizi_casa`, `formazione` e `generic` con dimensioni, page hints, pattern high-value e gap separati. La discovery automatica resta validata solo per `dentale`/MioDottore; le altre categorie usano CSV manuali finché fonti category-safe non sono validate.
+- Creato `01_ARCHITECTURE/RRT_FINAL_DASHBOARD_PRODUCT_SPEC_V1.md`: specifica dashboard finale con scelta categoria/citta, raccomandazione percorso opportunita, export CSV/XLSX/JSON/MD/DOCX/PDF, tre report per imprenditore e contatore costi in EUR.
+- Aggiunto guard runtime: i run live degli agent team A1-A9 restano bloccati senza consenso esplicito via `RRT_AGENT_TEAM_APPROVAL=I_APPROVE_AGENT_TEAM_LIVE_RUN`.
+- Formalizzate le primary intelligence sources per tutte le categorie: Google Business/Profile Reviews/Maps, portali recensioni, social e bilanci pubblici/Registro Imprese, separandole dalla risoluzione del dominio ufficiale e dagli Opportunity Signal.
+- Creato `01_ARCHITECTURE/RRT_DASHBOARD_ONLINE_RESEARCH_NOTES_V1.md` con ricerca online e autoanalisi su moduli utili per la dashboard: Opportunity Cockpit, Source Coverage Matrix, Explainable Score, Map View, Entity Resolution, Review Intelligence, Public Financial Snapshot, Report Builder, Cost & Consent e Calibration Loop.
+- Formalizzata la regola aurea dashboard: massimizzare prima tutto cio che e gratuito, legalmente accessibile e realisticamente utile; mai inventare e mai usare agent/API/fonti a pagamento senza consenso. Aggiunte SLA operative: triage singolo in 30-90s, report rapido 2-5m, batch 50 in 5-15m, batch 200 in 15-45m con output progressivo.
+- Implementata `11_DASHBOARD/dashboard.py`: dashboard HTML locale zero-LLM da CSV pre-screen, con Opportunity Cockpit, Source Coverage Matrix, shortlist CSV, payload JSON, report batch Markdown, report rapidi singoli e stato `AGENT_TEAM_LOCKED`.
+- Estesi gli export dashboard: `prospects.xlsx`, `batch_report.docx` e `print_report.html` generati localmente senza dipendenze esterne e con costo `EUR 0.0000`.
+- Aggiunti tre report per prospect selezionato: rapido zero-LLM (`reports/`), opportunita guidato non-agentico (`guided_reports/`) e template A1-A9 bloccato (`full_rrt_locked/`) con consenso/budget richiesti.
+- Implementato `11_DASHBOARD/enrich_public_sources.py`: enrichment online gratuito/legal-safe da sito ufficiale e URL pubblici forniti, con estrazione social/review/bilanci linkati, `robots.txt` check, provenance `source_refs_json`, nessun aggiramento e costo `EUR 0.0000`.
+- Aggiunta segmentazione target per `ristorazione`: `fine_dining`, `pizzeria`, `trattoria_osteria`, `sushi_etnico`, `delivery_asporto`, `eventi_catering`, `enoteca_wine_bar`, `bar_cafe` e `ristorazione_generic`, con TripAdvisor e altri portali review come intelligence/provenance per segmento.
 
 ## 2026-08-10
 - Integrato il framework persistito del repository con le librerie metodologiche consolidate emerse nel lavoro conversazionale.

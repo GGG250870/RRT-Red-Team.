@@ -12,6 +12,7 @@ INPUT → GENERAL EVIDENCE → TARGET DISCOVERY → PROSPECT EVIDENCE SATURATION
 ## Validation layers
 - Entity Resolution
 - Scope Resolution
+- Primary Intelligence Review: sito ufficiale, Google Business/Profile Reviews/Maps, portali recensioni, social e bilanci pubblici
 - Target-Specific Deep Scan
 - Saturation Evidence Re-Audit
 - Target Match
@@ -28,6 +29,8 @@ INPUT → GENERAL EVIDENCE → TARGET DISCOVERY → PROSPECT EVIDENCE SATURATION
 - VALIDATED_SIGNAL
 
 ## Related
+- [[01_ARCHITECTURE/RRT_FINAL_DASHBOARD_PRODUCT_SPEC_V1]]
+- [[01_ARCHITECTURE/RRT_DASHBOARD_ONLINE_RESEARCH_NOTES_V1]]
 - [[02_AGENTS/Multi-Agent System]]
 - [[03_RULES/Rules Index]]
 - [[09_VALIDATION/Validation Dashboard]]

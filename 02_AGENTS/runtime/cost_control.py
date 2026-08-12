@@ -17,6 +17,15 @@ class BudgetPolicy:
     per_run_usd: float = float(os.getenv("RRT_BUDGET_PER_RUN_USD", "10.00"))
 
 
+def usd_to_eur(usd: float) -> float:
+    rate = float(os.getenv("RRT_USD_EUR_RATE", "1.00"))
+    return round(max(usd or 0.0, 0.0) * rate, 6)
+
+
+def format_eur(usd: float) -> str:
+    return f"EUR {usd_to_eur(usd):.4f}"
+
+
 def estimate_cost_usd(model: str, input_tokens: int = 0, output_tokens: int = 0) -> float:
     price = DEFAULT_MODEL_PRICES.get(model)
     if not price:
