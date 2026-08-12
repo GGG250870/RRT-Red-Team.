@@ -33,9 +33,11 @@ Output:
 - `batch_report.md`: report batch editabile;
 - `batch_report.docx`: report batch editabile in Word;
 - `print_report.html`: versione stampabile/esportabile PDF dal browser;
-- `reports/*.md`: report rapidi per singolo imprenditore selezionabile;
-- `guided_reports/*.md`: report opportunita guidati, non-agentici;
-- `full_rrt_locked/*.md`: template report completo A1-A9 bloccato fino a consenso e budget.
+- `reports/*.md`: Passaggio 1, report rapidi per singolo imprenditore selezionabile;
+- `guided_reports/*.md`: Passaggio 2, report opportunita guidati, non-agentici;
+- `full_rrt_locked/*.md`: Passaggio 3, template report completo A1-A9 bloccato fino a consenso e budget.
+
+CSV, XLSX e report singoli includono sempre il blocco contatti: telefono, cellulare/WhatsApp quando disponibile, email e indirizzo. I campi non trovati restano marcati come `NON_TROVATO`/vuoti: non vengono mai inventati.
 
 ## Stato costi
 
@@ -46,24 +48,27 @@ La dashboard V1 usa input gia disponibili, fonti pubbliche gratuite quando acces
 - nessuna chiamata API a pagamento;
 - nessun report A1-A9.
 
-## Tre report per imprenditore
+## Tre passaggi crescenti per imprenditore
 
 Per ogni prospect in `SHORTLIST` o `ESCALATE` la dashboard produce:
 
-1. Report rapido
+1. Passaggio 1 - Report rapido
    - lettura zero-LLM;
+   - telefono, cellulare/WhatsApp, email e indirizzo;
    - coverage fonti;
    - score spiegabili;
    - prossima azione.
 
-2. Report opportunita guidato
+2. Passaggio 2 - Report opportunita guidato
    - ipotesi di lavoro non-agentica;
+   - telefono, cellulare/WhatsApp, email e indirizzo;
    - controlli gratuiti mancanti;
    - domande da verificare prima di spendere;
    - nessun Opportunity Signal certificato.
 
-3. Report A1-A9 locked
+3. Passaggio 3 - Report A1-A9 locked
    - template di richiesta dossier completo;
+   - telefono, cellulare/WhatsApp, email e indirizzo;
    - stato `AGENT_TEAM_LOCKED`;
    - richiede consenso esplicito e budget EUR prima del run.
 
@@ -72,6 +77,7 @@ Per ogni prospect in `SHORTLIST` o `ESCALATE` la dashboard produce:
 `enrich_public_sources.py` puo accedere online a informazioni disponibili, gratuite e legalmente estraibili:
 
 - sito ufficiale;
+- telefono, cellulare/WhatsApp, email e indirizzo esposti su sito ufficiale o dati strutturati pubblici;
 - link social pubblici esposti dal sito;
 - link a portali recensioni esposti dal sito;
 - link a bilanci/documenti finanziari pubblici esposti dal sito;

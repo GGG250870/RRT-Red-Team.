@@ -63,6 +63,9 @@ FINANCIAL_HINTS = [
     "telemaco",
     "xbrl",
 ]
+PHONE_RE = re.compile(r"(?:\+39[\s.-]?)?(?:3\d{2}|0\d{1,4})[\s.-]?\d{5,8}")
+EMAIL_RE = re.compile(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.I)
+MOBILE_PREFIX_RE = re.compile(r"^(?:\+39)?3\d{2}")
 
 
 def norm(value):
@@ -170,6 +173,108 @@ def extract_links(html, base_url):
     return out
 
 
+def extract_json_ld_objects(html):
+    objects = []
+    for raw in re.findall(r'(?is)<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>', html or ""):
+        try:
+            data = json.loads(unescape(raw).strip())
+        except Exception:
+            continue
+        if isinstance(data, list):
+            objects.extend(data)
+        elif isinstance(data, dict):
+            graph = data.get("@graph")
+            if isinstance(graph, list):
+                objects.extend(graph)
+            objects.append(data)
+    return objects
+
+
+def flatten_address(value):
+    if isinstance(value, str):
+        return clean_text(value)[:240]
+    if not isinstance(value, dict):
+        return ""
+    parts = [
+        value.get("streetAddress"),
+        value.get("postalCode"),
+        value.get("addressLocality"),
+        value.get("addressRegion"),
+        value.get("addressCountry"),
+    ]
+    return clean_text(", ".join(str(part) for part in parts if part))[:240]
+
+
+def extract_schema_contacts(html):
+    contacts = {}
+    for obj in extract_json_ld_objects(html):
+        if not isinstance(obj, dict):
+            continue
+        phone = norm(obj.get("telephone"))
+        email = norm(obj.get("email"))
+        address = flatten_address(obj.get("address"))
+        if phone and "phone" not in contacts:
+            contacts["phone"] = phone[:80]
+            if MOBILE_PREFIX_RE.match(re.sub(r"\D", "", phone).replace("39", "", 1) if phone.startswith("+39") else re.sub(r"\D", "", phone)):
+                contacts.setdefault("mobile_phone", phone[:80])
+        if email and "email" not in contacts:
+            contacts["email"] = email[:120]
+        if address and "address" not in contacts:
+            contacts["address"] = address
+    return contacts
+
+
+def normalize_phone(value):
+    cleaned = re.sub(r"[^\d+]", "", value or "")
+    if not cleaned:
+        return ""
+    if cleaned.startswith("0039"):
+        cleaned = "+39" + cleaned[4:]
+    return cleaned[:30]
+
+
+def is_mobile_phone(value):
+    digits = re.sub(r"\D", "", value or "")
+    if digits.startswith("39"):
+        digits = digits[2:]
+    return bool(MOBILE_PREFIX_RE.match(digits))
+
+
+def extract_contact_details(html, base_url, links):
+    contacts = extract_schema_contacts(html)
+    text = clean_text(html)
+    for href, _label in re.findall(r'(?is)<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)</a>', html or ""):
+        href = unescape(href.strip())
+        parsed = urllib.parse.urlparse(urllib.parse.urljoin(base_url, href))
+        if parsed.scheme == "mailto" and "email" not in contacts:
+            email = parsed.path.split("?", 1)[0]
+            if EMAIL_RE.fullmatch(email):
+                contacts["email"] = email[:120]
+        if parsed.scheme == "tel":
+            phone = normalize_phone(parsed.path)
+            if phone and "phone" not in contacts:
+                contacts["phone"] = phone
+            if phone and is_mobile_phone(phone) and "mobile_phone" not in contacts:
+                contacts["mobile_phone"] = phone
+        if "wa.me" in parsed.netloc or "whatsapp" in parsed.netloc:
+            phone = normalize_phone(parsed.path)
+            if phone and "mobile_phone" not in contacts:
+                contacts["mobile_phone"] = phone
+    if "email" not in contacts:
+        match = EMAIL_RE.search(text)
+        if match:
+            contacts["email"] = match.group(0)[:120]
+    if "phone" not in contacts:
+        match = PHONE_RE.search(text)
+        if match:
+            contacts["phone"] = normalize_phone(match.group(0))
+    if "mobile_phone" not in contacts and is_mobile_phone(contacts.get("phone")):
+        contacts["mobile_phone"] = contacts["phone"]
+    contacts["contact_extraction_state"] = "FOUND" if any(contacts.get(k) for k in ["phone", "mobile_phone", "email", "address"]) else "NOT_FOUND"
+    contacts["contact_source_url"] = base_url if contacts["contact_extraction_state"] == "FOUND" else ""
+    return contacts
+
+
 def pick_social_links(links):
     found = {}
     for link in links:
@@ -241,6 +346,10 @@ def enrich_row(row, fetch_extra_urls=False):
     if fetched["state"] == "OK":
         html = fetched.get("html", "")
         links = extract_links(html, fetched.get("url") or homepage)
+        contact_details = extract_contact_details(html, fetched.get("url") or homepage, links)
+        for column in ["phone", "mobile_phone", "email", "address", "contact_source_url", "contact_extraction_state"]:
+            if not norm(out.get(column)) and norm(contact_details.get(column)):
+                out[column] = contact_details[column]
         out["official_title"] = out.get("official_title") or extract_title(html)
         out["official_meta_description"] = out.get("official_meta_description") or extract_meta_description(html)
         out["official_links_checked"] = str(len(links))
@@ -283,6 +392,7 @@ def enrich_row(row, fetch_extra_urls=False):
 def fieldnames_for(rows):
     preferred = [
         "company", "domain", "city", "vertical", "decision", "preliminary_score",
+        "phone", "mobile_phone", "email", "address", "contact_extraction_state", "contact_source_url",
         "online_enrichment_state", "online_enrichment_url", "online_enrichment_robots_state",
         "official_title", "official_meta_description", "official_links_checked",
         "google_state", "google_url", "google_rating", "google_review_count", "google_place_id",

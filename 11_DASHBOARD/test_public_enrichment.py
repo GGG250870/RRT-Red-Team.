@@ -12,8 +12,27 @@ HTML = """<!doctype html>
 <head>
   <title>Alpha Impresa</title>
   <meta name="description" content="Soluzioni B2B certificate e assistenza.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Restaurant",
+    "name": "Alpha Impresa",
+    "telephone": "+39 02 1234567",
+    "email": "info@alpha.example",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Via Roma 10",
+      "postalCode": "20100",
+      "addressLocality": "Milano",
+      "addressCountry": "IT"
+    }
+  }
+  </script>
 </head>
 <body>
+  <a href="tel:+39021234567">Telefono</a>
+  <a href="https://wa.me/393331234567">WhatsApp</a>
+  <a href="mailto:booking@alpha.example">Email booking</a>
   <a href="https://www.facebook.com/alphaimpresa">Facebook</a>
   <a href="https://www.linkedin.com/company/alphaimpresa">LinkedIn</a>
   <a href="https://www.trustpilot.com/review/alpha.example">Trustpilot</a>
@@ -55,6 +74,11 @@ def main():
             assert rows[0]["linkedin_url"] == "https://www.linkedin.com/company/alphaimpresa"
             assert rows[0]["review_portal_url"] == "https://www.trustpilot.com/review/alpha.example"
             assert rows[0]["financial_source_url"] == "https://alpha.example/bilanci/alpha-bilancio-2025.pdf"
+            assert rows[0]["phone"] == "+39 02 1234567"
+            assert rows[0]["mobile_phone"] == "393331234567"
+            assert rows[0]["email"] == "info@alpha.example"
+            assert rows[0]["address"] == "Via Roma 10, 20100, Milano, IT"
+            assert rows[0]["contact_extraction_state"] == "FOUND"
             assert rows[0]["free_online_enrichment_cost_eur"] == "EUR 0.0000"
             refs = json.loads(rows[0]["source_refs_json"])
             assert refs["google_maps_search_url"].startswith("https://www.google.com/maps/search/")

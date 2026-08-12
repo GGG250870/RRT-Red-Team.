@@ -79,6 +79,14 @@ La dashboard deve permettere di scegliere:
    - report singolo imprenditore;
    - export machine-readable.
 
+Ogni lista e report per imprenditore deve includere sempre un blocco contatti con:
+- telefono;
+- cellulare/WhatsApp quando disponibile o distinguibile;
+- email;
+- indirizzo.
+
+Se il dato non e disponibile da input o fonti pubbliche gratuite, deve restare vuoto o `NON_TROVATO`. Non e ammesso completarlo per inferenza.
+
 ## Cosa e piu opportuno per identificare opportunita
 
 La dashboard deve raccomandare il percorso in base a categoria, qualita fonti e costo atteso.
@@ -252,6 +260,10 @@ V1 locale:
 Ogni export deve includere:
 - categoria;
 - citta/area;
+- telefono;
+- cellulare/WhatsApp quando disponibile;
+- email;
+- indirizzo;
 - sorgente;
 - Google/review/social/public financial source refs quando disponibili;
 - dominio ufficiale;
@@ -264,14 +276,15 @@ Ogni export deve includere:
 
 ## Tre report per singolo imprenditore
 
-Dopo selezione di un singolo imprenditore, la dashboard deve offrire tre report.
+Dopo selezione di un singolo imprenditore, la dashboard deve offrire tre passaggi crescenti.
 
-### 1. Report rapido zero-LLM
+### 1. Passaggio 1 - Report rapido zero-LLM
 
 Scopo: lettura operativa economica.
 
 Contenuto:
 - profilo categoria;
+- telefono, cellulare/WhatsApp, email e indirizzo;
 - sito live/non live;
 - dimensioni D1-D5;
 - gap osservabili;
@@ -281,11 +294,12 @@ Contenuto:
 
 Non usa agent team.
 
-### 2. Report opportunita guidato
+### 2. Passaggio 2 - Report opportunita guidato
 
 Scopo: analisi piu ricca ma ancora controllata.
 
 Contenuto:
+- telefono, cellulare/WhatsApp, email e indirizzo;
 - sintesi sito ufficiale;
 - ipotesi di gap;
 - domande commerciali da verificare;
@@ -294,11 +308,12 @@ Contenuto:
 
 Puo usare strumenti non-agentici solo se approvati e conteggiati. Non produce Opportunity Signal certificato.
 
-### 3. Report RRT completo A1-A9
+### 3. Passaggio 3 - Report RRT completo A1-A9
 
 Scopo: dossier ad alta affidabilita.
 
 Contenuto:
+- telefono, cellulare/WhatsApp, email e indirizzo;
 - evidence atomica;
 - target-specific deep scan;
 - saturation;

@@ -16,6 +16,10 @@ def write_fixture(path):
             "city": "Milano",
             "vertical": "dentale",
             "target_segment": "implantologia",
+            "phone": "+39021234567",
+            "mobile_phone": "+393331234567",
+            "email": "info@alpha.example",
+            "address": "Via Roma 10, Milano",
             "website_live": "1",
             "fetch_state": "OK",
             "D1_hits": "2",
@@ -46,6 +50,10 @@ def write_fixture(path):
             "city": "Roma",
             "vertical": "ristorazione",
             "target_segment": "pizzeria",
+            "phone": "",
+            "mobile_phone": "",
+            "email": "",
+            "address": "",
             "website_live": "0",
             "fetch_state": "NO_OFFICIAL_DOMAIN",
             "D1_hits": "0",
@@ -100,10 +108,21 @@ def main():
         assert list((output_dir / "full_rrt_locked").glob("*.md"))
         locked = next((output_dir / "full_rrt_locked").glob("*.md")).read_text(encoding="utf-8")
         assert "AGENT_TEAM_LOCKED" in locked
+        assert "Passaggio 3" in locked
+        assert "Cellulare/WhatsApp: +393331234567" in locked
         guided = next((output_dir / "guided_reports").glob("*.md")).read_text(encoding="utf-8")
         assert "NON_AGENTIC_GUIDED_REPORT" in guided
+        assert "Passaggio 2" in guided
+        assert "Email: info@alpha.example" in guided
+        rapid = next((output_dir / "reports").glob("*.md")).read_text(encoding="utf-8")
+        assert "Passaggio 1" in rapid
+        assert "Telefono: +39021234567" in rapid
+        assert "Indirizzo: Via Roma 10, Milano" in rapid
         with zipfile.ZipFile(output_dir / "prospects.xlsx") as z:
             assert "xl/worksheets/sheet1.xml" in z.namelist()
+            sheet = z.read("xl/worksheets/sheet1.xml").decode("utf-8")
+            assert "mobile_phone" in sheet
+            assert "+393331234567" in sheet
             assert "xl/worksheets/sheet2.xml" in z.namelist()
         with zipfile.ZipFile(output_dir / "batch_report.docx") as z:
             assert "word/document.xml" in z.namelist()

@@ -12,6 +12,7 @@ from pathlib import Path
 DECISION_ORDER = ["ESCALATE", "SHORTLIST", "COLLECTION_RESTRICTED", "REJECT"]
 SOURCE_COLUMNS = {
     "official_website": ["domain", "website_live"],
+    "contacts": ["phone", "telefono", "mobile_phone", "mobile", "cellulare", "whatsapp", "email", "mail", "address", "indirizzo"],
     "google": ["google_url", "google_rating", "google_review_count", "google_place_id"],
     "review_portals": ["source_url", "review_source", "review_portal_url"],
     "social": ["facebook_url", "instagram_url", "linkedin_url", "tiktok_url"],
@@ -19,6 +20,7 @@ SOURCE_COLUMNS = {
 }
 EXPORT_COLUMNS = [
     "rank", "company", "domain", "city", "vertical", "target_segment", "decision",
+    "phone", "mobile_phone", "email", "address",
     "preliminary_score", "fetch_state", "online_enrichment_state", "google_state",
     "google_rating", "google_review_count", "social_presence_count",
     "public_financials_state", "next_best_action", "operation_cost_eur",
@@ -99,6 +101,42 @@ def source_state(row, columns):
 
 def source_coverage(row):
     return {name: source_state(row, columns) for name, columns in SOURCE_COLUMNS.items()}
+
+
+CONTACT_ALIASES = {
+    "phone": ["phone", "telefono", "telephone", "tel"],
+    "mobile_phone": ["mobile_phone", "mobile", "cellulare", "whatsapp", "whatsapp_phone"],
+    "email": ["email", "mail", "e_mail"],
+    "address": ["address", "indirizzo", "street_address", "sede", "location"],
+}
+
+
+def contact_value(row, key):
+    for column in CONTACT_ALIASES[key]:
+        value = norm(row.get(column))
+        if value:
+            return value
+    return ""
+
+
+def contact_summary_lines(row):
+    values = {
+        "Telefono": contact_value(row, "phone") or "NON_TROVATO",
+        "Cellulare/WhatsApp": contact_value(row, "mobile_phone") or "NON_TROVATO",
+        "Email": contact_value(row, "email") or "NON_TROVATA",
+        "Indirizzo": contact_value(row, "address") or "NON_TROVATO",
+    }
+    return [f"- {label}: {value}" for label, value in values.items()]
+
+
+def contact_html(row):
+    values = [
+        ("Telefono", contact_value(row, "phone") or "NON_TROVATO"),
+        ("Cellulare/WhatsApp", contact_value(row, "mobile_phone") or "NON_TROVATO"),
+        ("Email", contact_value(row, "email") or "NON_TROVATA"),
+        ("Indirizzo", contact_value(row, "address") or "NON_TROVATO"),
+    ]
+    return "".join(f"<span>{escape(label)}: {escape(value)}</span>" for label, value in values)
 
 
 def explainable_scores(row):
@@ -258,6 +296,7 @@ def render_html(payload):
             f'<span>{escape(norm(item.get("target_segment")) or "unknown")}</span>'
             f'<span>{escape(norm(item.get("city")) or norm(item.get("area")) or "unknown")}</span>'
             f'<span>{escape(item["_operation_cost_eur"])}</span></div>'
+            f'<div class="contact">{contact_html(item)}</div>'
             f'<div class="coverage">{coverage_html}</div>'
             f'<div class="score-grid">{score_html}</div>'
             f'<p class="next">{escape(item["_next_best_action"])}</p>'
@@ -324,7 +363,9 @@ def render_html(payload):
     .prospect-head {{ display: flex; justify-content: space-between; gap: 12px; align-items: start; }}
     .prospect h3 {{ margin: 0; font-size: 16px; }}
     .meta, .coverage {{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; color: var(--muted); }}
+    .contact {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 10px; color: var(--muted); font-size: 12px; }}
     .meta span {{ border: 1px solid var(--line); border-radius: 6px; padding: 3px 7px; background: #fafafa; }}
+    .contact span {{ border: 1px solid var(--line); border-radius: 6px; padding: 4px 7px; background: #fff; overflow-wrap: anywhere; }}
     .score-grid {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }}
     .meter-top {{ display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }}
     .bar {{ height: 8px; background: #e8edf3; border-radius: 99px; overflow: hidden; margin-top: 3px; }}
@@ -335,6 +376,7 @@ def render_html(payload):
     @media (max-width: 760px) {{
       .toolbar {{ grid-template-columns: 1fr; }}
       .score-grid {{ grid-template-columns: 1fr; }}
+      .contact {{ grid-template-columns: 1fr; }}
       table {{ font-size: 12px; }}
       main {{ padding: 12px; }}
     }}
@@ -464,7 +506,9 @@ def render_single_report(item):
     scores = item["_explainable_scores"]
     company = norm(item.get("company")) or norm(item.get("domain")) or "Prospect"
     lines = [
-        f"# RRT Rapid Report - {company}",
+        f"# Passaggio 1 - RRT Rapid Report - {company}",
+        "",
+        "Livello: rapido gratuito, zero-LLM, utile per shortlist iniziale.",
         "",
         f"- Category: {norm(item.get('vertical')) or 'unknown'}",
         f"- Target segment: {norm(item.get('target_segment')) or 'unknown'}",
@@ -474,8 +518,13 @@ def render_single_report(item):
         f"- Cost: {item['_operation_cost_eur']}",
         f"- Agent team: AGENT_TEAM_LOCKED",
         "",
-        "## Source Coverage",
+        "## Contatti",
     ]
+    lines.extend(contact_summary_lines(item))
+    lines.extend([
+        "",
+        "## Source Coverage",
+    ])
     for source, state in coverage.items():
         lines.append(f"- {source}: {state}")
     lines.extend(["", "## Explainable Scores"])
@@ -524,7 +573,9 @@ def render_guided_report(item):
     scores = item["_explainable_scores"]
     missing = missing_coverage_items(item)
     lines = [
-        f"# RRT Guided Opportunity Report - {company}",
+        f"# Passaggio 2 - RRT Guided Opportunity Report - {company}",
+        "",
+        "Livello: analisi guidata crescente, non-agentica, basata su fonti gratuite e verificabili.",
         "",
         "Status: NON_AGENTIC_GUIDED_REPORT",
         f"Cost: {item['_operation_cost_eur']}",
@@ -537,13 +588,18 @@ def render_guided_report(item):
         f"- Decision: {norm(item.get('decision')) or 'UNKNOWN'}",
         f"- Preliminary score: {norm(item.get('preliminary_score')) or '0'}",
         "",
+        "## Contatti",
+    ]
+    lines.extend(contact_summary_lines(item))
+    lines.extend([
+        "",
         "## Opportunity Hypothesis",
         "This is a working hypothesis from free public signals only. It must be confirmed before any commercial claim.",
         f"- Current next action: {item['_next_best_action']}",
         f"- Strongest free signal bucket: {max((k for k in scores if k.endswith('_score')), key=lambda k: scores[k], default='unresolved')}",
         "",
         "## Missing Free Checks",
-    ]
+    ])
     if missing:
         lines.extend(f"- {source}" for source in missing)
     else:
@@ -566,7 +622,9 @@ def render_guided_report(item):
 def render_full_rrt_locked_report(item):
     company = norm(item.get("company")) or norm(item.get("domain")) or "Prospect"
     lines = [
-        f"# RRT Full A1-A9 Report Request - {company}",
+        f"# Passaggio 3 - RRT Full A1-A9 Report Request - {company}",
+        "",
+        "Livello: report completo massimo, bloccato finche non autorizzi budget e agent team.",
         "",
         "Status: AGENT_TEAM_LOCKED",
         "Cost estimate: REQUIRED_BEFORE_RUN",
@@ -578,6 +636,11 @@ def render_full_rrt_locked_report(item):
         f"- City: {norm(item.get('city')) or norm(item.get('area')) or 'unknown'}",
         f"- Domain: {norm(item.get('domain')) or 'NEEDS_OFFICIAL_DOMAIN'}",
         f"- Decision: {norm(item.get('decision')) or 'UNKNOWN'}",
+        "",
+        "## Contatti",
+    ]
+    lines.extend(contact_summary_lines(item))
+    lines.extend([
         "",
         "## Required Before Unlock",
         "- Explicit user approval for this entrepreneur or batch.",
@@ -598,7 +661,7 @@ def render_full_rrt_locked_report(item):
         "",
         "## Guardrail",
         "This file is a locked request template, not an executed A1-A9 report.",
-    ]
+    ])
     return "\n".join(lines) + "\n"
 
 
@@ -611,6 +674,10 @@ def export_row(item):
         "vertical": norm(item.get("vertical")),
         "target_segment": norm(item.get("target_segment")),
         "decision": norm(item.get("decision")) or "UNKNOWN",
+        "phone": contact_value(item, "phone"),
+        "mobile_phone": contact_value(item, "mobile_phone"),
+        "email": contact_value(item, "email"),
+        "address": contact_value(item, "address"),
         "preliminary_score": norm(item.get("preliminary_score")) or "0",
         "fetch_state": norm(item.get("fetch_state")),
         "online_enrichment_state": norm(item.get("online_enrichment_state")),

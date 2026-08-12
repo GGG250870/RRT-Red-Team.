@@ -31,6 +31,8 @@ status: active
 - Aggiunti tre report per prospect selezionato: rapido zero-LLM (`reports/`), opportunita guidato non-agentico (`guided_reports/`) e template A1-A9 bloccato (`full_rrt_locked/`) con consenso/budget richiesti.
 - Implementato `11_DASHBOARD/enrich_public_sources.py`: enrichment online gratuito/legal-safe da sito ufficiale e URL pubblici forniti, con estrazione social/review/bilanci linkati, `robots.txt` check, provenance `source_refs_json`, nessun aggiramento e costo `EUR 0.0000`.
 - Aggiunta segmentazione target per `ristorazione`: `fine_dining`, `pizzeria`, `trattoria_osteria`, `sushi_etnico`, `delivery_asporto`, `eventi_catering`, `enoteca_wine_bar`, `bar_cafe` e `ristorazione_generic`, con TripAdvisor e altri portali review come intelligence/provenance per segmento.
+- Rafforzati i tre report per imprenditore come passaggi crescenti: Passaggio 1 rapido zero-LLM, Passaggio 2 guidato non-agentico, Passaggio 3 A1-A9 locked. Ogni passaggio e gli export operativi includono telefono, cellulare/WhatsApp quando disponibile, email e indirizzo, senza inventare dati mancanti.
+- Esteso l'enrichment gratuito/legal-safe con estrazione prudente di contatti da sito ufficiale, link `tel:`, `mailto:`, WhatsApp e dati strutturati JSON-LD pubblici.
 
 ## 2026-08-10
 - Integrato il framework persistito del repository con le librerie metodologiche consolidate emerse nel lavoro conversazionale.
