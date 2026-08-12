@@ -39,6 +39,8 @@ Output:
 
 CSV, XLSX e report singoli includono sempre il blocco contatti: telefono, cellulare/WhatsApp quando disponibile, email e indirizzo. I campi non trovati restano marcati come `NON_TROVATO`/vuoti: non vengono mai inventati.
 
+La lista operativa HTML mostra i contatti principali e, per ogni prospect in `SHORTLIST` o `ESCALATE`, i link diretti ai tre passaggi report.
+
 ## Stato costi
 
 La dashboard V1 usa input gia disponibili, fonti pubbliche gratuite quando accessibili e genera output locali:

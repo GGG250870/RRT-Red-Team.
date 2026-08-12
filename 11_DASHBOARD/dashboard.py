@@ -139,6 +139,19 @@ def contact_html(row):
     return "".join(f"<span>{escape(label)}: {escape(value)}</span>" for label, value in values)
 
 
+def report_links_html(item):
+    if norm(item.get("decision")) not in {"SHORTLIST", "ESCALATE"}:
+        return '<span class="muted">Report disponibili dopo shortlist/escalation</span>'
+    prospect_id = escape(item["_id"])
+    return (
+        '<div class="report-links">'
+        f'<a href="reports/{prospect_id}.md">Passaggio 1</a>'
+        f'<a href="guided_reports/{prospect_id}.md">Passaggio 2</a>'
+        f'<a href="full_rrt_locked/{prospect_id}.md">Passaggio 3</a>'
+        '</div>'
+    )
+
+
 def explainable_scores(row):
     dims = [as_int(row.get(f"D{i}_hits")) for i in range(1, 6)]
     observed = as_int(row.get("observed_dimensions"))
@@ -275,6 +288,7 @@ def render_html(payload):
         decision = norm(item.get("decision")) or "UNKNOWN"
         domain = norm(item.get("domain"))
         domain_html = f'<a href="https://{escape(domain)}" target="_blank" rel="noreferrer">{escape(domain)}</a>' if domain else "NEEDS_OFFICIAL_DOMAIN"
+        reports_html = report_links_html(item)
         rows_html.append(
             "<tr>"
             f"<td>{item['_rank']}</td>"
@@ -282,10 +296,15 @@ def render_html(payload):
             f"<td>{escape(norm(item.get('vertical')))}</td>"
             f"<td>{escape(norm(item.get('target_segment')))}</td>"
             f"<td>{escape(norm(item.get('city')) or norm(item.get('area')))}</td>"
+            f"<td>{escape(contact_value(item, 'phone')) or 'NON_TROVATO'}</td>"
+            f"<td>{escape(contact_value(item, 'mobile_phone')) or 'NON_TROVATO'}</td>"
+            f"<td>{escape(contact_value(item, 'email')) or 'NON_TROVATA'}</td>"
+            f"<td>{escape(contact_value(item, 'address')) or 'NON_TROVATO'}</td>"
             f"<td><span class=\"decision {css_class(decision)}\">{escape(decision)}</span></td>"
             f"<td>{escape(norm(item.get('preliminary_score')) or '0')}</td>"
             f"<td>{domain_html}</td>"
             f"<td>{escape(item['_next_best_action'])}</td>"
+            f"<td>{reports_html}</td>"
             "</tr>"
         )
         cards_html.append(
@@ -299,6 +318,7 @@ def render_html(payload):
             f'<div class="contact">{contact_html(item)}</div>'
             f'<div class="coverage">{coverage_html}</div>'
             f'<div class="score-grid">{score_html}</div>'
+            f'{reports_html}'
             f'<p class="next">{escape(item["_next_best_action"])}</p>'
             '</section>'
         )
@@ -366,6 +386,9 @@ def render_html(payload):
     .contact {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 10px; color: var(--muted); font-size: 12px; }}
     .meta span {{ border: 1px solid var(--line); border-radius: 6px; padding: 3px 7px; background: #fafafa; }}
     .contact span {{ border: 1px solid var(--line); border-radius: 6px; padding: 4px 7px; background: #fff; overflow-wrap: anywhere; }}
+    .report-links {{ display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }}
+    .report-links a {{ border: 1px solid var(--accent); border-radius: 6px; padding: 5px 8px; color: var(--accent); text-decoration: none; font-weight: 700; }}
+    .muted {{ color: var(--muted); font-size: 12px; }}
     .score-grid {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }}
     .meter-top {{ display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }}
     .bar {{ height: 8px; background: #e8edf3; border-radius: 99px; overflow: hidden; margin-top: 3px; }}
@@ -429,7 +452,7 @@ def render_html(payload):
     <section class="band">
       <h2>Lista Operativa</h2>
       <table id="prospect-table">
-        <thead><tr><th>#</th><th>Azienda</th><th>Categoria</th><th>Target</th><th>Citta</th><th>Decisione</th><th>Score</th><th>Dominio</th><th>Prossima azione</th></tr></thead>
+        <thead><tr><th>#</th><th>Azienda</th><th>Categoria</th><th>Target</th><th>Citta</th><th>Telefono</th><th>Cellulare</th><th>Email</th><th>Indirizzo</th><th>Decisione</th><th>Score</th><th>Dominio</th><th>Prossima azione</th><th>Report</th></tr></thead>
         <tbody>{''.join(rows_html)}</tbody>
       </table>
     </section>

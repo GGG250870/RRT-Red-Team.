@@ -129,7 +129,12 @@ def main():
         data = json.loads((output_dir / "dashboard_payload.json").read_text(encoding="utf-8"))
         assert data["items"][0]["_source_coverage"]["google"] == "FOUND"
         assert data["items"][0]["_source_coverage"]["public_financials"] == "FOUND"
-        assert "AGENT_TEAM_LOCKED" in (output_dir / "index.html").read_text(encoding="utf-8")
+        html = (output_dir / "index.html").read_text(encoding="utf-8")
+        assert "AGENT_TEAM_LOCKED" in html
+        assert "Telefono" in html
+        assert "reports/alpha-dental.md" in html
+        assert "guided_reports/alpha-dental.md" in html
+        assert "full_rrt_locked/alpha-dental.md" in html
     print(json.dumps({"status": "PASS", "tests": 1}))
 
 
