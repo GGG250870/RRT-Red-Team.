@@ -4,13 +4,15 @@ project: RRT Red Team
 date: 2026-08-11
 area: Genova
 vertical: dentale
-status: report-generation
+status: manual-selection-not-validated
 ---
 
 # Pilot Genova - 3 studi dentistici
 
 ## Obiettivo
-Sessione di prova manuale assistita dal framework RRT per identificare 3 studi dentistici di Genova con presenza digitale e reputazione sufficienti per produrre un report presentabile.
+Sessione di prova manuale assistita dal framework RRT per identificare 3 studi dentistici di Genova con presenza digitale e reputazione sufficienti per formulare ipotesi di lavoro.
+
+Questa nota non è un run A1→A9, non è un ranking validato e non autorizza Opportunity Signal o claim economici.
 
 ## Prospect selezionati
 1. Studio Odontoiatrico Leonardi - https://alessandroleonardi.it/
@@ -43,4 +45,4 @@ Sessione di prova manuale assistita dal framework RRT per identificare 3 studi d
 Questa e' una sessione pilota manuale, non ancora un run automatico validato del builder portal-first. Le conclusioni devono distinguere dati osservati, inferenze e gap non verificabili. Mancanza di evidenza non equivale a zero.
 
 ## Obiettivo report
-Per ciascun prospect: evidenze forti, blind spot commerciali plausibili, rischio di saturazione/comunicazione, opportunita' prioritarie e una prima mossa concreta. Il report deve essere presentabile al titolare e non suonare come audit generico SEO/social.
+Per ciascun prospect: evidenze forti, blind spot commerciali plausibili, rischio di saturazione/comunicazione, ipotesi prioritarie e una prima mossa da validare. Il report deve distinguere dati osservati, ipotesi e stati `UNRESOLVED`.
