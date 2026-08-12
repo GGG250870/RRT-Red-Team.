@@ -72,7 +72,7 @@ def main():
         assert row["mobile_phone"] == "+393331234567"
         assert row["email"] == "info@pizzeria-alpha.example"
         assert row["address"] == "Via Roma 10 20100 Milano"
-        assert row["official_domain_state"] == "RESOLVED_FROM_OSM_WEBSITE"
+        assert row["official_domain_state"] == "RESOLVED_FROM_OPEN_DATA_WEBSITE"
         assert row["google_url"].startswith("https://www.google.com/maps/search/")
         manual_bbox = build_batch.parse_bbox("45.40,9.05,45.55,9.30", label="manual_bbox:Milano")
         manual_rows = build_batch.discover_area_auto(

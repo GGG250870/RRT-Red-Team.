@@ -581,10 +581,10 @@ def osm_row_from_element(element, area, vertical, target_segment, bbox):
         "address": compose_address(tags, area),
         "latitude": lat,
         "longitude": lon,
-        "discovery_source": "openstreetmap_overpass",
-        "review_source": "openstreetmap.org",
+        "discovery_source": "open_data_city",
+        "review_source": "open_data_map",
         "discovery_query": bbox.get("display_name", area),
-        "official_domain_state": "RESOLVED_FROM_OSM_WEBSITE" if domain else "UNRESOLVED",
+        "official_domain_state": "RESOLVED_FROM_OPEN_DATA_WEBSITE" if domain else "UNRESOLVED",
         "official_domain_source": website,
         "google_url": "https://www.google.com/maps/search/" + urllib.parse.quote_plus(" ".join(p for p in [company, area] if p)),
         "registroimprese_url": "https://www.registroimprese.it/ricerca-libera?p_p_id=ricercalibera&search=" + urllib.parse.quote_plus(company),
@@ -626,7 +626,7 @@ def discover_open_data_area(area, vertical, target_segment, limit, bbox_override
         rows.append(row)
         if len(rows) >= limit:
             break
-    print(f"[OPEN_DATA] {area} | source=openstreetmap_overpass | endpoint={used_endpoint} | accepted={len(rows)}")
+    print(f"[OPEN_DATA] {area} | source=open_data_city | endpoint=public_map_api | accepted={len(rows)}")
     return rows
 
 
@@ -808,7 +808,7 @@ def main():
     ap.add_argument("--vertical", default="dentale")
     ap.add_argument("--target-segment", default="auto")
     ap.add_argument("--bbox", help="Manual area bounding box in south,west,north,east format; valid only with one area")
-    ap.add_argument("--bbox-cache", default=DEFAULT_BBOX_CACHE, help="JSON cache for Nominatim city bounding boxes")
+    ap.add_argument("--bbox-cache", default=DEFAULT_BBOX_CACHE, help="JSON cache for city bounding boxes")
     args = ap.parse_args()
     vertical = normalize_vertical(args.vertical)
     target_segment = normalize_target_segment(vertical, args.target_segment)
@@ -833,7 +833,7 @@ def main():
     print("TARGET_SEGMENT: " + target_segment)
     print("Primary portals: " + (" | ".join(p for p, _ in primary) if primary else "none validated"))
     if vertical in OPEN_DATA_VERTICALS:
-        print("Open data primary discovery: openstreetmap_overpass via city bounding box")
+        print("Open data primary discovery: public city map data via bounding box")
         print("Open data bbox cache: " + (args.bbox_cache or "disabled"))
         if bbox_override:
             print("Open data manual bbox: " + args.bbox)

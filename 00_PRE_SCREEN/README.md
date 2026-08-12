@@ -45,21 +45,21 @@ Nota: i profili di portale non sono domini ufficiali. Quando `build_batch.py` sc
 
 Primary discovery release-safe corrente:
 - `dentale`: MioDottore.
-- `ristorazione`: OpenStreetMap/Overpass open data per estrazione city-first; TripAdvisor/TheFork/Google restano intelligence/provenance, non scraping.
-- `pmi`: OpenStreetMap/Overpass best effort per aziende/craft/office/industrial; dimensione fino a 200 persone resta da validare con fonti esterne.
-- `hospitality`: OpenStreetMap/Overpass open data per strutture ricettive.
-- `benessere_estetica`: OpenStreetMap/Overpass open data per beauty, hairdresser, spa, massage.
-- `servizi_casa`: OpenStreetMap/Overpass open data per shop/craft rilevanti.
-- `formazione`: OpenStreetMap/Overpass open data per scuole, corsi e istituzioni formative.
+- `ristorazione`: fonte open data cartografica per estrazione city-first; TripAdvisor/TheFork/Google restano intelligence/provenance, non scraping.
+- `pmi`: fonte open data cartografica best effort per aziende/craft/office/industrial; dimensione fino a 200 persone resta da validare con fonti esterne.
+- `hospitality`: fonte open data cartografica per strutture ricettive.
+- `benessere_estetica`: fonte open data cartografica per beauty, hairdresser, spa, massage.
+- `servizi_casa`: fonte open data cartografica per shop/craft rilevanti.
+- `formazione`: fonte open data cartografica per scuole, corsi e istituzioni formative.
 - `generic`: nessuna fonte automatica; usare CSV manuale con domini ufficiali.
 
-OpenStreetMap/Overpass viene usato con limiti piccoli, User-Agent identificativo e provenance. Nominatim viene usato solo per risolvere la bounding box della citta indicata, rispettando il limite di richiesta. Non e una fonte completa di mercato: se mancano sito, telefono o email, il record resta parziale.
-Gli endpoint Overpass pubblici possono essere lenti o temporaneamente indisponibili. In quel caso il builder restituisce `DISCOVERY_EMPTY` o batch parziale: riprovare piu tardi o usare CSV/manual seed senza forzare risultati.
+La fonte open data cartografica viene usata con limiti piccoli, User-Agent identificativo e provenance. Il servizio pubblico di geocoding viene usato solo per risolvere la bounding box della citta indicata, rispettando il limite di richiesta. Non e una fonte completa di mercato: se mancano sito, telefono o email, il record resta parziale.
+Gli endpoint pubblici possono essere lenti o temporaneamente indisponibili. In quel caso il builder restituisce `DISCOVERY_EMPTY` o batch parziale: riprovare piu tardi o usare CSV/manual seed senza forzare risultati.
 
 Per ridurre chiamate e ambiguita:
-- `--bbox-cache 00_PRE_SCREEN/open_data_city_bbox_cache.json` salva/riusa le bbox risolte da Nominatim;
+- `--bbox-cache 00_PRE_SCREEN/open_data_city_bbox_cache.json` salva/riusa le bbox risolte dal geocoding pubblico;
 - `--bbox south,west,north,east` permette di indicare manualmente una zona precisa per una singola citta;
-- i record OSM con `addr:city` diverso dalla citta richiesta vengono scartati.
+- i record open data con `addr:city` diverso dalla citta richiesta vengono scartati.
 
 Primary intelligence per tutte le categorie:
 - Google Business Profile, Google Reviews e Google Maps come fonte primaria di reputazione/local presence.

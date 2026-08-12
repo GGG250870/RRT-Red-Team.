@@ -37,9 +37,9 @@ status: active
 - Aggiunto `Cost & Consent Panel` con ledger costi esportabile in JSON/CSV/XLSX: operazioni gratuite concluse a `EUR 0.0000`, Passaggio 3 A1-A9 bloccato con `REQUIRED_BEFORE_RUN` fino a consenso esplicito e budget EUR.
 - Creato `01_ARCHITECTURE/RRT_DASHBOARD_DELIVERY_ROADMAP_V1.md`: roadmap tempi per merge, pilot ristorazione in 24 ore dal dataset reale, pilot PMI/nicchie, calibrazione 50-200 prospect in 3-5 giorni e connettori ufficiali opzionali.
 - Aggiunto pilot kit dashboard: `11_DASHBOARD/pilot_readiness.py`, runbook pilot e template CSV ristorazione/PMI per controllare readiness dataset prima di pre-screen e dashboard.
-- Esteso `00_PRE_SCREEN/build_batch.py` con discovery open data city-first via OpenStreetMap/Overpass per ristorazione, hospitality, benessere/estetica, servizi casa, formazione e PMI best effort; Nominatim usato solo per bounding box citta con User-Agent e limiti.
+- Esteso `00_PRE_SCREEN/build_batch.py` con discovery open data city-first via fonte cartografica pubblica per ristorazione, hospitality, benessere/estetica, servizi casa, formazione e PMI best effort; geocoding pubblico usato solo per bounding box citta con User-Agent e limiti.
 - Creata `03_RULES/RRT_FREE_AI_ASSISTANCE_POLICY_V1.md`: AI gratuite esterne ammesse solo come assistenza non autoritativa, a costo `EUR 0.0000`, su dati pubblici/non sensibili e senza sbloccare A1-A9.
-- Rafforzata discovery open data con cache bbox Nominatim, opzione `--bbox` manuale, retry leggero JSON e filtro `addr:city` per ridurre ambiguita geografiche.
+- Rafforzata discovery open data con cache bbox, opzione `--bbox` manuale, retry leggero JSON e filtro `addr:city` per ridurre ambiguita geografiche.
 
 ## 2026-08-10
 - Integrato il framework persistito del repository con le librerie metodologiche consolidate emerse nel lavoro conversazionale.
