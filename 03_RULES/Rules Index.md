@@ -15,6 +15,13 @@ status: active
 - Nessuna stima di perdita economica senza evidenza L3/L4
 - Human Review obbligatoria per Opportunity Signal
 
+## Scoring Integrity V2
+- Una dimensione mancante mantiene il target `UNRESOLVED`.
+- `level = 0` è valido solo con `NOT_FOUND_AFTER_PROTOCOL`.
+- `COLLECTION_RESTRICTED`, `CONTRADICTORY` e `UNRESOLVED` bloccano lo scoring.
+- Il QA deve bloccare dimensioni duplicate o inattese.
+- Gli zeri legacy non dimostrati passano in [[09_VALIDATION/Legacy Zero Repair Queue]], non vengono corretti automaticamente.
+
 ## Validation targets
 - Claim attribution accuracy ≥ 98%
 - Entity integrity ≥ 99%
@@ -25,4 +32,6 @@ status: active
 
 ## Related
 - [[01_ARCHITECTURE/Architecture Overview]]
+- [[01_ARCHITECTURE/Knowledge Graph Flow]]
 - [[09_VALIDATION/Validation Dashboard]]
+- [[09_VALIDATION/Scoring Integrity V2]]
