@@ -9,10 +9,15 @@ created: 2026-08-12
 
 Research companion: [[01_ARCHITECTURE/RRT_DASHBOARD_ONLINE_RESEARCH_NOTES_V1]]
 Delivery roadmap: [[01_ARCHITECTURE/RRT_DASHBOARD_DELIVERY_ROADMAP_V1]]
+Product North Star: [[01_ARCHITECTURE/RRT_PRODUCT_NORTH_STAR_V1]]
 
 ## Intento
 
 La dashboard finale deve essere il centro operativo per identificare opportunita commerciali per categoria, citta e singolo imprenditore, mantenendo il principio cheap-first e impedendo l'uso degli agent team finche l'utente non lo autorizza esplicitamente.
+
+La dashboard non e il prodotto vendibile finale. E la superficie di controllo che porta da mercato/lista prospect a pochi Opportunity Signal forti, falsificati e auditabili.
+
+Una lista prospect, un PDF consulente o un report rapido sono output intermedi. Il prodotto finale RRT e il Signal che sopravvive a entity resolution, benchmark comparabile, Red Team, commercial gate e human review.
 
 ## Regola aurea
 
@@ -80,6 +85,13 @@ La dashboard deve permettere di scegliere:
    - report singolo imprenditore;
    - export machine-readable.
 
+Ogni output deve dichiarare chiaramente se e:
+- `PROSPECT_LIST`: utile per primo contatto, non Signal;
+- `RAPID_CONTEXT`: contesto operativo, non Signal;
+- `OPPORTUNITY_HYPOTHESIS`: ipotesi da falsificare;
+- `OPPORTUNITY_SIGNAL_CANDIDATE`: finding sopravvissuto ai gate automatici ma non ancora validato;
+- `OPPORTUNITY_SIGNAL`: finding falsificato, auditabile e human-reviewed.
+
 Ogni lista e report per imprenditore deve includere sempre un blocco contatti con:
 - telefono;
 - cellulare/WhatsApp quando disponibile o distinguibile;
@@ -114,6 +126,8 @@ Ordine consigliato:
    - filtra per segnali pubblici e gap operativi;
    - produce `REJECT`, `COLLECTION_RESTRICTED`, `SHORTLIST`, `ESCALATE`;
    - non produce Opportunity Signal.
+
+   Lo scopo del pre-screen e ridurre costo e rumore, non sostituire il Red Team commerciale.
 
 5. `human_selection`
    - l'utente seleziona imprenditori o aziende su cui vale la pena spendere.

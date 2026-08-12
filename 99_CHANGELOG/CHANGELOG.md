@@ -6,6 +6,9 @@ status: active
 # CHANGELOG
 
 ## 2026-08-12
+- Creata `01_ARCHITECTURE/RRT_PRODUCT_NORTH_STAR_V1.md`: definizione ufficiale di RRT come Red Team commerciale esterno, non scraper/SEO audit/report marketing. Il prodotto finale e 3-7 Opportunity Signal forti, non ovvi, falsificati, auditabili e commercialmente potenti.
+- Riallineate HOME, Architecture Overview, Rules Index e Dashboard Product Spec alla North Star: dashboard, scoring, runtime, liste prospect e report rapidi sono infrastruttura/output intermedi, non prodotto vendibile se non portano a Signal che sopravvivono a entity resolution, benchmark, Red Team, commercial gate e human review.
+- Aggiunto Product Drift Test: ogni nuovo sviluppo deve dimostrare come aumenta affidabilita, confronto target-specifico, falsificazione, costo basso per prospect o effetto "come l'avete visto dall'esterno?".
 - Rafforzata PR #7 `agent/prescreen-batch-generator`: il batch builder portal-first scarta link di navigazione/generici e non usa più domini di portale come domini ufficiali del prospect.
 - `build_batch.py` risolve domini ufficiali solo da link espliciti `Sito web`/`website` nella scheda portale; altrimenti lascia `domain` vuoto e imposta `official_domain_state = UNRESOLVED`.
 - `pre_screen.py` preserva `source_url` e ferma i record senza dominio ufficiale come `COLLECTION_RESTRICTED` con `fetch_state = NO_OFFICIAL_DOMAIN`.

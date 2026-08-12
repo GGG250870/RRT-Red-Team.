@@ -6,6 +6,7 @@ status: active
 # Rules Index
 
 ## Core rules
+- Product North Star obbligatoria: ogni sviluppo deve aumentare la probabilita di produrre Opportunity Signal forti, non ovvi, falsificati e auditabili. Vedi [[01_ARCHITECTURE/RRT_PRODUCT_NORTH_STAR_V1]]
 - Evidence provenance obbligatoria
 - Entity integrity prima di ogni scoring
 - `NOT_FOUND` solo dopo protocollo target-specifico
@@ -15,6 +16,7 @@ status: active
 - Nessuna stima di perdita economica senza evidenza L3/L4
 - Human Review obbligatoria per Opportunity Signal
 - AI gratuite esterne solo come assistenza non autoritativa: [[03_RULES/RRT_FREE_AI_ASSISTANCE_POLICY_V1]]
+- Dashboard, scoring e runtime sono infrastruttura: non vanno confusi con il prodotto vendibile se non portano a Signal commercialmente potenti.
 
 ## Scoring Integrity V2
 - Una dimensione mancante mantiene il target `UNRESOLVED`.
@@ -30,8 +32,11 @@ status: active
 - False signal rate ≤ 2%
 - Overclaim rate ≤ 1%
 - Human/model agreement ≥ 90%
+- Product relevance: ogni Opportunity Signal deve dimostrare perche puo influenzare una decisione del cliente, non solo migliorare igiene SEO o completezza informativa.
+- Surprise threshold: un report vendibile deve contenere almeno un finding che l'imprenditore probabilmente non stava gia considerando.
 
 ## Related
+- [[01_ARCHITECTURE/RRT_PRODUCT_NORTH_STAR_V1]]
 - [[01_ARCHITECTURE/Architecture Overview]]
 - [[01_ARCHITECTURE/Knowledge Graph Flow]]
 - [[09_VALIDATION/Validation Dashboard]]

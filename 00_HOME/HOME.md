@@ -10,6 +10,7 @@ updated: 2026-08-12
 ## Navigazione
 - [[00_HOME/SECOND_BRAIN]]
 - [[01_ARCHITECTURE/Architecture Overview]]
+- [[01_ARCHITECTURE/RRT_PRODUCT_NORTH_STAR_V1]]
 - [[01_ARCHITECTURE/Integrated Knowledge Model]]
 - [[01_ARCHITECTURE/Knowledge Graph Flow]]
 - [[01_ARCHITECTURE/RRT_FINAL_DASHBOARD_PRODUCT_SPEC_V1]]
@@ -33,6 +34,7 @@ updated: 2026-08-12
 - [[99_CHANGELOG/CHANGELOG]]
 
 ## Stato progetto
+- North Star prodotto: RRT non e uno scraper, un SEO audit o un report marketing generico; e un Red Team commerciale esterno che deve produrre pochi Opportunity Signal forti, falsificati, auditabili e commercialmente sorprendenti. Vedi [[01_ARCHITECTURE/RRT_PRODUCT_NORTH_STAR_V1]].
 - Runtime A1→A9: **VALIDATO** su B04-37 con A9 `READY`.
 - Runner end-to-end: `rrt_e2e.sh` + `02_AGENTS/runtime/end_to_end_runner.py` presenti in `main`.
 - Auto-repair: **VALIDATO**. Se A4 blocca con `COLLECTION_RESTRICTED`, il runner esegue una sola volta A3 repair e A4/A5 re-audit.
@@ -53,6 +55,7 @@ PUNTO ZERO / PROBLEMA PERCEPITO → PATTERN → BLIND SPOT → EVIDENCE → TARG
 Vedi [[01_ARCHITECTURE/Knowledge Graph Flow]] per la mappa navigabile.
 
 ## Regole chiave
+0. Ogni sviluppo deve essere giudicato rispetto alla North Star: aumentare la probabilita di produrre 3-7 Opportunity Signal forti, non ovvi, falsificati e auditabili.
 1. Nessun dato inventato.
 2. Nessun `NOT_FOUND` senza Target-Specific Deep Scan.
 3. Identità e scope prima dello scoring.
@@ -69,6 +72,7 @@ Vedi [[01_ARCHITECTURE/Knowledge Graph Flow]] per la mappa navigabile.
 14. Gli agent team A1→A9 restano `AGENT_TEAM_LOCKED` finche l'utente non autorizza esplicitamente il run e il budget in EUR.
 15. Regola aurea: eseguire prima tutto cio che e gratuito, legalmente accessibile e realisticamente utile; mai inventare, mai spendere senza consenso.
 16. AI gratuite esterne sono ammesse solo come assistenza non autoritativa su dati pubblici/non sensibili; non sono fonti primarie e non sbloccano A1→A9.
+17. La dashboard e una superficie di controllo, non il prodotto: il prodotto e il Signal che sopravvive a entity resolution, benchmark, Red Team e human review.
 
 ## Casi runtime di riferimento
 - [[04_PROSPECTS/B04-37 - Studio Dentistico Pietro Leone]]
@@ -76,3 +80,6 @@ Vedi [[01_ARCHITECTURE/Knowledge Graph Flow]] per la mappa navigabile.
 
 ## Obiettivo operativo
 Usare [[00_HOME/SECOND_BRAIN]] come pannello quotidiano. Le note prospect diventano l'unità principale di navigazione umana; il runtime continua a vivere in `02_AGENTS/runtime/` senza dipendere da Obsidian.
+
+## Obiettivo prodotto
+Dato un nome azienda o una lista prospect, RRT deve ricostruire l'entita reale, osservare cio che il mercato vede online, confrontarlo con competitor comparabili, individuare gap decisionali, falsificarli e consegnare pochi Opportunity Signal che l'imprenditore probabilmente non stava vedendo.
