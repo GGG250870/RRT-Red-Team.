@@ -5,6 +5,13 @@ status: active
 
 # CHANGELOG
 
+## 2026-08-12
+- Rafforzata PR #7 `agent/prescreen-batch-generator`: il batch builder portal-first scarta link di navigazione/generici e non usa più domini di portale come domini ufficiali del prospect.
+- `build_batch.py` lascia `domain` vuoto e imposta `official_domain_state = UNRESOLVED` quando scopre solo una scheda portale.
+- `pre_screen.py` preserva `source_url` e ferma i record senza dominio ufficiale come `COLLECTION_RESTRICTED` con `fetch_state = NO_OFFICIAL_DOMAIN`.
+- Test live Savona: 5 profili reali MioDottore, 0 righe navigazionali, 0 `ESCALATE`, 5 `COLLECTION_RESTRICTED`; la shortlist resta vuota finché manca `OFFICIAL_DOMAIN_RESOLUTION`.
+- PR #7 resta non merge-safe finché non viene implementata e validata la risoluzione del dominio ufficiale.
+
 ## 2026-08-10
 - Integrato il framework persistito del repository con le librerie metodologiche consolidate emerse nel lavoro conversazionale.
 - Creato [[01_ARCHITECTURE/Integrated Knowledge Model]].

@@ -238,6 +238,8 @@ def score_row(result):
 
 def decision(score, website_live, observed_dims, fetch_state, high_value_hits, structure_hits):
     if not website_live:
+        if fetch_state in {"NO_OFFICIAL_DOMAIN", "PORTAL_ONLY"}:
+            return "COLLECTION_RESTRICTED"
         if fetch_state == "NO_DOMAIN":
             return "REJECT"
         return "COLLECTION_RESTRICTED"
@@ -269,7 +271,7 @@ def main():
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fields = [
-        "company", "domain", "city", "vertical", "website_live", "fetch_state", "pages_found",
+        "company", "domain", "source_url", "official_domain_state", "city", "vertical", "website_live", "fetch_state", "pages_found",
         "D1_hits", "D2_hits", "D3_hits", "D4_hits", "D5_hits", "contactability", "observed_dimensions",
         "high_value_hits", "structure_hits", "youth_growth_hits", "commercial_gap_count",
         "facebook_url", "instagram_url", "linkedin_url", "tiktok_url",
@@ -284,9 +286,13 @@ def main():
         for idx, row in enumerate(rows, 1):
             company = (row.get("company") or row.get("name") or "").strip()
             domain = normalize_domain(row.get("domain") or row.get("website") or row.get("official_domain"))
+            source_url = (row.get("source_url") or "").strip()
+            official_domain_state = (row.get("official_domain_state") or "").strip()
             city = (row.get("city") or "").strip()
             vertical = (row.get("vertical") or "").strip()
             result = scan(domain)
+            if not domain and source_url:
+                result["fetch_state"] = "NO_OFFICIAL_DOMAIN"
             hits = result["hits"]
             observed_dims = sum(1 for v in hits.values() if v > 0)
             social_presence_count = sum(1 for v in result["social_links"].values() if v)
@@ -296,6 +302,8 @@ def main():
             writer.writerow({
                 "company": company,
                 "domain": domain,
+                "source_url": source_url,
+                "official_domain_state": official_domain_state,
                 "city": city,
                 "vertical": vertical,
                 "website_live": result["website_live"],

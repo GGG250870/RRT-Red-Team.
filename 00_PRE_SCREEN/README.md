@@ -19,7 +19,7 @@ zsh rrt_build_and_prescreen.sh 100
 
 Il comando:
 1. usa ricerche web pubbliche senza API key per costruire un CSV di prospect;
-2. deduplica per dominio;
+2. deduplica i record-source per profilo/entity del portale;
 3. esegue il pre-screen deterministico zero-LLM;
 4. produce i risultati completi;
 5. crea un CSV separato con soli `SHORTLIST` e `ESCALATE`.
@@ -30,6 +30,8 @@ File predefiniti:
 - `00_PRE_SCREEN/batch_dentale_shortlist.csv`
 
 La discovery gratuita è volutamente sostituibile: `build_batch.py` è separato da `pre_screen.py`. Se una fonte pubblica cambia o limita l'accesso, il motore di scoring non va modificato.
+
+Nota: i profili di portale non sono domini ufficiali. Quando `build_batch.py` scopre una scheda su MioDottore/Dentisti-Italia/DocDental ma non risolve un dominio ufficiale, lascia `domain` vuoto e imposta `official_domain_state = UNRESOLVED`. Il pre-screen deve fermare questi record come `COLLECTION_RESTRICTED`, non calcolare lo score sul dominio del portale.
 
 ## Input CSV
 Colonne consigliate:
@@ -43,6 +45,8 @@ Sono accettati anche `name`, `website`, `official_domain` come alias.
 ## Output CSV
 - company
 - domain
+- source_url
+- official_domain_state
 - city
 - vertical
 - website_live
@@ -94,3 +98,4 @@ zsh rrt_e2e.sh CASE-ID "Company" https://domain.it/
 6. Le soglie sono euristiche iniziali e vanno calibrate sui batch reali.
 7. Il motore usa solo librerie Python standard e HTTP pubblico; nessuna API LLM.
 8. Nessuna chiamata A1→A9 viene eseguita automaticamente dal batch gratuito.
+9. Un dominio di portale non può essere usato come dominio ufficiale del prospect.

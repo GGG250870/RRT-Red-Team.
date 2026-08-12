@@ -38,6 +38,17 @@ VERTICAL_HINTS = {
     "dentale": ["dent", "odont", "implant", "ortodonz", "stomatolog", "dental"],
 }
 
+GENERIC_LABELS = {
+    "", "login", "registrati gratis", "altro", "mappa", "avanti",
+    "in che modo ordiniamo i risultati", "scarica gratuitamente la nostra app mobile",
+}
+
+PORTAL_PROFILE_RULES = {
+    "miodottore.it": re.compile(r"^/profilo/[^/?#]+/?$", re.I),
+    "dentisti-italia.it": re.compile(r"/dentista-[^/?#]+/[^/?#]+/?$", re.I),
+    "docdental.it": re.compile(r"/(clinica|cliniche|dentista|studio)[^/?#]+", re.I),
+}
+
 
 def fetch(url):
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml"})
@@ -74,6 +85,35 @@ def looks_vertical(text, vertical):
     return any(h in hay for h in VERTICAL_HINTS.get(vertical, [vertical.lower()]))
 
 
+def is_generic_label(label):
+    text = clean_text(label).lower()
+    if text in GENERIC_LABELS:
+        return True
+    if re.fullmatch(r"\d+", text):
+        return True
+    if re.search(r"\b(recension[ei]|dentisti a|carie|gengivite|malocclusione|pulpite)\b", text):
+        return True
+    return False
+
+
+def is_portal_profile_link(link, portal):
+    parsed = urllib.parse.urlparse(link)
+    host = normalize_domain(link)
+    if host != portal:
+        return False
+    rule = PORTAL_PROFILE_RULES.get(portal)
+    if not rule:
+        return False
+    return bool(rule.search(parsed.path or ""))
+
+
+def company_key(company):
+    text = clean_text(company).lower()
+    text = re.sub(r"\b(dott|dottssa|dott\.|dott\.ssa|dr|dr\.|prof|prof\.)\b", " ", text)
+    text = re.sub(r"[^a-z0-9à-ÿ]+", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
 def extract_links(html, base_url):
     out = []
     seen = set()
@@ -98,13 +138,15 @@ def discover_portal(area, vertical, portal, template, limit):
     results = []
     for link, label in extract_links(html, final_url or url):
         hay = f"{label} {link} {area}".lower()
-        if area.lower() not in hay and slug not in link.lower():
+        if is_generic_label(label):
             continue
-        if not looks_vertical(hay, vertical):
+        if not is_portal_profile_link(link, portal):
+            continue
+        if not looks_vertical(hay, vertical) and portal != "miodottore.it":
             continue
         results.append({
-            "company": label or normalize_domain(link),
-            "domain": normalize_domain(link),
+            "company": clean_text(label),
+            "domain": "",
             "source_url": link,
             "area": area,
             "city": area,
@@ -113,6 +155,7 @@ def discover_portal(area, vertical, portal, template, limit):
             "discovery_source": "portal_direct",
             "review_source": portal,
             "discovery_query": url,
+            "official_domain_state": "UNRESOLVED",
         })
         if len(results) >= limit:
             break
@@ -127,7 +170,7 @@ def discover_area(area, vertical, limit):
     portals = PRIMARY_PORTALS_BY_VERTICAL.get(vertical, [])
     for portal, template in portals:
         for row in discover_portal(area, vertical, portal, template, limit):
-            key = (row["company"].lower(), row["source_url"])
+            key = (portal, company_key(row["company"]), row["source_url"].split("#", 1)[0])
             if key in seen:
                 continue
             seen.add(key)
@@ -160,7 +203,7 @@ def main():
     per_area = max(5, (args.target + len(areas) - 1) // len(areas))
     for area in areas:
         for row in discover_area(area, args.vertical, per_area * 3):
-            key = (row["company"].lower(), row["source_url"])
+            key = (row["review_source"], company_key(row["company"]), row["source_url"].split("#", 1)[0])
             if key in seen:
                 continue
             seen.add(key)
@@ -173,7 +216,7 @@ def main():
 
     path = Path(args.output_csv)
     path.parent.mkdir(parents=True, exist_ok=True)
-    fields = ["company", "domain", "source_url", "area", "city", "country", "vertical", "discovery_source", "review_source", "discovery_query"]
+    fields = ["company", "domain", "source_url", "area", "city", "country", "vertical", "discovery_source", "review_source", "discovery_query", "official_domain_state"]
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
