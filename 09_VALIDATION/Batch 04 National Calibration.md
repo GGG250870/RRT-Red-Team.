@@ -37,6 +37,10 @@ Frustagli e Antonio Scala erano stati inizialmente marcati saturated ma sono sta
 - Gennaro Salvatore: partial.
 - diversi casi undercovered nel pass corrente.
 
+## Scoring Integrity V2
+Il nuovo QA è documentato in [[09_VALIDATION/Scoring Integrity V2]].
+L'applicazione retrospettiva ha aperto [[09_VALIDATION/Legacy Zero Repair Queue]] con 15 zeri legacy da ri-validare.
+
 ## Integrità
 Un conteggio conversazionale precedente sullo stato Entity Resolution non coincideva con il ledger persistito. È stato corretto: da allora i progressi vengono calcolati esclusivamente dal ledger autorevole.
 
@@ -45,5 +49,8 @@ Stimare error modes e calibrare i gate prima del campione Validation da 100 pros
 
 ## Related
 - [[09_VALIDATION/Validation Dashboard]]
+- [[09_VALIDATION/Scoring Integrity V2]]
+- [[09_VALIDATION/Legacy Zero Repair Queue]]
 - [[03_RULES/Rules Index]]
 - [[02_AGENTS/Multi-Agent System]]
+- [[01_ARCHITECTURE/Knowledge Graph Flow]]
