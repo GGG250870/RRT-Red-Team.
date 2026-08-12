@@ -19,6 +19,7 @@ OVERPASS_URLS = [
     "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
 ]
+DEFAULT_BBOX_CACHE = "00_PRE_SCREEN/open_data_city_bbox_cache.json"
 
 PRIMARY_PORTALS_BY_VERTICAL = {
     "dentale": [
@@ -363,7 +364,7 @@ def fetch(url):
         return None, None
 
 
-def fetch_json(url, data=None):
+def fetch_json(url, data=None, retries=1):
     headers = {"User-Agent": OPEN_DATA_USER_AGENT}
     if data is None:
         headers["Accept"] = "application/json"
@@ -372,13 +373,16 @@ def fetch_json(url, data=None):
         headers["Content-Type"] = "application/x-www-form-urlencoded"
         headers["Accept"] = "*/*"
     req = urllib.request.Request(url, data=data, headers=headers)
-    try:
-        with urllib.request.urlopen(req, timeout=OPEN_DATA_TIMEOUT) as resp:
-            raw = resp.read(MAX_BYTES)
-            charset = resp.headers.get_content_charset() or "utf-8"
-            return json.loads(raw.decode(charset, errors="replace"))
-    except Exception:
-        return None
+    for attempt in range(retries + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=OPEN_DATA_TIMEOUT) as resp:
+                raw = resp.read(MAX_BYTES)
+                charset = resp.headers.get_content_charset() or "utf-8"
+                return json.loads(raw.decode(charset, errors="replace"))
+        except Exception:
+            if attempt < retries:
+                time.sleep(0.6 * (attempt + 1))
+    return None
 
 
 def slugify_area(area):
@@ -433,7 +437,45 @@ def element_lat_lon(element):
     return str(center.get("lat", "")), str(center.get("lon", ""))
 
 
-def resolve_city_bbox(area):
+def parse_bbox(value, label="manual_bbox"):
+    if not value:
+        return None
+    parts = [p.strip() for p in value.split(",")]
+    if len(parts) != 4:
+        raise ValueError("--bbox richiede formato south,west,north,east")
+    south, west, north, east = parts
+    for part in parts:
+        float(part)
+    return {"south": south, "west": west, "north": north, "east": east, "display_name": label}
+
+
+def load_bbox_cache(path):
+    if not path:
+        return {}
+    p = Path(path)
+    if not p.exists():
+        return {}
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def save_bbox_cache(path, data):
+    if not path:
+        return
+    p = Path(path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
+
+
+def resolve_city_bbox(area, bbox_cache_path=None, bbox_override=None):
+    if bbox_override:
+        return dict(bbox_override)
+    cache_key = area.strip().lower()
+    cache = load_bbox_cache(bbox_cache_path)
+    if cache_key in cache:
+        return cache[cache_key]
     query = urllib.parse.urlencode({
         "city": area,
         "country": "Italia",
@@ -442,7 +484,7 @@ def resolve_city_bbox(area):
         "addressdetails": "1",
         "featureType": "city",
     })
-    data = fetch_json(f"{NOMINATIM_URL}?{query}")
+    data = fetch_json(f"{NOMINATIM_URL}?{query}", retries=1)
     if not data:
         return None
     chosen = data[0]
@@ -455,13 +497,17 @@ def resolve_city_bbox(area):
     if len(bbox) != 4:
         return None
     south, north, west, east = bbox
-    return {
+    bbox = {
         "south": south,
         "north": north,
         "west": west,
         "east": east,
         "display_name": chosen.get("display_name", area),
     }
+    if bbox_cache_path:
+        cache[cache_key] = bbox
+        save_bbox_cache(bbox_cache_path, cache)
+    return bbox
 
 
 def osm_target_filter(target_segment):
@@ -545,8 +591,8 @@ def osm_row_from_element(element, area, vertical, target_segment, bbox):
     }
 
 
-def discover_open_data_area(area, vertical, target_segment, limit):
-    bbox = resolve_city_bbox(area)
+def discover_open_data_area(area, vertical, target_segment, limit, bbox_override=None, bbox_cache_path=DEFAULT_BBOX_CACHE):
+    bbox = resolve_city_bbox(area, bbox_cache_path=bbox_cache_path, bbox_override=bbox_override)
     time.sleep(1.1)
     if not bbox:
         print(f"[OPEN_DATA] {area} | geocode=FAIL")
@@ -555,7 +601,7 @@ def discover_open_data_area(area, vertical, target_segment, limit):
     data = None
     used_endpoint = ""
     for endpoint in OVERPASS_URLS:
-        data = fetch_json(endpoint, data=urllib.parse.urlencode({"data": query}))
+        data = fetch_json(endpoint, data=urllib.parse.urlencode({"data": query}), retries=1)
         if data:
             used_endpoint = endpoint
             break
@@ -746,9 +792,9 @@ def discover_area(area, vertical, target_segment, limit):
     return rows
 
 
-def discover_area_auto(area, vertical, target_segment, limit):
+def discover_area_auto(area, vertical, target_segment, limit, bbox_override=None, bbox_cache_path=DEFAULT_BBOX_CACHE):
     if vertical in OPEN_DATA_VERTICALS:
-        rows = discover_open_data_area(area, vertical, target_segment, limit)
+        rows = discover_open_data_area(area, vertical, target_segment, limit, bbox_override=bbox_override, bbox_cache_path=bbox_cache_path)
         if rows:
             return rows
     return discover_area(area, vertical, target_segment, limit)
@@ -761,6 +807,8 @@ def main():
     ap.add_argument("--target", type=int, default=100)
     ap.add_argument("--vertical", default="dentale")
     ap.add_argument("--target-segment", default="auto")
+    ap.add_argument("--bbox", help="Manual area bounding box in south,west,north,east format; valid only with one area")
+    ap.add_argument("--bbox-cache", default=DEFAULT_BBOX_CACHE, help="JSON cache for Nominatim city bounding boxes")
     args = ap.parse_args()
     vertical = normalize_vertical(args.vertical)
     target_segment = normalize_target_segment(vertical, args.target_segment)
@@ -768,6 +816,14 @@ def main():
     areas = [a.strip() for a in args.areas.split(",") if a.strip()]
     if not areas:
         print("Nessuna area specificata")
+        return 2
+    if args.bbox and len(areas) != 1:
+        print("--bbox puo essere usato solo con una singola area")
+        return 2
+    try:
+        bbox_override = parse_bbox(args.bbox, label=f"manual_bbox:{areas[0]}") if args.bbox else None
+    except ValueError as exc:
+        print(str(exc))
         return 2
 
     print("COUNTRY_SCOPE: ITALIA ONLY")
@@ -778,6 +834,9 @@ def main():
     print("Primary portals: " + (" | ".join(p for p, _ in primary) if primary else "none validated"))
     if vertical in OPEN_DATA_VERTICALS:
         print("Open data primary discovery: openstreetmap_overpass via city bounding box")
+        print("Open data bbox cache: " + (args.bbox_cache or "disabled"))
+        if bbox_override:
+            print("Open data manual bbox: " + args.bbox)
     print("Primary intelligence - Google: " + source_group_summary(vertical, "google"))
     print("Primary intelligence - reviews: " + source_group_summary(vertical, "review_portals"))
     print("Primary intelligence - social: " + source_group_summary(vertical, "social"))
@@ -791,7 +850,7 @@ def main():
     seen = set()
     per_area = max(5, (args.target + len(areas) - 1) // len(areas))
     for area in areas:
-        for row in discover_area_auto(area, vertical, target_segment, per_area * 3):
+        for row in discover_area_auto(area, vertical, target_segment, per_area * 3, bbox_override=bbox_override, bbox_cache_path=args.bbox_cache):
             key = (row["review_source"], company_key(row["company"]), row["source_url"].split("#", 1)[0])
             if key in seen:
                 continue

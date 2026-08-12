@@ -56,6 +56,11 @@ Primary discovery release-safe corrente:
 OpenStreetMap/Overpass viene usato con limiti piccoli, User-Agent identificativo e provenance. Nominatim viene usato solo per risolvere la bounding box della citta indicata, rispettando il limite di richiesta. Non e una fonte completa di mercato: se mancano sito, telefono o email, il record resta parziale.
 Gli endpoint Overpass pubblici possono essere lenti o temporaneamente indisponibili. In quel caso il builder restituisce `DISCOVERY_EMPTY` o batch parziale: riprovare piu tardi o usare CSV/manual seed senza forzare risultati.
 
+Per ridurre chiamate e ambiguita:
+- `--bbox-cache 00_PRE_SCREEN/open_data_city_bbox_cache.json` salva/riusa le bbox risolte da Nominatim;
+- `--bbox south,west,north,east` permette di indicare manualmente una zona precisa per una singola citta;
+- i record OSM con `addr:city` diverso dalla citta richiesta vengono scartati.
+
 Primary intelligence per tutte le categorie:
 - Google Business Profile, Google Reviews e Google Maps come fonte primaria di reputazione/local presence.
 - Portali recensioni verticali e generalisti rilevanti per categoria.
@@ -160,6 +165,12 @@ Per estrarre una lista iniziale dalla citta indicata:
 ```bash
 zsh rrt_build_and_prescreen.sh 50 "Milano" ristorazione pizzeria
 zsh rrt_dashboard.sh 00_PRE_SCREEN/batch_ristorazione_pizzeria_results.csv 11_DASHBOARD/out/milano_pizzeria
+```
+
+Esempio con bbox manuale:
+
+```bash
+python3 00_PRE_SCREEN/build_batch.py 00_PRE_SCREEN/batch_milano_pizzeria.csv --target 50 --areas Milano --vertical ristorazione --target-segment pizzeria --bbox 45.3867,9.0408,45.5358,9.2781
 ```
 
 ```bash

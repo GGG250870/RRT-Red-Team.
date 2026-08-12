@@ -7,7 +7,7 @@ from pathlib import Path
 import build_batch
 
 
-def fake_fetch_json(url, data=None):
+def fake_fetch_json(url, data=None, retries=1):
     if "nominatim.openstreetmap.org" in url:
         assert "city=Milano" in url
         return [{
@@ -60,7 +60,10 @@ def main():
     build_batch.fetch_json = fake_fetch_json
     build_batch.time.sleep = lambda _seconds: None
     try:
-        rows = build_batch.discover_area_auto("Milano", "ristorazione", "pizzeria", 10)
+        with tempfile.TemporaryDirectory() as cache_td:
+            cache_path = Path(cache_td) / "bbox_cache.json"
+            rows = build_batch.discover_area_auto("Milano", "ristorazione", "pizzeria", 10, bbox_cache_path=cache_path)
+            assert cache_path.exists()
         assert len(rows) == 1
         row = rows[0]
         assert row["company"] == "Pizzeria Alpha"
@@ -71,6 +74,11 @@ def main():
         assert row["address"] == "Via Roma 10 20100 Milano"
         assert row["official_domain_state"] == "RESOLVED_FROM_OSM_WEBSITE"
         assert row["google_url"].startswith("https://www.google.com/maps/search/")
+        manual_bbox = build_batch.parse_bbox("45.40,9.05,45.55,9.30", label="manual_bbox:Milano")
+        manual_rows = build_batch.discover_area_auto(
+            "Milano", "ristorazione", "pizzeria", 10, bbox_override=manual_bbox, bbox_cache_path=None
+        )
+        assert len(manual_rows) == 1
 
         with tempfile.TemporaryDirectory() as td:
             output = Path(td) / "batch.csv"
