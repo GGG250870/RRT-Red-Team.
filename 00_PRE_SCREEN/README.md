@@ -45,13 +45,16 @@ Nota: i profili di portale non sono domini ufficiali. Quando `build_batch.py` sc
 
 Primary discovery release-safe corrente:
 - `dentale`: MioDottore.
-- `ristorazione`: nessuna fonte automatica ancora validata; usare CSV manuale con domini ufficiali.
-- `pmi`: nessuna fonte automatica ancora validata; usare CSV manuale con domini ufficiali.
-- `hospitality`: nessuna fonte automatica ancora validata; usare CSV manuale con domini ufficiali.
-- `benessere_estetica`: nessuna fonte automatica ancora validata; usare CSV manuale con domini ufficiali.
-- `servizi_casa`: nessuna fonte automatica ancora validata; usare CSV manuale con domini ufficiali.
-- `formazione`: nessuna fonte automatica ancora validata; usare CSV manuale con domini ufficiali.
+- `ristorazione`: OpenStreetMap/Overpass open data per estrazione city-first; TripAdvisor/TheFork/Google restano intelligence/provenance, non scraping.
+- `pmi`: OpenStreetMap/Overpass best effort per aziende/craft/office/industrial; dimensione fino a 200 persone resta da validare con fonti esterne.
+- `hospitality`: OpenStreetMap/Overpass open data per strutture ricettive.
+- `benessere_estetica`: OpenStreetMap/Overpass open data per beauty, hairdresser, spa, massage.
+- `servizi_casa`: OpenStreetMap/Overpass open data per shop/craft rilevanti.
+- `formazione`: OpenStreetMap/Overpass open data per scuole, corsi e istituzioni formative.
 - `generic`: nessuna fonte automatica; usare CSV manuale con domini ufficiali.
+
+OpenStreetMap/Overpass viene usato con limiti piccoli, User-Agent identificativo e provenance. Nominatim viene usato solo per risolvere la bounding box della citta indicata, rispettando il limite di richiesta. Non e una fonte completa di mercato: se mancano sito, telefono o email, il record resta parziale.
+Gli endpoint Overpass pubblici possono essere lenti o temporaneamente indisponibili. In quel caso il builder restituisce `DISCOVERY_EMPTY` o batch parziale: riprovare piu tardi o usare CSV/manual seed senza forzare risultati.
 
 Primary intelligence per tutte le categorie:
 - Google Business Profile, Google Reviews e Google Maps come fonte primaria di reputazione/local presence.
@@ -151,6 +154,13 @@ Le dimensioni sono profili zero-LLM per filtro operativo. Non sono confrontabili
 Lo score è solo un filtro operativo. Non rappresenta un Opportunity Signal e non sostituisce A1→A9.
 
 ## Uso manuale
+
+Per estrarre una lista iniziale dalla citta indicata:
+
+```bash
+zsh rrt_build_and_prescreen.sh 50 "Milano" ristorazione pizzeria
+zsh rrt_dashboard.sh 00_PRE_SCREEN/batch_ristorazione_pizzeria_results.csv 11_DASHBOARD/out/milano_pizzeria
+```
 
 ```bash
 python3 00_PRE_SCREEN/pre_screen.py 00_PRE_SCREEN/prospects_example.csv 00_PRE_SCREEN/output.csv

@@ -1,15 +1,24 @@
 #!/usr/bin/env python3
 import argparse
 import csv
+import json
 import re
+import time
 import urllib.parse
 import urllib.request
 from html import unescape
 from pathlib import Path
 
 USER_AGENT = "Mozilla/5.0 (compatible; RRT-BatchBuilder/2.0; +public-web-research)"
+OPEN_DATA_USER_AGENT = "RRT-BatchBuilder/2.0 public-web-research"
 TIMEOUT = 8
+OPEN_DATA_TIMEOUT = 30
 MAX_BYTES = 1_000_000
+NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
+OVERPASS_URLS = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
+]
 
 PRIMARY_PORTALS_BY_VERTICAL = {
     "dentale": [
@@ -22,6 +31,33 @@ PRIMARY_PORTALS_BY_VERTICAL = {
     "servizi_casa": [],
     "formazione": [],
     "generic": []
+}
+
+OPEN_DATA_VERTICALS = {"ristorazione", "hospitality", "benessere_estetica", "servizi_casa", "formazione", "pmi"}
+OSM_TAG_QUERIES = {
+    "ristorazione": [
+        '["amenity"~"restaurant|cafe|bar|fast_food|pub|ice_cream"]',
+    ],
+    "hospitality": [
+        '["tourism"~"hotel|guest_house|hostel|apartment|chalet|camp_site|agritourism"]',
+    ],
+    "benessere_estetica": [
+        '["shop"~"beauty|hairdresser|massage"]',
+        '["leisure"="spa"]',
+    ],
+    "servizi_casa": [
+        '["shop"~"hardware|doityourself|paint|furniture|kitchen|bathroom_furnishing"]',
+        '["craft"~"electrician|plumber|carpenter|roofer|painter|builder|glaziery"]',
+    ],
+    "formazione": [
+        '["amenity"~"school|college|university|music_school|driving_school|language_school"]',
+        '["office"="educational_institution"]',
+    ],
+    "pmi": [
+        '["office"~"company|it|consulting|accountant|architect|engineer"]',
+        '["craft"]',
+        '["industrial"]',
+    ],
 }
 
 PRIMARY_INTELLIGENCE_SOURCES_BY_VERTICAL = {
@@ -327,6 +363,24 @@ def fetch(url):
         return None, None
 
 
+def fetch_json(url, data=None):
+    headers = {"User-Agent": OPEN_DATA_USER_AGENT}
+    if data is None:
+        headers["Accept"] = "application/json"
+    if data is not None:
+        data = data.encode("utf-8")
+        headers["Content-Type"] = "application/x-www-form-urlencoded"
+        headers["Accept"] = "*/*"
+    req = urllib.request.Request(url, data=data, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=OPEN_DATA_TIMEOUT) as resp:
+            raw = resp.read(MAX_BYTES)
+            charset = resp.headers.get_content_charset() or "utf-8"
+            return json.loads(raw.decode(charset, errors="replace"))
+    except Exception:
+        return None
+
+
 def slugify_area(area):
     s = area.strip().lower()
     s = re.sub(r"[^a-z0-9à-ÿ]+", "-", s)
@@ -344,6 +398,190 @@ def normalize_domain(url):
 def clean_text(value):
     value = unescape(re.sub(r"(?s)<[^>]+>", " ", value or ""))
     return re.sub(r"\s+", " ", value).strip()
+
+
+def first_tag(tags, *names):
+    for name in names:
+        value = clean_text(tags.get(name, ""))
+        if value:
+            return value
+    return ""
+
+
+def compose_address(tags, fallback_city):
+    parts = [
+        first_tag(tags, "addr:street"),
+        first_tag(tags, "addr:housenumber"),
+        first_tag(tags, "addr:postcode"),
+        first_tag(tags, "addr:city") or fallback_city,
+    ]
+    return clean_text(" ".join(part for part in parts if part))
+
+
+def osm_object_url(element):
+    osm_type = element.get("type", "")
+    osm_id = element.get("id", "")
+    if not osm_type or not osm_id:
+        return ""
+    return f"https://www.openstreetmap.org/{osm_type}/{osm_id}"
+
+
+def element_lat_lon(element):
+    if "lat" in element and "lon" in element:
+        return str(element["lat"]), str(element["lon"])
+    center = element.get("center") or {}
+    return str(center.get("lat", "")), str(center.get("lon", ""))
+
+
+def resolve_city_bbox(area):
+    query = urllib.parse.urlencode({
+        "city": area,
+        "country": "Italia",
+        "format": "json",
+        "limit": "3",
+        "addressdetails": "1",
+        "featureType": "city",
+    })
+    data = fetch_json(f"{NOMINATIM_URL}?{query}")
+    if not data:
+        return None
+    chosen = data[0]
+    for candidate in data:
+        address = candidate.get("address") or {}
+        if (address.get("city") or address.get("town") or address.get("municipality") or "").lower() == area.lower():
+            chosen = candidate
+            break
+    bbox = chosen.get("boundingbox") or []
+    if len(bbox) != 4:
+        return None
+    south, north, west, east = bbox
+    return {
+        "south": south,
+        "north": north,
+        "west": west,
+        "east": east,
+        "display_name": chosen.get("display_name", area),
+    }
+
+
+def osm_target_filter(target_segment):
+    if target_segment == "pizzeria":
+        return ['["cuisine"~"pizza|italian",i]', '["name"~"pizzeria|pizza",i]']
+    if target_segment == "bar_cafe":
+        return ['["amenity"~"cafe|bar|pub"]']
+    if target_segment == "sushi_etnico":
+        return ['["cuisine"~"sushi|japanese|chinese|thai|indian|asian|fusion|poke",i]']
+    if target_segment == "trattoria_osteria":
+        return ['["name"~"trattoria|osteria",i]', '["cuisine"~"regional|italian",i]']
+    if target_segment == "enoteca_wine_bar":
+        return ['["amenity"~"bar|pub"]', '["name"~"enoteca|wine",i]']
+    return []
+
+
+def overpass_query(vertical, target_segment, bbox, limit):
+    selectors = OSM_TAG_QUERIES.get(vertical, [])
+    bbox_expr = f'({bbox["south"]},{bbox["west"]},{bbox["north"]},{bbox["east"]})'
+    blocks = []
+    for selector in selectors:
+        blocks.extend([
+            f"node{selector}{bbox_expr};",
+            f"way{selector}{bbox_expr};",
+        ])
+    return "[out:json][timeout:20];(" + "".join(blocks) + f");out center tags qt {max(limit * 8, 80)};"
+
+
+def row_matches_target(row, tags, vertical, target_segment):
+    if vertical != "ristorazione" or target_segment in {"", "auto", "ristorazione_generic"}:
+        return True
+    hay = " ".join([
+        row.get("company", ""),
+        tags.get("cuisine", ""),
+        tags.get("amenity", ""),
+        tags.get("description", ""),
+    ]).lower()
+    target = TARGET_SEGMENTS_BY_VERTICAL.get(vertical, {}).get(target_segment, {})
+    hints = target.get("hints", [])
+    return any(hint.lower() in hay for hint in hints)
+
+
+def row_matches_area(tags, area):
+    tagged_city = first_tag(tags, "addr:city", "is_in:city")
+    if not tagged_city:
+        return True
+    return tagged_city.lower() == area.lower()
+
+
+def osm_row_from_element(element, area, vertical, target_segment, bbox):
+    tags = element.get("tags") or {}
+    company = first_tag(tags, "name", "operator", "brand")
+    if not company:
+        return None
+    website = first_tag(tags, "website", "contact:website", "url")
+    domain = normalize_domain(website)
+    lat, lon = element_lat_lon(element)
+    source_url = osm_object_url(element)
+    return {
+        "company": company,
+        "domain": domain,
+        "source_url": source_url,
+        "area": area,
+        "city": first_tag(tags, "addr:city") or area,
+        "country": "IT",
+        "vertical": vertical,
+        "target_segment": target_segment,
+        "phone": first_tag(tags, "phone", "contact:phone"),
+        "mobile_phone": first_tag(tags, "mobile", "contact:mobile", "contact:whatsapp"),
+        "email": first_tag(tags, "email", "contact:email"),
+        "address": compose_address(tags, area),
+        "latitude": lat,
+        "longitude": lon,
+        "discovery_source": "openstreetmap_overpass",
+        "review_source": "openstreetmap.org",
+        "discovery_query": bbox.get("display_name", area),
+        "official_domain_state": "RESOLVED_FROM_OSM_WEBSITE" if domain else "UNRESOLVED",
+        "official_domain_source": website,
+        "google_url": "https://www.google.com/maps/search/" + urllib.parse.quote_plus(" ".join(p for p in [company, area] if p)),
+        "registroimprese_url": "https://www.registroimprese.it/ricerca-libera?p_p_id=ricercalibera&search=" + urllib.parse.quote_plus(company),
+    }
+
+
+def discover_open_data_area(area, vertical, target_segment, limit):
+    bbox = resolve_city_bbox(area)
+    time.sleep(1.1)
+    if not bbox:
+        print(f"[OPEN_DATA] {area} | geocode=FAIL")
+        return []
+    query = overpass_query(vertical, target_segment, bbox, limit)
+    data = None
+    used_endpoint = ""
+    for endpoint in OVERPASS_URLS:
+        data = fetch_json(endpoint, data=urllib.parse.urlencode({"data": query}))
+        if data:
+            used_endpoint = endpoint
+            break
+    if not data:
+        print(f"[OPEN_DATA] {area} | overpass=FAIL")
+        return []
+    rows = []
+    seen = set()
+    for element in data.get("elements", []):
+        tags = element.get("tags") or {}
+        if not row_matches_area(tags, area):
+            continue
+        row = osm_row_from_element(element, area, vertical, target_segment, bbox)
+        if not row:
+            continue
+        if not row_matches_target(row, tags, vertical, target_segment):
+            continue
+        key = (company_key(row["company"]), row.get("address"), row.get("source_url"))
+        if key in seen:
+            continue
+        seen.add(key)
+        rows.append(row)
+        if len(rows) >= limit:
+            break
+    print(f"[OPEN_DATA] {area} | source=openstreetmap_overpass | endpoint={used_endpoint} | accepted={len(rows)}")
+    return rows
 
 
 def looks_vertical(text, vertical):
@@ -508,6 +746,14 @@ def discover_area(area, vertical, target_segment, limit):
     return rows
 
 
+def discover_area_auto(area, vertical, target_segment, limit):
+    if vertical in OPEN_DATA_VERTICALS:
+        rows = discover_open_data_area(area, vertical, target_segment, limit)
+        if rows:
+            return rows
+    return discover_area(area, vertical, target_segment, limit)
+
+
 def main():
     ap = argparse.ArgumentParser(description="RRT Italy-only portal-first batch builder")
     ap.add_argument("output_csv")
@@ -525,11 +771,13 @@ def main():
         return 2
 
     print("COUNTRY_SCOPE: ITALIA ONLY")
-    print("DISCOVERY_MODE: PORTAL_FIRST")
+    print("DISCOVERY_MODE: OPEN_DATA_FIRST" if vertical in OPEN_DATA_VERTICALS else "DISCOVERY_MODE: PORTAL_FIRST")
     primary = PRIMARY_PORTALS_BY_VERTICAL.get(vertical, [])
     print("VERTICAL: " + vertical)
     print("TARGET_SEGMENT: " + target_segment)
     print("Primary portals: " + (" | ".join(p for p, _ in primary) if primary else "none validated"))
+    if vertical in OPEN_DATA_VERTICALS:
+        print("Open data primary discovery: openstreetmap_overpass via city bounding box")
     print("Primary intelligence - Google: " + source_group_summary(vertical, "google"))
     print("Primary intelligence - reviews: " + source_group_summary(vertical, "review_portals"))
     print("Primary intelligence - social: " + source_group_summary(vertical, "social"))
@@ -543,7 +791,7 @@ def main():
     seen = set()
     per_area = max(5, (args.target + len(areas) - 1) // len(areas))
     for area in areas:
-        for row in discover_area(area, vertical, target_segment, per_area * 3):
+        for row in discover_area_auto(area, vertical, target_segment, per_area * 3):
             key = (row["review_source"], company_key(row["company"]), row["source_url"].split("#", 1)[0])
             if key in seen:
                 continue
@@ -557,7 +805,12 @@ def main():
 
     path = Path(args.output_csv)
     path.parent.mkdir(parents=True, exist_ok=True)
-    fields = ["company", "domain", "source_url", "area", "city", "country", "vertical", "target_segment", "discovery_source", "review_source", "discovery_query", "official_domain_state", "official_domain_source"]
+    fields = [
+        "company", "domain", "source_url", "area", "city", "country", "vertical", "target_segment",
+        "phone", "mobile_phone", "email", "address", "latitude", "longitude",
+        "google_url", "registroimprese_url",
+        "discovery_source", "review_source", "discovery_query", "official_domain_state", "official_domain_source",
+    ]
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
