@@ -13,6 +13,12 @@ status: active
 - Test live Savona: 5 profili reali MioDottore, 0 righe navigazionali, 2 domini ufficiali risolti, 1 `ESCALATE`, 1 `SHORTLIST`, 3 `COLLECTION_RESTRICTED`.
 - Default `rrt_build_and_prescreen.sh` riportati a città (`Milano,Roma,Torino,Genova,Bologna`); il targeting quartiere resta best effort e non ancora validato.
 - PR #7 resta da validare su più aree perché MioDottore non copre necessariamente il livello quartiere e le fonti secondarie sono disabilitate.
+- Rafforzato `02_AGENTS/runtime/qa_scoring_engine_v2.py`: un target bloccato non può esporre `status = PASS` né `normalized_0_100`.
+- Estesa `09_VALIDATION/test_scoring_integrity_v2.py` da 5 a 11 regression check, includendo stati bloccanti (`UNRESOLVED`, `COLLECTION_RESTRICTED`, `CONTRADICTORY`), dimensioni inattese, scoring bloccato con output numerico e guard `SATURATED_MULTI_TARGET`.
+- Aggiunto in `02_AGENTS/runtime/motore_multi_target_v2.py` il guard `validate_saturated_multi_target`: `SATURATED_MULTI_TARGET` è valido solo se tutti i target attesi sono terminali.
+- Riallineate le note Obsidian di Tranche D al ledger machine-readable `09_VALIDATION/RRT_BATCH_04_SATURATION_REAUDIT_TRANCHE_D_V1.json`: B04-34, B04-37 e B04-48 risultano re-audit PASS 3/3.
+- Aggiornate le schede B04-34 e B04-48: benchmark freeze parziale e `NO_SIGNAL_PROVISIONAL`; P1-P8 prominence/discoverability resta il gate aperto prima di qualunque conclusione commerciale.
+- La Legacy Zero Repair Queue resta aperta con 15 item: nessuno zero legacy è stato convertito automaticamente.
 
 ## 2026-08-10
 - Integrato il framework persistito del repository con le librerie metodologiche consolidate emerse nel lavoro conversazionale.

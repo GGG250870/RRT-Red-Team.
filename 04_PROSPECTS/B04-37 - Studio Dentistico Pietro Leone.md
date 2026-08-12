@@ -12,7 +12,7 @@ red_team_state: WEAK_SURVIVAL
 signal_state: WATCHLIST
 qa_state: READY
 human_review: pending
-updated: 2026-08-10
+updated: 2026-08-12
 ---
 
 # B04-37 — Studio Dentistico Dott. Pietro Leone
@@ -25,6 +25,9 @@ Pipeline completa A1→A9 conclusa con `PASS`. QA finale A9: `READY`.
 - Dott. Pietro Leone.
 - Napoli, Viale Antonio Gramsci 18.
 - Dominio ufficiale: https://www.studiodentisticoleone.it/
+
+## Evidence Pack
+[[05_EVIDENCE/B04-37 - Evidence Pack]]
 
 ## Target match
 - D1 paura/ansia/sedazione: OBSERVED.
@@ -57,8 +60,9 @@ Durante la validazione B04-37 sono emersi e corretti:
 ## Collegamenti
 - [[00_HOME/SECOND_BRAIN]]
 - [[04_PROSPECTS/Prospects Index]]
-- [[05_EVIDENCE/Evidence Index]]
+- [[05_EVIDENCE/B04-37 - Evidence Pack]]
 - [[06_BENCHMARKS/Benchmarks Index]]
 - [[08_RED_TEAM/Red Team Index]]
 - [[07_SIGNALS/Signals Index]]
 - [[09_VALIDATION/Validation Dashboard]]
+- [[09_VALIDATION/Batch 04 National Calibration]]
