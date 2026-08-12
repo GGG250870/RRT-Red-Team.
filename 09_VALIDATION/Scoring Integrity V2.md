@@ -19,7 +19,13 @@ Il QA V2 ha corretto due difetti strutturali del motore multi-target:
 - Dimensioni duplicate o inattese bloccano il QA.
 
 ## Test
-La regression suite V2 passa **5/5**.
+La regression suite V2 passa **11/11**.
+
+Copertura aggiunta:
+- stati `UNRESOLVED`, `COLLECTION_RESTRICTED` e `CONTRADICTORY` bloccano lo score;
+- dimensioni inattese bloccano il target;
+- `SATURATED_MULTI_TARGET` è bloccato se almeno un target atteso non è terminale;
+- il QA rifiuta target bloccati che espongono comunque `normalized_0_100` o `status = PASS`.
 
 ## Debito tecnico emerso
 L'applicazione del nuovo QA alla matrice storica ha individuato **15 zeri legacy non sufficientemente dimostrati**.

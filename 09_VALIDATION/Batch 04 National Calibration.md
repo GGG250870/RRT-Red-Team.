@@ -39,16 +39,18 @@ Frustagli e Antonio Scala erano stati inizialmente marcati saturated ma sono sta
 - diversi casi undercovered nel pass corrente.
 
 ### Tranche D
-- [[04_PROSPECTS/B04-34 - Centro Odontoiatrico Gioia]] — `SATURATED_MULTI_TARGET_PRE_REAUDIT`.
+- [[04_PROSPECTS/B04-34 - Centro Odontoiatrico Gioia]] — re-audit PASS; benchmark freeze parziale; `NO_SIGNAL_PROVISIONAL`.
 - [[04_PROSPECTS/B04-37 - Studio Dentistico Pietro Leone]] — caso di riferimento end-to-end, A9 `READY`, `WATCHLIST`.
-- [[04_PROSPECTS/B04-48 - Savasta & Partners]] — `SATURATED_MULTI_TARGET_PRE_REAUDIT`.
+- [[04_PROSPECTS/B04-48 - Savasta & Partners]] — re-audit PASS; benchmark freeze parziale; `NO_SIGNAL_PROVISIONAL`.
 
 Evidence Pack:
 - [[05_EVIDENCE/B04-34 - Evidence Pack]]
 - [[05_EVIDENCE/B04-37 - Evidence Pack]]
 - [[05_EVIDENCE/B04-48 - Evidence Pack]]
 
-Gate dedicato: [[09_VALIDATION/Saturation Evidence Re-Audit - Tranche D]].
+Gate dedicato: [[09_VALIDATION/Saturation Evidence Re-Audit - Tranche D]] — PASS 3/3.
+
+Nota conservativa: il Red Team/Commercial Gate Tranche D registra `NO_SIGNAL_PROVISIONAL` per B04-34 e B04-48 finché P1-P8 non è completato. Nessun caso Tranche D viene forzato verso Opportunity Signal.
 
 ## Scoring Integrity V2
 Il nuovo QA è documentato in [[09_VALIDATION/Scoring Integrity V2]].

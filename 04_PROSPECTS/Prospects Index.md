@@ -9,9 +9,9 @@ updated: 2026-08-12
 Ogni prospect ha una nota madre con frontmatter YAML e link a evidence, benchmark, red-team, validation e signal.
 
 ## Prospect attivi
-- [[04_PROSPECTS/B04-34 - Centro Odontoiatrico Gioia]] — SATURATED_MULTI_TARGET pre-reaudit; benchmark bloccato.
+- [[04_PROSPECTS/B04-34 - Centro Odontoiatrico Gioia]] — re-audit PASS; benchmark freeze parziale; NO_SIGNAL_PROVISIONAL.
 - [[04_PROSPECTS/B04-37 - Studio Dentistico Pietro Leone]] — A9 READY, WATCHLIST.
-- [[04_PROSPECTS/B04-48 - Savasta & Partners]] — SATURATED_MULTI_TARGET pre-reaudit; benchmark bloccato.
+- [[04_PROSPECTS/B04-48 - Savasta & Partners]] — re-audit PASS; benchmark freeze parziale; NO_SIGNAL_PROVISIONAL.
 - [[04_PROSPECTS/ICO-01 - ICO Dental]] — COLLECTION_RESTRICTED dopo auto-repair.
 
 ## Tranche D

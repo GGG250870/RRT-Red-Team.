@@ -8,10 +8,12 @@
 4. Stati `COLLECTION_RESTRICTED`, `INSUFFICIENT`, `CONTRADICTORY`, `ENTITY_AMBIGUOUS`, `UNRESOLVED` bloccano lo scoring.
 5. Dimensioni duplicate o inattese bloccano il target.
 6. Il QA usa `target_master_v1.json` come fonte delle 5 dimensioni attese per D1-D5.
+7. `SATURATED_MULTI_TARGET` è ammesso solo con tutti i target attesi in stato terminale.
+8. Il QA rifiuta target bloccati che espongono comunque `status = PASS` o uno score numerico.
 
 ## Regression test
 
-Suite `SCORING_INTEGRITY_V2`: **5/5 PASS**.
+Suite `SCORING_INTEGRITY_V2`: **11/11 PASS**.
 
 ## Audit legacy
 

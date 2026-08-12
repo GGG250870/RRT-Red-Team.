@@ -2,7 +2,7 @@
 type: validation-gate
 batch: 04
 stage: saturation-evidence-reaudit
-status: pending
+status: pass
 cases:
   - B04-34
   - B04-37
@@ -16,9 +16,19 @@ updated: 2026-08-12
 Verificare in modo indipendente che ogni dimensione D1-D5 dei casi della Tranche D sia supportata da evidenza diretta e coerente prima del benchmark.
 
 ## Casi
-- [[04_PROSPECTS/B04-34 - Centro Odontoiatrico Gioia]] — pre-reaudit.
+- [[04_PROSPECTS/B04-34 - Centro Odontoiatrico Gioia]] — PASS.
 - [[04_PROSPECTS/B04-37 - Studio Dentistico Pietro Leone]] — già validato end-to-end; usato anche come riferimento di coerenza.
-- [[04_PROSPECTS/B04-48 - Savasta & Partners]] — pre-reaudit.
+- [[04_PROSPECTS/B04-48 - Savasta & Partners]] — PASS.
+
+## Esito persistito
+Il ledger `09_VALIDATION/RRT_BATCH_04_SATURATION_REAUDIT_TRANCHE_D_V1.json` registra:
+- `audited`: 3;
+- `pass`: 3;
+- `downgrade`: 0;
+- `reject`: 0;
+- `next_stage`: `TARGET_MATCH_THEN_BENCHMARK_SELECTION_FREEZE`.
+
+Il PASS certifica solo la saturazione evidenziale D1-D5 su fonti ufficiali. Non certifica perdita economica, opportunity signal o superiorità/inferiorità commerciale.
 
 ## Regole
 1. Ogni dimensione deve avere evidenza diretta oppure uno stato terminale valido.
@@ -38,3 +48,5 @@ Verificare in modo indipendente che ogni dimensione D1-D5 dei casi della Tranche
 - [[09_VALIDATION/Scoring Integrity V2]]
 - [[03_RULES/Rules Index]]
 - [[05_EVIDENCE/Evidence Index]]
+- [[06_BENCHMARKS/RRT_BATCH_04_TARGET_MATCH_BENCHMARK_FREEZE_TRANCHE_D_V1]]
+- [[08_RED_TEAM/RRT_BATCH_04_DECISION_LOSS_RED_TEAM_COMMERCIAL_GATE_TRANCHE_D_V1]]
