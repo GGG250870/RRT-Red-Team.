@@ -49,10 +49,20 @@ def validate_cell(company: str, target: str, cell: Dict[str, Any], expected_dime
     if unexpected:
         issues.append(("ERROR",company,target,f"unexpected dimensions={unexpected}"))
 
-    if not missing_dims and not duplicate and not unexpected and len(levels)==len(expected_dimensions):
+    pre_score_issues = list(issues)
+    structurally_complete = not missing_dims and not duplicate and not unexpected and len(levels)==len(expected_dimensions)
+    score_is_allowed = structurally_complete and not pre_score_issues
+    if score_is_allowed:
         expected=round(sum(levels)/(len(expected_dimensions)*3)*100)
         if expected != cell.get("normalized_0_100"):
             issues.append(("ERROR",company,target,f"score mismatch {cell.get('normalized_0_100')} != {expected}"))
+        if cell.get("status") not in (None, "PASS"):
+            issues.append(("ERROR",company,target,f"status mismatch {cell.get('status')} != PASS"))
+    else:
+        if cell.get("normalized_0_100") is not None:
+            issues.append(("ERROR",company,target,"blocked target must not produce normalized_0_100"))
+        if cell.get("status") == "PASS":
+            issues.append(("ERROR",company,target,"status PASS is invalid for blocked target"))
 
     expected_coverage=round((len(expected_dimensions)-len(missing_dims))/max(len(expected_dimensions),1),3)
     if "coverage_ratio" in cell and cell.get("coverage_ratio") != expected_coverage:

@@ -34,7 +34,7 @@ updated: 2026-08-12
 - Isolation guard: i worker reclamano task per `case_id`; eliminata contaminazione tra prospect.
 - Caso B04-37: pipeline completa PASS; A8 `WATCHLIST`; A9 `READY`.
 - Caso ICO-01: auto-repair eseguito correttamente; esito finale `COLLECTION_RESTRICTED` su D1-D5 per insufficiente acquisizione ufficiale. Questo è uno stato valido, non un errore tecnico.
-- Scoring Integrity V2: regression suite 5/5 PASS; individuati 15 zeri legacy da ri-validare.
+- Scoring Integrity V2: regression suite 11/11 PASS; individuati 15 zeri legacy da ri-validare.
 - Human review: obbligatorio per ogni Opportunity Signal.
 - GitHub: fonte persistente e auditabile.
 - Obsidian: interfaccia umana del second brain e knowledge graph.

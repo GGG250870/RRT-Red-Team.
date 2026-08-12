@@ -5,14 +5,14 @@ company: Savasta & Partners
 city: Cagliari
 official_domain: https://studiosavasta.com/
 entity_status: VERIFIED_OFFICIAL_DOMAIN
-saturation_state: SATURATED_MULTI_TARGET_PRE_REAUDIT
-target_match_state: pending
-benchmark_state: blocked_pending_reaudit
-red_team_state: not_started
-signal_state: not_scored
-qa_state: pending
+saturation_state: SATURATED_MULTI_TARGET_REAUDIT_PASS
+target_match_state: PASS
+benchmark_state: FROZEN_PARTIAL_TOPSET
+red_team_state: PROVISIONAL_NEGATIVE_CONTROL
+signal_state: NO_SIGNAL_PROVISIONAL
+qa_state: pending_prominence_gate
 human_review: not_applicable
-audit_stage: SATURATION_EVIDENCE_REAUDIT
+audit_stage: PROMINENCE_DISCOVERABILITY_GATE_PENDING
 updated: 2026-08-12
 ---
 
@@ -21,7 +21,8 @@ updated: 2026-08-12
 ## Stato sintetico
 Il Deep Scan Tranche D ha chiuso D1-D5 con evidenze ufficiali sufficienti per proporre `SATURATED_MULTI_TARGET`.
 
-Lo stato NON è ancora definitivo: il caso è in attesa di [[09_VALIDATION/Saturation Evidence Re-Audit - Tranche D]].
+Il re-audit indipendente ha confermato PASS nel ledger [[09_VALIDATION/Saturation Evidence Re-Audit - Tranche D]].
+Il caso ha benchmark freeze parziale e resta `NO_SIGNAL_PROVISIONAL` finché il gate P1-P8 di prominence/discoverability non viene eseguito.
 
 ## Identità
 - Savasta & Partners.
@@ -39,18 +40,22 @@ Dettaglio: [[05_EVIDENCE/B04-48 - Evidence Pack]]
 
 ## Gate
 - Entity/Scope: PASS.
-- Deep Scan: PASS preliminare.
-- Saturation Evidence Re-Audit: PENDING.
-- Benchmark: BLOCKED.
-- Red Team: NOT STARTED.
-- Commercial Gate: NOT STARTED.
+- Deep Scan: PASS.
+- Saturation Evidence Re-Audit: PASS.
+- Target Match: PASS.
+- Benchmark: FROZEN_PARTIAL_TOPSET.
+- Red Team: PROVISIONAL_NEGATIVE_CONTROL.
+- Commercial Gate: NO_SIGNAL_PROVISIONAL.
+- QA: PENDING_PROMINENCE_GATE.
 
 ## Regola
-Nessun benchmark o Signal viene prodotto finché il re-audit non conferma D1-D5 con riferimenti diretti.
+Nessun Opportunity Signal viene prodotto finché il gate P1-P8 non conferma una differenza esterna rilevante. Il benchmark parziale è congelato e non può essere esteso post-gap per massimizzare differenze.
 
 ## Collegamenti
 - [[04_PROSPECTS/Prospects Index]]
 - [[05_EVIDENCE/B04-48 - Evidence Pack]]
+- [[06_BENCHMARKS/RRT_BATCH_04_TARGET_MATCH_BENCHMARK_FREEZE_TRANCHE_D_V1]]
+- [[08_RED_TEAM/RRT_BATCH_04_DECISION_LOSS_RED_TEAM_COMMERCIAL_GATE_TRANCHE_D_V1]]
 - [[09_VALIDATION/Batch 04 National Calibration]]
 - [[09_VALIDATION/Saturation Evidence Re-Audit - Tranche D]]
 - [[03_RULES/Rules Index]]

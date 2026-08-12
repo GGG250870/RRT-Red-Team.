@@ -26,7 +26,7 @@ status: active
 - Deep Scan in corso per tranche
 
 ## Integrità scoring
-- [[09_VALIDATION/Scoring Integrity V2]] — QA del motore multi-target e regression suite 5/5.
+- [[09_VALIDATION/Scoring Integrity V2]] — QA del motore multi-target e regression suite 11/11.
 - [[09_VALIDATION/Legacy Zero Repair Queue]] — 15 zeri legacy da ri-validare con protocollo di assenza.
 
 ## Human review

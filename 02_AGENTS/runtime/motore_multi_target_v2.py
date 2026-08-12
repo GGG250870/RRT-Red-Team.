@@ -10,6 +10,12 @@ BLOCKING_STATES = {
     "COLLECTION_RESTRICTED", "INSUFFICIENT", "CONTRADICTORY",
     "ENTITY_AMBIGUOUS", "UNRESOLVED"
 }
+TARGET_TERMINAL_STATES = {
+    "FOUND", "NOT_FOUND_AFTER_PROTOCOL", "VERIFICATO", "VERIFICATO_WEB", "PUBBLICO"
+}
+SATURATION_TERMINAL_STATES = {
+    "PASS", "FOUND", "NOT_FOUND_AFTER_PROTOCOL", "VERIFICATO", "VERIFICATO_WEB", "PUBBLICO"
+}
 
 @dataclass
 class Observation:
@@ -92,4 +98,34 @@ def evaluate_path(
             "livello 0 accompagnato da NOT_FOUND_AFTER_PROTOCOL."
         ),
         "note": "Non misura qualità clinica, vendite reali, conversione o ROI."
+    }
+
+
+def validate_saturated_multi_target(
+    target_states: Dict[str, str],
+    expected_targets: List[str],
+) -> Dict[str, Any]:
+    missing_targets = [target for target in expected_targets if target not in target_states]
+    non_terminal_targets = sorted(
+        target
+        for target, state in target_states.items()
+        if target in expected_targets and state not in TARGET_TERMINAL_STATES and state not in SATURATION_TERMINAL_STATES
+    )
+    unexpected_targets = sorted(target for target in target_states if target not in expected_targets)
+    issues: List[str] = []
+    if missing_targets:
+        issues.append(f"Target mancanti: {missing_targets}")
+    if unexpected_targets:
+        issues.append(f"Target inattesi: {unexpected_targets}")
+    if non_terminal_targets:
+        issues.append(f"SATURATED_MULTI_TARGET vietato con target non terminali: {non_terminal_targets}")
+    ok = not missing_targets and not unexpected_targets and not non_terminal_targets
+    return {
+        "status": "PASS" if ok else "BLOCKED",
+        "expected_targets": expected_targets,
+        "missing_targets": missing_targets,
+        "unexpected_targets": unexpected_targets,
+        "non_terminal_targets": non_terminal_targets,
+        "issues": issues,
+        "rule": "SATURATED_MULTI_TARGET ammesso solo quando tutti i target previsti sono terminali.",
     }
