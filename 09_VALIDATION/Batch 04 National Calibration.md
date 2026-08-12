@@ -4,6 +4,7 @@ batch: 04
 sample_size: 50
 status: deep-scan-in-progress
 selection: unbiased-neutral
+updated: 2026-08-12
 ---
 
 # Batch 04 — National Calibration
@@ -37,6 +38,18 @@ Frustagli e Antonio Scala erano stati inizialmente marcati saturated ma sono sta
 - Gennaro Salvatore: partial.
 - diversi casi undercovered nel pass corrente.
 
+### Tranche D
+- [[04_PROSPECTS/B04-34 - Centro Odontoiatrico Gioia]] — `SATURATED_MULTI_TARGET_PRE_REAUDIT`.
+- [[04_PROSPECTS/B04-37 - Studio Dentistico Pietro Leone]] — caso di riferimento end-to-end, A9 `READY`, `WATCHLIST`.
+- [[04_PROSPECTS/B04-48 - Savasta & Partners]] — `SATURATED_MULTI_TARGET_PRE_REAUDIT`.
+
+Evidence Pack:
+- [[05_EVIDENCE/B04-34 - Evidence Pack]]
+- [[05_EVIDENCE/B04-37 - Evidence Pack]]
+- [[05_EVIDENCE/B04-48 - Evidence Pack]]
+
+Gate dedicato: [[09_VALIDATION/Saturation Evidence Re-Audit - Tranche D]].
+
 ## Scoring Integrity V2
 Il nuovo QA è documentato in [[09_VALIDATION/Scoring Integrity V2]].
 L'applicazione retrospettiva ha aperto [[09_VALIDATION/Legacy Zero Repair Queue]] con 15 zeri legacy da ri-validare.
@@ -49,8 +62,11 @@ Stimare error modes e calibrare i gate prima del campione Validation da 100 pros
 
 ## Related
 - [[09_VALIDATION/Validation Dashboard]]
+- [[09_VALIDATION/Saturation Evidence Re-Audit - Tranche D]]
 - [[09_VALIDATION/Scoring Integrity V2]]
 - [[09_VALIDATION/Legacy Zero Repair Queue]]
+- [[04_PROSPECTS/Prospects Index]]
+- [[05_EVIDENCE/Evidence Index]]
 - [[03_RULES/Rules Index]]
 - [[02_AGENTS/Multi-Agent System]]
 - [[01_ARCHITECTURE/Knowledge Graph Flow]]
