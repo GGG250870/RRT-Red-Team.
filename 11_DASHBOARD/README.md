@@ -25,6 +25,20 @@ Oppure wrapper:
 zsh rrt_dashboard.sh 00_PRE_SCREEN/batch_dentale_results.csv 11_DASHBOARD/out/dentale
 ```
 
+## Pilot reale
+
+Prima di lanciare un pilot su dataset reale, usa il readiness check:
+
+```bash
+python3 11_DASHBOARD/pilot_readiness.py INPUT.csv --min-rows 30 --output-json 11_DASHBOARD/out/pilot_readiness.json
+```
+
+Template disponibili:
+- `11_DASHBOARD/templates/ristorazione_pilot_template.csv`
+- `11_DASHBOARD/templates/pmi_pilot_template.csv`
+
+Runbook: `11_DASHBOARD/PILOT_RUNBOOK.md`.
+
 Output:
 - `index.html`: dashboard apribile nel browser;
 - `dashboard_payload.json`: payload standardizzato;

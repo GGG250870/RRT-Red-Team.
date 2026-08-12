@@ -36,6 +36,7 @@ status: active
 - La lista operativa della dashboard espone contatti e link diretti ai tre passaggi report per ogni prospect selezionato in `SHORTLIST` o `ESCALATE`.
 - Aggiunto `Cost & Consent Panel` con ledger costi esportabile in JSON/CSV/XLSX: operazioni gratuite concluse a `EUR 0.0000`, Passaggio 3 A1-A9 bloccato con `REQUIRED_BEFORE_RUN` fino a consenso esplicito e budget EUR.
 - Creato `01_ARCHITECTURE/RRT_DASHBOARD_DELIVERY_ROADMAP_V1.md`: roadmap tempi per merge, pilot ristorazione in 24 ore dal dataset reale, pilot PMI/nicchie, calibrazione 50-200 prospect in 3-5 giorni e connettori ufficiali opzionali.
+- Aggiunto pilot kit dashboard: `11_DASHBOARD/pilot_readiness.py`, runbook pilot e template CSV ristorazione/PMI per controllare readiness dataset prima di pre-screen e dashboard.
 
 ## 2026-08-10
 - Integrato il framework persistito del repository con le librerie metodologiche consolidate emerse nel lavoro conversazionale.
