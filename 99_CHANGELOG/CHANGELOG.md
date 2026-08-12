@@ -34,6 +34,7 @@ status: active
 - Rafforzati i tre report per imprenditore come passaggi crescenti: Passaggio 1 rapido zero-LLM, Passaggio 2 guidato non-agentico, Passaggio 3 A1-A9 locked. Ogni passaggio e gli export operativi includono telefono, cellulare/WhatsApp quando disponibile, email e indirizzo, senza inventare dati mancanti.
 - Esteso l'enrichment gratuito/legal-safe con estrazione prudente di contatti da sito ufficiale, link `tel:`, `mailto:`, WhatsApp e dati strutturati JSON-LD pubblici.
 - La lista operativa della dashboard espone contatti e link diretti ai tre passaggi report per ogni prospect selezionato in `SHORTLIST` o `ESCALATE`.
+- Aggiunto `Cost & Consent Panel` con ledger costi esportabile in JSON/CSV/XLSX: operazioni gratuite concluse a `EUR 0.0000`, Passaggio 3 A1-A9 bloccato con `REQUIRED_BEFORE_RUN` fino a consenso esplicito e budget EUR.
 
 ## 2026-08-10
 - Integrato il framework persistito del repository con le librerie metodologiche consolidate emerse nel lavoro conversazionale.

@@ -25,6 +25,10 @@ EXPORT_COLUMNS = [
     "google_rating", "google_review_count", "social_presence_count",
     "public_financials_state", "next_best_action", "operation_cost_eur",
 ]
+COST_LEDGER_COLUMNS = [
+    "scope", "prospect_id", "company", "operation", "status",
+    "estimated_cost_eur", "actual_cost_eur", "requires_approval", "notes",
+]
 
 
 def read_csv(path):
@@ -152,6 +156,86 @@ def report_links_html(item):
     )
 
 
+def cost_ledger_rows(items):
+    rows = [
+        {
+            "scope": "batch",
+            "prospect_id": "",
+            "company": "",
+            "operation": "zero_llm_dashboard_generation",
+            "status": "COMPLETED",
+            "estimated_cost_eur": eur(0.0),
+            "actual_cost_eur": eur(0.0),
+            "requires_approval": "NO",
+            "notes": "Local dashboard/export generation; no paid API and no agent team.",
+        }
+    ]
+    for item in items:
+        company = norm(item.get("company")) or norm(item.get("domain"))
+        rows.append({
+            "scope": "prospect",
+            "prospect_id": item["_id"],
+            "company": company,
+            "operation": "free_public_prescreen_context",
+            "status": "COMPLETED",
+            "estimated_cost_eur": eur(0.0),
+            "actual_cost_eur": eur(0.0),
+            "requires_approval": "NO",
+            "notes": "Free-first public/source coverage context only.",
+        })
+        if norm(item.get("decision")) in {"SHORTLIST", "ESCALATE"}:
+            rows.extend([
+                {
+                    "scope": "report",
+                    "prospect_id": item["_id"],
+                    "company": company,
+                    "operation": "passaggio_1_rapid_report",
+                    "status": "COMPLETED",
+                    "estimated_cost_eur": eur(0.0),
+                    "actual_cost_eur": eur(0.0),
+                    "requires_approval": "NO",
+                    "notes": "Zero-LLM rapid report generated locally.",
+                },
+                {
+                    "scope": "report",
+                    "prospect_id": item["_id"],
+                    "company": company,
+                    "operation": "passaggio_2_guided_report",
+                    "status": "COMPLETED",
+                    "estimated_cost_eur": eur(0.0),
+                    "actual_cost_eur": eur(0.0),
+                    "requires_approval": "NO",
+                    "notes": "Non-agentic guided report generated locally.",
+                },
+                {
+                    "scope": "report",
+                    "prospect_id": item["_id"],
+                    "company": company,
+                    "operation": "passaggio_3_full_a1_a9_report",
+                    "status": "LOCKED",
+                    "estimated_cost_eur": "REQUIRED_BEFORE_RUN",
+                    "actual_cost_eur": eur(0.0),
+                    "requires_approval": "YES",
+                    "notes": "Agent team locked; requires explicit approval and EUR budget cap.",
+                },
+            ])
+    return rows
+
+
+def cost_summary(cost_rows):
+    completed = [row for row in cost_rows if row["status"] == "COMPLETED"]
+    locked = [row for row in cost_rows if row["status"] == "LOCKED"]
+    return {
+        "completed_operations": len(completed),
+        "locked_operations": len(locked),
+        "estimated_free_cost_eur": eur(0.0),
+        "actual_cost_eur": eur(0.0),
+        "requires_approval_count": sum(1 for row in cost_rows if row["requires_approval"] == "YES"),
+        "currency": "EUR",
+        "agent_team_status": "AGENT_TEAM_LOCKED",
+    }
+
+
 def explainable_scores(row):
     dims = [as_int(row.get(f"D{i}_hits")) for i in range(1, 6)]
     observed = as_int(row.get("observed_dimensions"))
@@ -244,11 +328,14 @@ def build_dashboard_payload(rows):
         item["_next_best_action"] = next_best_action(row)
         item["_operation_cost_eur"] = eur(0.0)
         items.append(item)
+    cost_rows = cost_ledger_rows(items)
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "method": "zero_llm_dashboard",
         "golden_rule": "free_first_never_invent_agent_team_locked",
         "summary": summarize(rows),
+        "cost_summary": cost_summary(cost_rows),
+        "cost_ledger": cost_rows,
         "items": items,
     }
 
@@ -333,6 +420,17 @@ def render_html(payload):
     city_options = "".join(f'<option value="{escape(city)}">{escape(city)}</option>' for city in sorted(summary["cities"]))
     vertical_options = "".join(f'<option value="{escape(v)}">{escape(v)}</option>' for v in sorted(summary["verticals"]))
     target_options = "".join(f'<option value="{escape(s)}">{escape(s)}</option>' for s in sorted(summary["target_segments"]))
+    cost = payload["cost_summary"]
+    locked_cost_rows = [row for row in payload["cost_ledger"] if row["status"] == "LOCKED"]
+    locked_cost_html = "".join(
+        "<tr>"
+        f"<td>{escape(row['company'])}</td>"
+        f"<td>{escape(row['operation'])}</td>"
+        f"<td>{escape(row['estimated_cost_eur'])}</td>"
+        f"<td>{escape(row['requires_approval'])}</td>"
+        "</tr>"
+        for row in locked_cost_rows
+    ) or '<tr><td colspan="4">Nessuna operazione bloccata.</td></tr>'
     return f"""<!doctype html>
 <html lang="it">
 <head>
@@ -436,9 +534,26 @@ def render_html(payload):
       <div class="kpis">{source_html}</div>
     </section>
 
+    <section class="band">
+      <h2>Cost & Consent Panel</h2>
+      <div class="kpis">
+        <div class="kpi"><span>Operazioni completate</span><strong>{cost["completed_operations"]}</strong></div>
+        <div class="kpi"><span>Operazioni bloccate</span><strong>{cost["locked_operations"]}</strong></div>
+        <div class="kpi"><span>Costo consuntivo</span><strong>{escape(cost["actual_cost_eur"])}</strong></div>
+        <div class="kpi"><span>Richiedono consenso</span><strong>{cost["requires_approval_count"]}</strong></div>
+      </div>
+      <p class="note">Le operazioni gratuite sono concluse a EUR 0.0000. Ogni report A1-A9 resta bloccato finche non esistono consenso esplicito, budget massimo e stima EUR prima del run.</p>
+      <table>
+        <thead><tr><th>Azienda</th><th>Operazione</th><th>Stima EUR</th><th>Consenso</th></tr></thead>
+        <tbody>{locked_cost_html}</tbody>
+      </table>
+    </section>
+
     <section class="band exports">
       <h2>Export</h2>
       <a href="dashboard_payload.json">JSON standardizzato</a>
+      <a href="cost_ledger.json">Cost ledger JSON</a>
+      <a href="cost_ledger.csv">Cost ledger CSV</a>
       <a href="shortlist.csv">Shortlist CSV</a>
       <a href="prospects.xlsx">XLSX editabile</a>
       <a href="batch_report.md">Report batch Markdown</a>
@@ -541,6 +656,12 @@ def render_single_report(item):
         f"- Cost: {item['_operation_cost_eur']}",
         f"- Agent team: AGENT_TEAM_LOCKED",
         "",
+        "## Cost Ledger",
+        "- Operation: passaggio_1_rapid_report",
+        f"- Estimated cost: {eur(0.0)}",
+        f"- Actual cost: {eur(0.0)}",
+        "- Requires approval: NO",
+        "",
         "## Contatti",
     ]
     lines.extend(contact_summary_lines(item))
@@ -604,6 +725,12 @@ def render_guided_report(item):
         f"Cost: {item['_operation_cost_eur']}",
         "Agent team: AGENT_TEAM_LOCKED",
         "",
+        "## Cost Ledger",
+        "- Operation: passaggio_2_guided_report",
+        f"- Estimated cost: {eur(0.0)}",
+        f"- Actual cost: {eur(0.0)}",
+        "- Requires approval: NO",
+        "",
         "## Decision Context",
         f"- Category: {norm(item.get('vertical')) or 'unknown'}",
         f"- Target segment: {norm(item.get('target_segment')) or 'unknown'}",
@@ -651,7 +778,14 @@ def render_full_rrt_locked_report(item):
         "",
         "Status: AGENT_TEAM_LOCKED",
         "Cost estimate: REQUIRED_BEFORE_RUN",
+        f"Actual cost: {eur(0.0)}",
         "Required approval: RRT_AGENT_TEAM_APPROVAL=I_APPROVE_AGENT_TEAM_LIVE_RUN",
+        "",
+        "## Cost Ledger",
+        "- Operation: passaggio_3_full_a1_a9_report",
+        "- Estimated cost: REQUIRED_BEFORE_RUN",
+        f"- Actual cost: {eur(0.0)}",
+        "- Requires approval: YES",
         "",
         "## Current Inputs",
         f"- Category: {norm(item.get('vertical')) or 'unknown'}",
@@ -760,6 +894,7 @@ def write_xlsx(path, payload):
 <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
 <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
 <Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+<Override PartName="/xl/worksheets/sheet3.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
 </Types>""")
         z.writestr("_rels/.rels", """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
@@ -770,15 +905,20 @@ def write_xlsx(path, payload):
 <sheets>
 <sheet name="Prospects" sheetId="1" r:id="rId1"/>
 <sheet name="Summary" sheetId="2" r:id="rId2"/>
+<sheet name="Cost Ledger" sheetId="3" r:id="rId3"/>
 </sheets>
 </workbook>""")
         z.writestr("xl/_rels/workbook.xml.rels", """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
 <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
 <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>
+<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet3.xml"/>
 </Relationships>""")
         z.writestr("xl/worksheets/sheet1.xml", sheet_xml(data_rows))
         z.writestr("xl/worksheets/sheet2.xml", sheet_xml(summary_rows))
+        cost_rows = [COST_LEDGER_COLUMNS]
+        cost_rows.extend([[row.get(col, "") for col in COST_LEDGER_COLUMNS] for row in payload["cost_ledger"]])
+        z.writestr("xl/worksheets/sheet3.xml", sheet_xml(cost_rows))
 
 
 def docx_paragraph(text, style=None):
@@ -841,11 +981,17 @@ def build_dashboard(input_csv, output_dir):
     output.mkdir(parents=True, exist_ok=True)
     payload = build_dashboard_payload(rows)
     write_json(output / "dashboard_payload.json", payload)
+    write_json(output / "cost_ledger.json", {
+        "generated_at": payload["generated_at"],
+        "cost_summary": payload["cost_summary"],
+        "cost_ledger": payload["cost_ledger"],
+    })
     write_text(output / "index.html", render_html(payload))
     write_text(output / "print_report.html", render_print_report(payload))
     write_text(output / "batch_report.md", render_batch_report(payload))
     write_xlsx(output / "prospects.xlsx", payload)
     write_docx(output / "batch_report.docx", payload)
+    write_csv(output / "cost_ledger.csv", payload["cost_ledger"], fieldnames=COST_LEDGER_COLUMNS)
     shortlist = [row for row in rows if norm(row.get("decision")) in {"SHORTLIST", "ESCALATE"}]
     write_csv(output / "shortlist.csv", shortlist, fieldnames=list(rows[0].keys()) if rows else [])
     reports_dir = output / "reports"

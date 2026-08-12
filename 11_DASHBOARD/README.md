@@ -28,8 +28,10 @@ zsh rrt_dashboard.sh 00_PRE_SCREEN/batch_dentale_results.csv 11_DASHBOARD/out/de
 Output:
 - `index.html`: dashboard apribile nel browser;
 - `dashboard_payload.json`: payload standardizzato;
+- `cost_ledger.json`: ledger costi e consenso machine-readable;
+- `cost_ledger.csv`: ledger costi editabile;
 - `shortlist.csv`: soli `SHORTLIST` ed `ESCALATE`;
-- `prospects.xlsx`: workbook editabile con prospect e summary;
+- `prospects.xlsx`: workbook editabile con prospect, summary e cost ledger;
 - `batch_report.md`: report batch editabile;
 - `batch_report.docx`: report batch editabile in Word;
 - `print_report.html`: versione stampabile/esportabile PDF dal browser;
@@ -40,12 +42,14 @@ Output:
 CSV, XLSX e report singoli includono sempre il blocco contatti: telefono, cellulare/WhatsApp quando disponibile, email e indirizzo. I campi non trovati restano marcati come `NON_TROVATO`/vuoti: non vengono mai inventati.
 
 La lista operativa HTML mostra i contatti principali e, per ogni prospect in `SHORTLIST` o `ESCALATE`, i link diretti ai tre passaggi report.
+Il `Cost & Consent Panel` mostra operazioni gratuite completate, operazioni bloccate, costo consuntivo e consenso richiesto prima di qualunque report A1-A9.
 
 ## Stato costi
 
 La dashboard V1 usa input gia disponibili, fonti pubbliche gratuite quando accessibili e genera output locali:
 
 - costo operativo: `EUR 0.0000`;
+- ledger costi esportato in `cost_ledger.json`, `cost_ledger.csv` e foglio `Cost Ledger` nell'XLSX;
 - agent team: `AGENT_TEAM_LOCKED`;
 - nessuna chiamata API a pagamento;
 - nessun report A1-A9.

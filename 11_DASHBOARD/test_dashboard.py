@@ -98,6 +98,8 @@ def main():
         assert payload["summary"]["free_operation_cost_eur"] == "EUR 0.0000"
         assert (output_dir / "index.html").exists()
         assert (output_dir / "dashboard_payload.json").exists()
+        assert (output_dir / "cost_ledger.json").exists()
+        assert (output_dir / "cost_ledger.csv").exists()
         assert (output_dir / "shortlist.csv").exists()
         assert (output_dir / "batch_report.md").exists()
         assert (output_dir / "batch_report.docx").exists()
@@ -124,13 +126,23 @@ def main():
             assert "mobile_phone" in sheet
             assert "+393331234567" in sheet
             assert "xl/worksheets/sheet2.xml" in z.namelist()
+            assert "xl/worksheets/sheet3.xml" in z.namelist()
+            cost_sheet = z.read("xl/worksheets/sheet3.xml").decode("utf-8")
+            assert "passaggio_3_full_a1_a9_report" in cost_sheet
+            assert "REQUIRED_BEFORE_RUN" in cost_sheet
         with zipfile.ZipFile(output_dir / "batch_report.docx") as z:
             assert "word/document.xml" in z.namelist()
         data = json.loads((output_dir / "dashboard_payload.json").read_text(encoding="utf-8"))
         assert data["items"][0]["_source_coverage"]["google"] == "FOUND"
         assert data["items"][0]["_source_coverage"]["public_financials"] == "FOUND"
+        assert data["cost_summary"]["actual_cost_eur"] == "EUR 0.0000"
+        assert data["cost_summary"]["locked_operations"] == 1
+        cost_data = json.loads((output_dir / "cost_ledger.json").read_text(encoding="utf-8"))
+        assert cost_data["cost_summary"]["requires_approval_count"] == 1
         html = (output_dir / "index.html").read_text(encoding="utf-8")
         assert "AGENT_TEAM_LOCKED" in html
+        assert "Cost & Consent Panel" in html
+        assert "REQUIRED_BEFORE_RUN" in html
         assert "Telefono" in html
         assert "reports/alpha-dental.md" in html
         assert "guided_reports/alpha-dental.md" in html
