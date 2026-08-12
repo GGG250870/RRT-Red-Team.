@@ -20,6 +20,7 @@ status: active
 - Riallineate le note Obsidian di Tranche D al ledger machine-readable `09_VALIDATION/RRT_BATCH_04_SATURATION_REAUDIT_TRANCHE_D_V1.json`: B04-34, B04-37 e B04-48 risultano re-audit PASS 3/3.
 - Aggiornate le schede B04-34 e B04-48: benchmark freeze parziale e `NO_SIGNAL_PROVISIONAL`; P1-P8 prominence/discoverability resta il gate aperto prima di qualunque conclusione commerciale.
 - La Legacy Zero Repair Queue resta aperta con 15 item: nessuno zero legacy è stato convertito automaticamente.
+- Creato `09_VALIDATION/RRT_LEGACY_ZERO_REPAIR_PASS1_V1.json`: primo repair pass sui 15 zeri legacy. Esito: 4 `FOUND`, 3 `COLLECTION_RESTRICTED`, 8 `UNRESOLVED`, 0 `NOT_FOUND_AFTER_PROTOCOL`; 11 item restano bloccanti prima dello scoring storico.
 
 ## 2026-08-10
 - Integrato il framework persistito del repository con le librerie metodologiche consolidate emerse nel lavoro conversazionale.
