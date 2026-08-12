@@ -33,6 +33,10 @@ La discovery gratuita è volutamente sostituibile: `build_batch.py` è separato 
 
 Nota: i profili di portale non sono domini ufficiali. Quando `build_batch.py` scopre una scheda su MioDottore/Dentisti-Italia/DocDental ma non risolve un dominio ufficiale, lascia `domain` vuoto e imposta `official_domain_state = UNRESOLVED`. Il pre-screen deve fermare questi record come `COLLECTION_RESTRICTED`, non calcolare lo score sul dominio del portale.
 
+Primary discovery release-safe corrente: MioDottore. Dentisti-Italia e DocDental restano nella backlog sorgenti ma sono disabilitati come primary discovery finché il parser profili non è validato contro righe di navigazione.
+
+Il targeting geografico resta city-first nella sorgente validata corrente. Quartieri o zone sono accettati come input, ma se il portale non li supporta il builder deve restituire `DISCOVERY_EMPTY` invece di allargare silenziosamente o usare fonti sporche.
+
 ## Input CSV
 Colonne consigliate:
 - `company`

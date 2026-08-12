@@ -7,10 +7,12 @@ status: active
 
 ## 2026-08-12
 - Rafforzata PR #7 `agent/prescreen-batch-generator`: il batch builder portal-first scarta link di navigazione/generici e non usa più domini di portale come domini ufficiali del prospect.
-- `build_batch.py` lascia `domain` vuoto e imposta `official_domain_state = UNRESOLVED` quando scopre solo una scheda portale.
+- `build_batch.py` risolve domini ufficiali solo da link espliciti `Sito web`/`website` nella scheda portale; altrimenti lascia `domain` vuoto e imposta `official_domain_state = UNRESOLVED`.
 - `pre_screen.py` preserva `source_url` e ferma i record senza dominio ufficiale come `COLLECTION_RESTRICTED` con `fetch_state = NO_OFFICIAL_DOMAIN`.
-- Test live Savona: 5 profili reali MioDottore, 0 righe navigazionali, 0 `ESCALATE`, 5 `COLLECTION_RESTRICTED`; la shortlist resta vuota finché manca `OFFICIAL_DOMAIN_RESOLUTION`.
-- PR #7 resta non merge-safe finché non viene implementata e validata la risoluzione del dominio ufficiale.
+- Dentisti-Italia e DocDental sono stati disabilitati come primary discovery finché il parser profili non è validato contro righe di navigazione.
+- Test live Savona: 5 profili reali MioDottore, 0 righe navigazionali, 2 domini ufficiali risolti, 1 `ESCALATE`, 1 `SHORTLIST`, 3 `COLLECTION_RESTRICTED`.
+- Default `rrt_build_and_prescreen.sh` riportati a città (`Milano,Roma,Torino,Genova,Bologna`); il targeting quartiere resta best effort e non ancora validato.
+- PR #7 resta da validare su più aree perché MioDottore non copre necessariamente il livello quartiere e le fonti secondarie sono disabilitate.
 
 ## 2026-08-10
 - Integrato il framework persistito del repository con le librerie metodologiche consolidate emerse nel lavoro conversazionale.

@@ -14,8 +14,13 @@ MAX_BYTES = 1_000_000
 PRIMARY_PORTALS_BY_VERTICAL = {
     "dentale": [
         ("miodottore.it", "https://www.miodottore.it/dentista/{area_slug}"),
-        ("dentisti-italia.it", "https://www.dentisti-italia.it/dentista-liguria/dentista-{area_slug}/"),
-        ("docdental.it", "https://docdental.it/cliniche-dentali/{area_slug}/"),
+    ]
+}
+
+DISABLED_PRIMARY_PORTALS_BY_VERTICAL = {
+    "dentale": [
+        ("dentisti-italia.it", "disabled: profile parser not release-safe"),
+        ("docdental.it", "disabled: profile parser not release-safe"),
     ]
 }
 
@@ -32,6 +37,14 @@ REVIEW_PORTALS_BY_VERTICAL = {
         "guidamedicina.it",
         "whatclinic.com",
     ],
+}
+
+PORTAL_DOMAINS = {
+    "miodottore.it", "dentisti-italia.it", "docdental.it",
+    "google.com", "paginegialle.it", "facebook.com", "fb.com",
+    "instagram.com", "linkedin.com", "tiktok.com", "trustpilot.com",
+    "yelp.it", "doctolib.it", "guidamedicina.it", "whatclinic.com",
+    "docplanner.com", "pro.miodottore.it", "noa.ai",
 }
 
 VERTICAL_HINTS = {
@@ -114,6 +127,29 @@ def company_key(company):
     return re.sub(r"\s+", " ", text).strip()
 
 
+def is_disallowed_official_domain(host):
+    if not host:
+        return True
+    if host.startswith(("s3.", "pixel-", "static.")):
+        return True
+    return any(host == d or host.endswith("." + d) for d in PORTAL_DOMAINS)
+
+
+def resolve_official_domain(profile_url, portal):
+    final_url, html = fetch(profile_url)
+    if not html:
+        return "", "UNRESOLVED", ""
+    for link, label in extract_links(html, final_url or profile_url):
+        label_l = clean_text(label).lower()
+        if "sito web" not in label_l and "website" not in label_l:
+            continue
+        host = normalize_domain(link)
+        if is_disallowed_official_domain(host):
+            continue
+        return host, "RESOLVED_FROM_PORTAL_PROFILE", link
+    return "", "UNRESOLVED", ""
+
+
 def extract_links(html, base_url):
     out = []
     seen = set()
@@ -144,9 +180,10 @@ def discover_portal(area, vertical, portal, template, limit):
             continue
         if not looks_vertical(hay, vertical) and portal != "miodottore.it":
             continue
+        official_domain, official_state, official_source = resolve_official_domain(link, portal)
         results.append({
             "company": clean_text(label),
-            "domain": "",
+            "domain": official_domain,
             "source_url": link,
             "area": area,
             "city": area,
@@ -155,7 +192,8 @@ def discover_portal(area, vertical, portal, template, limit):
             "discovery_source": "portal_direct",
             "review_source": portal,
             "discovery_query": url,
-            "official_domain_state": "UNRESOLVED",
+            "official_domain_state": official_state,
+            "official_domain_source": official_source,
         })
         if len(results) >= limit:
             break
@@ -196,6 +234,9 @@ def main():
     print("COUNTRY_SCOPE: ITALIA ONLY")
     print("DISCOVERY_MODE: PORTAL_FIRST")
     print("Primary portals: " + " | ".join(p for p, _ in PRIMARY_PORTALS_BY_VERTICAL.get(args.vertical, [])))
+    disabled = DISABLED_PRIMARY_PORTALS_BY_VERTICAL.get(args.vertical, [])
+    if disabled:
+        print("Disabled primary portals: " + " | ".join(f"{p} ({reason})" for p, reason in disabled))
     print("Review portals (max 10): " + " | ".join(REVIEW_PORTALS_BY_VERTICAL.get(args.vertical, [])[:10]))
 
     rows = []
@@ -216,7 +257,7 @@ def main():
 
     path = Path(args.output_csv)
     path.parent.mkdir(parents=True, exist_ok=True)
-    fields = ["company", "domain", "source_url", "area", "city", "country", "vertical", "discovery_source", "review_source", "discovery_query", "official_domain_state"]
+    fields = ["company", "domain", "source_url", "area", "city", "country", "vertical", "discovery_source", "review_source", "discovery_query", "official_domain_state", "official_domain_source"]
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()

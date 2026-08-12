@@ -1,7 +1,7 @@
 #!/bin/zsh
 set -e
 TARGET="${1:-100}"
-AREAS="${2:-Milano Navigli,Roma Prati,Torino Crocetta,Genova Albaro,Bologna Centro}"
+AREAS="${2:-Milano,Roma,Torino,Genova,Bologna}"
 BATCH="${3:-00_PRE_SCREEN/batch_dentale.csv}"
 RESULTS="${4:-00_PRE_SCREEN/batch_dentale_results.csv}"
 SHORTLIST="${5:-00_PRE_SCREEN/batch_dentale_shortlist.csv}"

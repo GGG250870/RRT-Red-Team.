@@ -271,7 +271,7 @@ def main():
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fields = [
-        "company", "domain", "source_url", "official_domain_state", "city", "vertical", "website_live", "fetch_state", "pages_found",
+        "company", "domain", "source_url", "official_domain_state", "official_domain_source", "city", "vertical", "website_live", "fetch_state", "pages_found",
         "D1_hits", "D2_hits", "D3_hits", "D4_hits", "D5_hits", "contactability", "observed_dimensions",
         "high_value_hits", "structure_hits", "youth_growth_hits", "commercial_gap_count",
         "facebook_url", "instagram_url", "linkedin_url", "tiktok_url",
@@ -288,6 +288,7 @@ def main():
             domain = normalize_domain(row.get("domain") or row.get("website") or row.get("official_domain"))
             source_url = (row.get("source_url") or "").strip()
             official_domain_state = (row.get("official_domain_state") or "").strip()
+            official_domain_source = (row.get("official_domain_source") or "").strip()
             city = (row.get("city") or "").strip()
             vertical = (row.get("vertical") or "").strip()
             result = scan(domain)
@@ -304,6 +305,7 @@ def main():
                 "domain": domain,
                 "source_url": source_url,
                 "official_domain_state": official_domain_state,
+                "official_domain_source": official_domain_source,
                 "city": city,
                 "vertical": vertical,
                 "website_live": result["website_live"],
