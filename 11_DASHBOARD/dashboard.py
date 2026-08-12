@@ -15,15 +15,18 @@ SOURCE_COLUMNS = {
     "contacts": ["phone", "telefono", "mobile_phone", "mobile", "cellulare", "whatsapp", "email", "mail", "address", "indirizzo"],
     "google": ["google_url", "google_maps_search_url", "google_rating", "google_review_count", "google_place_id"],
     "review_portals": ["source_url", "review_source", "review_portal_url", "tripadvisor_search_url", "tripadvisor_url", "tripadvisor_rating", "tripadvisor_review_count"],
+    "entity_resolution": ["entity_resolution_state", "matched_review_sources", "google_verified_url", "tripadvisor_verified_url", "restaurantguru_verified_url"],
     "social": ["facebook_url", "instagram_url", "linkedin_url", "tiktok_url"],
     "public_financials": ["financial_source_url", "balance_sheet_url", "registroimprese_url", "vat_id", "piva"],
 }
 EXPORT_COLUMNS = [
     "rank", "company", "domain", "city", "vertical", "target_segment", "decision",
     "phone", "mobile_phone", "email", "address",
+    "entity_resolution_state", "matched_review_sources",
     "preliminary_score", "fetch_state", "online_enrichment_state", "google_state",
-    "google_rating", "google_review_count", "google_maps_search_url",
-    "tripadvisor_rating", "tripadvisor_review_count", "tripadvisor_search_url",
+    "google_rating", "google_review_count", "google_maps_search_url", "google_verified_url",
+    "tripadvisor_rating", "tripadvisor_review_count", "tripadvisor_search_url", "tripadvisor_verified_url",
+    "restaurantguru_search_url", "restaurantguru_verified_url",
     "social_presence_count",
     "public_financials_state", "next_best_action", "operation_cost_eur",
 ]
@@ -268,6 +271,11 @@ def explainable_scores(row):
 def next_best_action(row):
     decision = norm(row.get("decision"))
     coverage = source_coverage(row)
+    entity_state = norm(row.get("entity_resolution_state"))
+    if entity_state in {"ENTITY_CONFLICT", "OUT_OF_AREA_OR_ENTITY_CONFLICT"}:
+        return "Scartare o verificare manualmente: entita/fonte review non coerente."
+    if entity_state in {"AMBIGUOUS_REVIEW_LINK", "NEEDS_REVIEW_LINKS"}:
+        return "Completare risoluzione entita con link pubblici verificati prima del report."
     if not norm(row.get("domain")):
         return "Trovare dominio ufficiale prima di qualunque analisi."
     if decision == "COLLECTION_RESTRICTED":
@@ -385,6 +393,7 @@ def render_html(payload):
             f"<td>{escape(norm(item.get('vertical')))}</td>"
             f"<td>{escape(norm(item.get('target_segment')))}</td>"
             f"<td>{escape(norm(item.get('city')) or norm(item.get('area')))}</td>"
+            f"<td>{escape(norm(item.get('entity_resolution_state')) or 'NOT_CHECKED')}</td>"
             f"<td>{escape(contact_value(item, 'phone')) or 'NON_TROVATO'}</td>"
             f"<td>{escape(contact_value(item, 'mobile_phone')) or 'NON_TROVATO'}</td>"
             f"<td>{escape(contact_value(item, 'email')) or 'NON_TROVATA'}</td>"
@@ -569,7 +578,7 @@ def render_html(payload):
     <section class="band">
       <h2>Lista Operativa</h2>
       <table id="prospect-table">
-        <thead><tr><th>#</th><th>Azienda</th><th>Categoria</th><th>Target</th><th>Citta</th><th>Telefono</th><th>Cellulare</th><th>Email</th><th>Indirizzo</th><th>Decisione</th><th>Score</th><th>Dominio</th><th>Prossima azione</th><th>Report</th></tr></thead>
+        <thead><tr><th>#</th><th>Azienda</th><th>Categoria</th><th>Target</th><th>Citta</th><th>Entita</th><th>Telefono</th><th>Cellulare</th><th>Email</th><th>Indirizzo</th><th>Decisione</th><th>Score</th><th>Dominio</th><th>Prossima azione</th><th>Report</th></tr></thead>
         <tbody>{''.join(rows_html)}</tbody>
       </table>
     </section>

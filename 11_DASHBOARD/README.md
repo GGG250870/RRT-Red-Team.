@@ -54,6 +54,14 @@ Per aggregare export autorizzati:
 python3 11_DASHBOARD/review_intelligence.py reviews_export.csv review_summary.csv --output-json review_summary.json
 ```
 
+Per verificare che i link review letti manualmente appartengano davvero alla stessa azienda/citta:
+
+```bash
+python3 11_DASHBOARD/entity_resolution.py seed.csv resolved.csv --manual-links-csv verified_links.csv
+```
+
+Stati prodotti: `MATCH_CONFIRMED`, `AMBIGUOUS_REVIEW_LINK`, `OUT_OF_AREA_OR_ENTITY_CONFLICT`, `ENTITY_CONFLICT`, `NEEDS_REVIEW_LINKS`. Il costo resta `EUR 0.0000` e il team agent resta bloccato.
+
 Output:
 - `index.html`: dashboard apribile nel browser;
 - `dashboard_payload.json`: payload standardizzato;
@@ -151,8 +159,9 @@ zsh rrt_dashboard.sh 00_PRE_SCREEN/batch_ristorazione_pizzeria_results.csv 11_DA
 
 1. Genera o importa un CSV con domini ufficiali.
 2. Esegui `00_PRE_SCREEN/pre_screen.py`.
-3. Genera la dashboard.
-4. Esegui enrichment pubblico gratuito se vuoi massimizzare le fonti online.
-5. Usa filtri categoria/citta/decisione per selezionare prospect.
-6. Completa manualmente Google, recensioni, social e bilanci pubblici dove mancanti o non estraibili.
-7. Solo dopo selezione umana valuta un report guidato o A1-A9 con consenso e budget.
+3. Verifica entita e link review con `entity_resolution.py` quando lavori su liste generate per citta/categoria.
+4. Genera la dashboard.
+5. Esegui enrichment pubblico gratuito se vuoi massimizzare le fonti online.
+6. Usa filtri categoria/citta/decisione per selezionare prospect.
+7. Completa manualmente Google, recensioni, social e bilanci pubblici dove mancanti o non estraibili.
+8. Solo dopo selezione umana valuta un report guidato o A1-A9 con consenso e budget.
