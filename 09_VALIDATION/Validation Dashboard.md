@@ -20,11 +20,20 @@ status: active
 - Robustness: 250 casi
 
 ## Batch corrente
-- Batch 04 National Calibration
+- [[09_VALIDATION/Batch 04 National Calibration]]
 - 50 prospect congelati
 - Entity resolution chiusa in stati terminali
 - Deep Scan in corso per tranche
 
+## Integrità scoring
+- [[09_VALIDATION/Scoring Integrity V2]] — QA del motore multi-target e regression suite 5/5.
+- [[09_VALIDATION/Legacy Zero Repair Queue]] — 15 zeri legacy da ri-validare con protocollo di assenza.
+
 ## Human review
 Tutti gli Opportunity Signal richiedono blind review indipendente.
 I NO_SIGNAL vengono campionati come negative controls.
+
+## Navigazione
+- [[01_ARCHITECTURE/Knowledge Graph Flow]]
+- [[03_RULES/Rules Index]]
+- [[07_SIGNALS/Signals Index]]
