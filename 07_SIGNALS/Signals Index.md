@@ -22,6 +22,9 @@ status: active
 Opportunity Signal non equivale a perdita economica dimostrata.
 Validated Signal richiede evidenza comportamentale o economica verificata.
 
+## Signal attivi
+- [[07_SIGNALS/SAV-DENT-01 - Zecca-Cohen Opportunity Signal Dossier]] — OPPORTUNITY_SIGNAL, L2 discoverability proxy, Google profile -> sito ufficiale -> prima visita continuity gap.
+
 ## Related
 - [[09_VALIDATION/Validation Dashboard]]
 - [[08_RED_TEAM/Red Team Index]]

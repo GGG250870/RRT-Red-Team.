@@ -5,6 +5,10 @@ status: active
 
 # CHANGELOG
 
+## 2026-08-17
+- Chiuso il primo Opportunity Signal confermato del pilot dentale Savona: `SAV-DENT-01 - Studio Odontoiatrico Zecca-Cohen`, con dossier Signal, evidence pack, Red Team review, mini-audit cliente, script di primo contatto e checklist riusabile `RRT_DENTAL_SAVONA_DISCOVERY_TO_FIRST_VISIT_GATE_V1`.
+- Il Signal Zecca-Cohen e formulato conservativamente come `Google profile -> sito ufficiale -> prima visita continuity gap`; esclusi claim clinici, SEO generici, conversioni perse o perdita economica.
+
 ## 2026-08-12
 - Creata `01_ARCHITECTURE/RRT_PRODUCT_NORTH_STAR_V1.md`: definizione ufficiale di RRT come Red Team commerciale esterno, non scraper/SEO audit/report marketing. Il prodotto finale e 3-7 Opportunity Signal forti, non ovvi, falsificati, auditabili e commercialmente potenti.
 - Riallineate HOME, Architecture Overview, Rules Index e Dashboard Product Spec alla North Star: dashboard, scoring, runtime, liste prospect e report rapidi sono infrastruttura/output intermedi, non prodotto vendibile se non portano a Signal che sopravvivono a entity resolution, benchmark, Red Team, commercial gate e human review.

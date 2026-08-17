@@ -17,5 +17,7 @@ Ogni report dovrebbe indicare:
 - audit reference
 
 ## Related
+- [[10_REPORTS/SAV-DENT-01 - Zecca-Cohen Client Mini-Audit]]
+- [[10_REPORTS/SAV-DENT-01 - Zecca-Cohen First Contact Script]]
 - [[09_VALIDATION/Validation Dashboard]]
 - [[99_CHANGELOG/CHANGELOG]]
