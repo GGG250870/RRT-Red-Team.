@@ -83,6 +83,14 @@ Per ogni comparator:
 
 ## Finding decision rules
 
+### Batch learning 2026-08-17
+
+La passata sui candidati Savona rimanenti ha aggiunto tre guardrail:
+
+- un sito migliorabile, datato o meno guidato non e un Signal se telefono, email, form, WhatsApp o richiesta appuntamento sono gia chiari;
+- un possibile gap non va promosso senza stato fresco del profilo Google e percorso mobile osservato;
+- un'entita ambigua blocca il gate: prima si risolve l'entita, poi si valuta il finding.
+
 ### NO_SIGNAL
 
 Usare se:

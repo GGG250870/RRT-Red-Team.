@@ -8,6 +8,8 @@ status: active
 ## 2026-08-17
 - Chiuso il primo Opportunity Signal confermato del pilot dentale Savona: `SAV-DENT-01 - Studio Odontoiatrico Zecca-Cohen`, con dossier Signal, evidence pack, Red Team review, mini-audit cliente, script di primo contatto e checklist riusabile `RRT_DENTAL_SAVONA_DISCOVERY_TO_FIRST_VISIT_GATE_V1`.
 - Il Signal Zecca-Cohen e formulato conservativamente come `Google profile -> sito ufficiale -> prima visita continuity gap`; esclusi claim clinici, SEO generici, conversioni perse o perdita economica.
+- Applicato il gate dentale Savona ai candidati rimanenti: nessun nuovo Opportunity Signal certificato; creati triage operativo, outcome no-signal/deferral e batch Red Team review.
+- Classificati Mantovani e Roberto Cristiano Martinengo come benchmark/reference; Vesalici come `WATCHLIST_WEAK`; Bianco e San Giovanni come deferral/entity resolution; gli altri candidati non superano il gate discovery-to-first-visit.
 
 ## 2026-08-12
 - Creata `01_ARCHITECTURE/RRT_PRODUCT_NORTH_STAR_V1.md`: definizione ufficiale di RRT come Red Team commerciale esterno, non scraper/SEO audit/report marketing. Il prodotto finale e 3-7 Opportunity Signal forti, non ovvi, falsificati, auditabili e commercialmente potenti.
