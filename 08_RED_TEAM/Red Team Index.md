@@ -18,6 +18,7 @@ Il Red Team cerca controevidenze, non conferme.
 ## Review attive
 - [[08_RED_TEAM/SAV-DENT-01 - Zecca-Cohen Red Team Review]] — SURVIVES; phone-first/referral-led falsification considered.
 - [[08_RED_TEAM/SAVONA_DENTAL_REMAINING_CANDIDATES_RED_TEAM_REVIEW_2026-08-17]] — batch review; nessun ulteriore Opportunity Signal sopravvive al gate.
+- [[08_RED_TEAM/SAVONA_PMI_CLIMATIZZAZIONE_RED_TEAM_REVIEW_2026-08-18]] — batch review; Gigatech e Pernorio sopravvivono solo come WATCHLIST.
 
 ## Related
 - [[05_EVIDENCE/Evidence Index]]

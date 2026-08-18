@@ -27,6 +27,7 @@ Validated Signal richiede evidenza comportamentale o economica verificata.
 
 ## Esiti no-signal / deferral
 - [[07_SIGNALS/SAVONA_DENTAL_NO_ADDITIONAL_SIGNAL_OUTCOME_2026-08-17]] — nessun nuovo Opportunity Signal certificato nella passata sui candidati dentali Savona rimanenti.
+- [[07_SIGNALS/SAVONA_PMI_CLIMATIZZAZIONE_SIGNAL_OUTCOME_2026-08-18]] — shortlist operativa Savona PMI climatizzazione; nessun Signal certificato, Gigatech e Pernorio in WATCHLIST.
 
 ## Related
 - [[09_VALIDATION/Validation Dashboard]]

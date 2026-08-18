@@ -76,7 +76,7 @@ PRIMARY_INTELLIGENCE_SOURCES_BY_VERTICAL = {
     },
     "pmi": {
         "google": ["google_business_profile", "google_reviews", "google_maps"],
-        "review_portals": ["paginegialle.it", "trustpilot.com", "kompass.com", "europages.it"],
+        "review_portals": ["paginegialle.it", "trustpilot.com", "kompass.com", "europages.it", "prontopro.it", "habitissimo.it"],
         "social": ["linkedin.com", "facebook.com", "instagram.com"],
         "public_financials": ["registroimprese.it", "telemaco.infocamere.it", "company_official_financial_docs"],
     },
@@ -113,6 +113,20 @@ PRIMARY_INTELLIGENCE_SOURCES_BY_VERTICAL = {
 }
 
 TARGET_SEGMENTS_BY_VERTICAL = {
+    "pmi": {
+        "climatizzazione_impianti": {
+            "aliases": {"climatizzazione", "condizionamento", "clima", "impianti_clima", "impianti_termici", "hvac", "pompe_calore"},
+            "review_portals": ["google.com", "paginegialle.it", "prontopro.it", "habitissimo.it", "kompass.com", "europages.it"],
+            "hints": ["climatizzazione", "condizionamento", "pompa di calore", "pompe di calore", "impianti termici", "termoidraulica", "vmc", "fgas"],
+        },
+    },
+    "servizi_casa": {
+        "climatizzazione_impianti": {
+            "aliases": {"climatizzazione", "condizionamento", "clima", "impianti_clima", "impianti_termici", "hvac", "pompe_calore"},
+            "review_portals": ["google.com", "paginegialle.it", "prontopro.it", "habitissimo.it", "trustpilot.com"],
+            "hints": ["climatizzazione", "condizionamento", "pompa di calore", "pompe di calore", "impianti termici", "termoidraulica", "vmc", "fgas"],
+        },
+    },
     "ristorazione": {
         "ristorazione_generic": {
             "aliases": {"ristorazione", "generic", "generico", "ristorante"},
@@ -537,13 +551,19 @@ def overpass_query(vertical, target_segment, bbox, limit):
 
 
 def row_matches_target(row, tags, vertical, target_segment):
-    if vertical != "ristorazione" or target_segment in {"", "auto", "ristorazione_generic"}:
+    if target_segment in {"", "auto", vertical, "ristorazione_generic"}:
         return True
     hay = " ".join([
         row.get("company", ""),
+        row.get("address", ""),
         tags.get("cuisine", ""),
         tags.get("amenity", ""),
+        tags.get("shop", ""),
+        tags.get("craft", ""),
+        tags.get("office", ""),
+        tags.get("industrial", ""),
         tags.get("description", ""),
+        tags.get("service", ""),
     ]).lower()
     target = TARGET_SEGMENTS_BY_VERTICAL.get(vertical, {}).get(target_segment, {})
     hints = target.get("hints", [])

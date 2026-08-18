@@ -146,7 +146,7 @@ CATEGORY_PROFILES = {
         "escalate_requires_high_value": False,
     },
     "servizi_casa": {
-        "aliases": {"servizi_casa", "casa", "impianti", "serramenti", "fotovoltaico", "edilizia", "ristrutturazioni"},
+        "aliases": {"servizi_casa", "casa", "impianti", "serramenti", "fotovoltaico", "edilizia", "ristrutturazioni", "climatizzazione", "condizionamento"},
         "dimensions": {
             "D1": [r"preventivo", r"sopralluogo", r"contatt", r"telefono", r"urgenz", r"assistenza"],
             "D2": [r"servizi", r"installazione", r"manutenzione", r"riparazione", r"ristrutturazione", r"fornitura"],
@@ -249,6 +249,20 @@ CONTACT_PATTERNS = [
 ]
 
 TARGET_SEGMENTS_BY_VERTICAL = {
+    "pmi": {
+        "climatizzazione_impianti": [
+            r"climatizzazione", r"condizionamento", r"pompa di calore", r"pompe di calore",
+            r"impianti termici", r"termoidraulica", r"ventilazione", r"vmc",
+            r"f-gas", r"fgas", r"iso 9001", r"terzo responsabile", r"mepa", r"soa"
+        ],
+    },
+    "servizi_casa": {
+        "climatizzazione_impianti": [
+            r"climatizzazione", r"condizionamento", r"pompa di calore", r"pompe di calore",
+            r"impianti termici", r"termoidraulica", r"ventilazione", r"vmc",
+            r"installazione", r"manutenzione", r"assistenza", r"detrazion", r"bonus"
+        ],
+    },
     "ristorazione": {
         "fine_dining": [r"fine dining", r"stell", r"michelin", r"degustazione", r"chef", r"gourmet", r"alta cucina"],
         "pizzeria": [r"pizzeria", r"pizza", r"forno a legna", r"impasto", r"lievitazione"],
@@ -491,6 +505,7 @@ def main():
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fields = [
         "company", "domain", "source_url", "official_domain_state", "official_domain_source", "city", "vertical", "target_segment", "website_live", "fetch_state", "pages_found",
+        "phone", "mobile_phone", "email", "address", "google_maps_search_url", "registroimprese_url",
         "D1_hits", "D2_hits", "D3_hits", "D4_hits", "D5_hits", "contactability", "observed_dimensions",
         "high_value_hits", "structure_hits", "youth_growth_hits", "commercial_gap_count",
         "facebook_url", "instagram_url", "linkedin_url", "tiktok_url",
@@ -509,6 +524,12 @@ def main():
             official_domain_state = (row.get("official_domain_state") or "").strip()
             official_domain_source = (row.get("official_domain_source") or "").strip()
             city = (row.get("city") or "").strip()
+            phone = (row.get("phone") or "").strip()
+            mobile_phone = (row.get("mobile_phone") or row.get("mobile") or row.get("whatsapp") or "").strip()
+            email = (row.get("email") or "").strip()
+            address = (row.get("address") or "").strip()
+            google_maps_search_url = (row.get("google_maps_search_url") or row.get("google_url") or "").strip()
+            registroimprese_url = (row.get("registroimprese_url") or "").strip()
             vertical = normalize_vertical(row.get("vertical"))
             profile = profile_for(vertical)
             result = scan(domain, profile)
@@ -533,6 +554,12 @@ def main():
                 "website_live": result["website_live"],
                 "fetch_state": result["fetch_state"],
                 "pages_found": result["pages_found"],
+                "phone": phone,
+                "mobile_phone": mobile_phone,
+                "email": email,
+                "address": address,
+                "google_maps_search_url": google_maps_search_url,
+                "registroimprese_url": registroimprese_url,
                 "D1_hits": hits["D1"],
                 "D2_hits": hits["D2"],
                 "D3_hits": hits["D3"],

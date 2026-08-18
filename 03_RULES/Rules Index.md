@@ -17,6 +17,7 @@ status: active
 - Human Review obbligatoria per Opportunity Signal
 - AI gratuite esterne solo come assistenza non autoritativa: [[03_RULES/RRT_FREE_AI_ASSISTANCE_POLICY_V1]]
 - Gate dentale Savona discovery-to-first-visit riusabile: [[03_RULES/RRT_DENTAL_SAVONA_DISCOVERY_TO_FIRST_VISIT_GATE_V1]]
+- Gate PMI climatizzazione Savona lead-trust riusabile: [[03_RULES/RRT_PMI_CLIMATIZZAZIONE_SAVONA_LEAD_TRUST_GATE_V1]]
 - Dashboard, scoring e runtime sono infrastruttura: non vanno confusi con il prodotto vendibile se non portano a Signal commercialmente potenti.
 
 ## Scoring Integrity V2
@@ -44,3 +45,4 @@ status: active
 - [[09_VALIDATION/Scoring Integrity V2]]
 - [[03_RULES/RRT_FREE_AI_ASSISTANCE_POLICY_V1]]
 - [[03_RULES/RRT_DENTAL_SAVONA_DISCOVERY_TO_FIRST_VISIT_GATE_V1]]
+- [[03_RULES/RRT_PMI_CLIMATIZZAZIONE_SAVONA_LEAD_TRUST_GATE_V1]]

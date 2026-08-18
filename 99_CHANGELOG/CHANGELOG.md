@@ -5,6 +5,10 @@ status: active
 
 # CHANGELOG
 
+## 2026-08-18
+- Avviato pilot `Savona PMI climatizzazione`: aggiunto segmento `climatizzazione_impianti` al pre-screen, seed pubblico da 6 aziende, risultati pre-screen, dashboard locale zero-costo e gate `RRT_PMI_CLIMATIZZAZIONE_SAVONA_LEAD_TRUST_GATE_V1`.
+- Creati triage, Red Team review e outcome Signal: nessun Opportunity Signal certificato nella prima passata; Gigatech Impianti e Pernorio Termotecnica passano in `WATCHLIST`, RB Clima resta benchmark/reference.
+
 ## 2026-08-17
 - Chiuso il primo Opportunity Signal confermato del pilot dentale Savona: `SAV-DENT-01 - Studio Odontoiatrico Zecca-Cohen`, con dossier Signal, evidence pack, Red Team review, mini-audit cliente, script di primo contatto e checklist riusabile `RRT_DENTAL_SAVONA_DISCOVERY_TO_FIRST_VISIT_GATE_V1`.
 - Il Signal Zecca-Cohen e formulato conservativamente come `Google profile -> sito ufficiale -> prima visita continuity gap`; esclusi claim clinici, SEO generici, conversioni perse o perdita economica.

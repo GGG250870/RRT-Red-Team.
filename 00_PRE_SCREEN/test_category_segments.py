@@ -27,6 +27,10 @@ def main():
     assert build_batch.normalize_target_segment("ristorazione", "alta_cucina") == "fine_dining"
     assert "tripadvisor.it" in build_batch.review_portals_for("ristorazione", "pizzeria")
     assert "michelin.com" in build_batch.review_portals_for("ristorazione", "fine_dining")
+    assert pre_screen.infer_target_segment("pmi", "impianti termici climatizzazione fgas") == "climatizzazione_impianti"
+    assert pre_screen.infer_target_segment("servizi_casa", "installazione pompe di calore e condizionamento") == "climatizzazione_impianti"
+    assert build_batch.normalize_target_segment("pmi", "climatizzazione") == "climatizzazione_impianti"
+    assert "prontopro.it" in build_batch.review_portals_for("pmi", "climatizzazione_impianti")
 
     print(json.dumps({"status": "PASS", "tests": 1}))
 

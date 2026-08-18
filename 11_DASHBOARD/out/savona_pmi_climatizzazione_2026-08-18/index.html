@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RRT Opportunity Dashboard</title>
+  <style>
+    :root {
+      --ink: #202124;
+      --muted: #5f6368;
+      --line: #d7dce2;
+      --bg: #f7f9fb;
+      --panel: #ffffff;
+      --accent: #0b6bcb;
+      --good: #137333;
+      --warn: #b06000;
+      --bad: #b3261e;
+      --hold: #5f6368;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: var(--bg); }
+    header { background: #13212f; color: white; padding: 22px 28px; }
+    header h1 { margin: 0 0 6px; font-size: 24px; letter-spacing: 0; }
+    header p { margin: 0; color: #cbd5df; }
+    main { max-width: 1440px; margin: 0 auto; padding: 20px 24px 44px; }
+    .toolbar, .band, .prospect { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+    .toolbar { display: grid; grid-template-columns: repeat(6, minmax(140px, 1fr)); gap: 12px; padding: 14px; margin-bottom: 16px; }
+    label { display: block; color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+    select, input { width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 8px; background: white; color: var(--ink); }
+    .band { padding: 16px; margin-bottom: 16px; }
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+    .kpi { border-left: 4px solid var(--accent); background: #f8fbff; padding: 10px 12px; min-height: 64px; }
+    .kpi span { display: block; color: var(--muted); font-size: 12px; }
+    .kpi strong { font-size: 24px; }
+    .kpi.small strong { font-size: 18px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid var(--line); padding: 9px 8px; text-align: left; vertical-align: top; }
+    th { font-size: 12px; color: var(--muted); background: #f3f6f9; position: sticky; top: 0; }
+    tr[hidden], .prospect[hidden] { display: none; }
+    .decision, .pill { display: inline-block; border-radius: 999px; padding: 3px 8px; font-size: 12px; font-weight: 700; }
+    .state-escalate, .state-found { background: #e6f4ea; color: var(--good); }
+    .state-shortlist { background: #e8f0fe; color: var(--accent); }
+    .state-collection-restricted, .state-not-checked { background: #f1f3f4; color: var(--hold); }
+    .state-reject, .state-conflict { background: #fce8e6; color: var(--bad); }
+    .state-stale { background: #fef7e0; color: var(--warn); }
+    .prospects { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 12px; }
+    .prospect { padding: 14px; }
+    .prospect-head { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+    .prospect h3 { margin: 0; font-size: 16px; }
+    .meta, .coverage { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; color: var(--muted); }
+    .contact { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 10px; color: var(--muted); font-size: 12px; }
+    .meta span { border: 1px solid var(--line); border-radius: 6px; padding: 3px 7px; background: #fafafa; }
+    .contact span { border: 1px solid var(--line); border-radius: 6px; padding: 4px 7px; background: #fff; overflow-wrap: anywhere; }
+    .report-links { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+    .report-links a { border: 1px solid var(--accent); border-radius: 6px; padding: 5px 8px; color: var(--accent); text-decoration: none; font-weight: 700; }
+    .muted { color: var(--muted); font-size: 12px; }
+    .score-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+    .meter-top { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
+    .bar { height: 8px; background: #e8edf3; border-radius: 99px; overflow: hidden; margin-top: 3px; }
+    .bar span { display: block; height: 100%; background: var(--accent); }
+    .next { margin: 12px 0 0; color: var(--ink); }
+    .note { color: var(--muted); margin-top: 8px; }
+    .exports a { margin-right: 12px; }
+    @media (max-width: 760px) {
+      .toolbar { grid-template-columns: 1fr; }
+      .score-grid { grid-template-columns: 1fr; }
+      .contact { grid-template-columns: 1fr; }
+      table { font-size: 12px; }
+      main { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>RRT Opportunity Dashboard</h1>
+    <p>Free-first, no invented data, agent team locked. Generated 2026-08-18T10:40:03.719203+00:00.</p>
+  </header>
+  <main>
+    <section class="toolbar" aria-label="Filtri">
+      <div><label for="filter-decision">Decisione</label><select id="filter-decision"><option value="">Tutte</option><option value="ESCALATE">ESCALATE</option><option value="SHORTLIST">SHORTLIST</option><option value="COLLECTION_RESTRICTED">COLLECTION_RESTRICTED</option><option value="REJECT">REJECT</option></select></div>
+      <div><label for="filter-vertical">Categoria</label><select id="filter-vertical"><option value="">Tutte</option><option value="pmi">pmi</option></select></div>
+      <div><label for="filter-target">Target</label><select id="filter-target"><option value="">Tutti</option><option value="climatizzazione_impianti">climatizzazione_impianti</option></select></div>
+      <div><label for="filter-city">Citta</label><select id="filter-city"><option value="">Tutte</option><option value="Albenga">Albenga</option><option value="Cairo Montenotte">Cairo Montenotte</option><option value="Savona">Savona</option><option value="Vado Ligure">Vado Ligure</option></select></div>
+      <div><label for="filter-search">Cerca</label><input id="filter-search" type="search" placeholder="azienda o dominio"></div>
+      <div><label>Agent team</label><input value="AGENT_TEAM_LOCKED" readonly></div>
+    </section>
+
+    <section class="band">
+      <h2>Opportunity Cockpit</h2>
+      <div class="kpis">
+        <div class="kpi"><span>Prospect</span><strong>6</strong></div>
+        <div class="kpi"><span>Score medio</span><strong>69.0</strong></div>
+        <div class="kpi"><span>Costo operazioni gratuite</span><strong>EUR 0.0000</strong></div>
+        <div class="kpi"><span>ESCALATE</span><strong>5</strong></div><div class="kpi"><span>SHORTLIST</span><strong>0</strong></div><div class="kpi"><span>COLLECTION_RESTRICTED</span><strong>1</strong></div><div class="kpi"><span>REJECT</span><strong>0</strong></div>
+      </div>
+      <p class="note">Google, recensioni, social e bilanci pubblici sono fonti di intelligence. Non sostituiscono il dominio ufficiale e non certificano Opportunity Signal.</p>
+    </section>
+
+    <section class="band">
+      <h2>Source Coverage Matrix</h2>
+      <div class="kpis"><div class="kpi small"><span>contacts</span><strong>6</strong></div><div class="kpi small"><span>google</span><strong>6</strong></div><div class="kpi small"><span>official_website</span><strong>6</strong></div><div class="kpi small"><span>public_financials</span><strong>6</strong></div><div class="kpi small"><span>review_portals</span><strong>6</strong></div><div class="kpi small"><span>social</span><strong>2</strong></div></div>
+    </section>
+
+    <section class="band">
+      <h2>Cost & Consent Panel</h2>
+      <div class="kpis">
+        <div class="kpi"><span>Operazioni completate</span><strong>17</strong></div>
+        <div class="kpi"><span>Operazioni bloccate</span><strong>5</strong></div>
+        <div class="kpi"><span>Costo consuntivo</span><strong>EUR 0.0000</strong></div>
+        <div class="kpi"><span>Richiedono consenso</span><strong>5</strong></div>
+      </div>
+      <p class="note">Le operazioni gratuite sono concluse a EUR 0.0000. Ogni report A1-A9 resta bloccato finche non esistono consenso esplicito, budget massimo e stima EUR prima del run.</p>
+      <table>
+        <thead><tr><th>Azienda</th><th>Operazione</th><th>Stima EUR</th><th>Consenso</th></tr></thead>
+        <tbody><tr><td>Climatica Albenga</td><td>passaggio_3_full_a1_a9_report</td><td>REQUIRED_BEFORE_RUN</td><td>YES</td></tr><tr><td>LD Tecnoimpianti Snc</td><td>passaggio_3_full_a1_a9_report</td><td>REQUIRED_BEFORE_RUN</td><td>YES</td></tr><tr><td>Gigatech Impianti</td><td>passaggio_3_full_a1_a9_report</td><td>REQUIRED_BEFORE_RUN</td><td>YES</td></tr><tr><td>Fratelli Zanti Srl</td><td>passaggio_3_full_a1_a9_report</td><td>REQUIRED_BEFORE_RUN</td><td>YES</td></tr><tr><td>Pernorio Termotecnica Srl</td><td>passaggio_3_full_a1_a9_report</td><td>REQUIRED_BEFORE_RUN</td><td>YES</td></tr></tbody>
+      </table>
+    </section>
+
+    <section class="band exports">
+      <h2>Export</h2>
+      <a href="dashboard_payload.json">JSON standardizzato</a>
+      <a href="cost_ledger.json">Cost ledger JSON</a>
+      <a href="cost_ledger.csv">Cost ledger CSV</a>
+      <a href="shortlist.csv">Shortlist CSV</a>
+      <a href="prospects.xlsx">XLSX editabile</a>
+      <a href="batch_report.md">Report batch Markdown</a>
+      <a href="batch_report.docx">DOCX editabile</a>
+      <a href="print_report.html">HTML stampa/PDF</a>
+      <a href="reports/">Report rapidi</a>
+      <a href="guided_reports/">Report guidati</a>
+      <a href="full_rrt_locked/">A1-A9 locked</a>
+    </section>
+
+    <section class="band">
+      <h2>Lista Operativa</h2>
+      <table id="prospect-table">
+        <thead><tr><th>#</th><th>Azienda</th><th>Categoria</th><th>Target</th><th>Citta</th><th>Entita</th><th>Telefono</th><th>Cellulare</th><th>Email</th><th>Indirizzo</th><th>Decisione</th><th>Score</th><th>Dominio</th><th>Prossima azione</th><th>Report</th></tr></thead>
+        <tbody><tr><td>1</td><td>Climatica Albenga</td><td>pmi</td><td>climatizzazione_impianti</td><td>Albenga</td><td>NOT_CHECKED</td><td>NON_TROVATO</td><td>+39 3288258190</td><td>climatica.albenga@gmail.com</td><td>Regione Cavallo, 13 - 17031 Albenga (SV)</td><td><span class="decision state-escalate">ESCALATE</span></td><td>95</td><td><a href="https://climaticaalbenga.com" target="_blank" rel="noreferrer">climaticaalbenga.com</a></td><td>Pronto per selezione umana; A1-A9 resta bloccato finche non autorizzato.</td><td><div class="report-links"><a href="reports/climatica-albenga.md">Passaggio 1</a><a href="guided_reports/climatica-albenga.md">Passaggio 2</a><a href="full_rrt_locked/climatica-albenga.md">Passaggio 3</a></div></td></tr><tr><td>2</td><td>LD Tecnoimpianti Snc</td><td>pmi</td><td>climatizzazione_impianti</td><td>Savona</td><td>NOT_CHECKED</td><td>+39 375 5313039</td><td>+39 375 5313038</td><td>ldtecnoimpiantisnc@gmail.com</td><td>Via Torino, 56R - 17100 Savona (SV)</td><td><span class="decision state-escalate">ESCALATE</span></td><td>95</td><td><a href="https://ldtecnoimpianti.it" target="_blank" rel="noreferrer">ldtecnoimpianti.it</a></td><td>Pronto per selezione umana; A1-A9 resta bloccato finche non autorizzato.</td><td><div class="report-links"><a href="reports/ld-tecnoimpianti-snc.md">Passaggio 1</a><a href="guided_reports/ld-tecnoimpianti-snc.md">Passaggio 2</a><a href="full_rrt_locked/ld-tecnoimpianti-snc.md">Passaggio 3</a></div></td></tr><tr><td>3</td><td>Gigatech Impianti</td><td>pmi</td><td>climatizzazione_impianti</td><td>Vado Ligure</td><td>NOT_CHECKED</td><td>+39 019 2160225</td><td>NON_TROVATO</td><td>info@gigatechimpianti.it</td><td>Via Piave, 33 - Vado Ligure (SV)</td><td><span class="decision state-escalate">ESCALATE</span></td><td>76</td><td><a href="https://gigatechimpanti.it" target="_blank" rel="noreferrer">gigatechimpanti.it</a></td><td>Pronto per selezione umana; A1-A9 resta bloccato finche non autorizzato.</td><td><div class="report-links"><a href="reports/gigatech-impianti.md">Passaggio 1</a><a href="guided_reports/gigatech-impianti.md">Passaggio 2</a><a href="full_rrt_locked/gigatech-impianti.md">Passaggio 3</a></div></td></tr><tr><td>4</td><td>Fratelli Zanti Srl</td><td>pmi</td><td>climatizzazione_impianti</td><td>Cairo Montenotte</td><td>NOT_CHECKED</td><td>+39 019 50 50 99</td><td>+39 335 7615199</td><td>zanti@zanti.it</td><td>Borgo Gramsci, 14 - 17014 Cairo Montenotte (SV)</td><td><span class="decision state-escalate">ESCALATE</span></td><td>74</td><td><a href="https://zanti.it" target="_blank" rel="noreferrer">zanti.it</a></td><td>Pronto per selezione umana; A1-A9 resta bloccato finche non autorizzato.</td><td><div class="report-links"><a href="reports/fratelli-zanti-srl.md">Passaggio 1</a><a href="guided_reports/fratelli-zanti-srl.md">Passaggio 2</a><a href="full_rrt_locked/fratelli-zanti-srl.md">Passaggio 3</a></div></td></tr><tr><td>5</td><td>Pernorio Termotecnica Srl</td><td>pmi</td><td>climatizzazione_impianti</td><td>Savona</td><td>NOT_CHECKED</td><td>+39 019 861701</td><td>NON_TROVATO</td><td>pernorio.leo@libero.it</td><td>Via Bonini, 17 - 17100 Savona (SV)</td><td><span class="decision state-escalate">ESCALATE</span></td><td>74</td><td><a href="https://pernorioriscaldamento.it" target="_blank" rel="noreferrer">pernorioriscaldamento.it</a></td><td>Pronto per selezione umana; A1-A9 resta bloccato finche non autorizzato.</td><td><div class="report-links"><a href="reports/pernorio-termotecnica-srl.md">Passaggio 1</a><a href="guided_reports/pernorio-termotecnica-srl.md">Passaggio 2</a><a href="full_rrt_locked/pernorio-termotecnica-srl.md">Passaggio 3</a></div></td></tr><tr><td>6</td><td>RB Clima Srl</td><td>pmi</td><td>climatizzazione_impianti</td><td>Savona</td><td>NOT_CHECKED</td><td>+39 0182 1761 063</td><td>+39 331 4407 983</td><td>rbclima@rbclima.it</td><td>Piazza Guido Rossa 14/R, 17100 Savona (SV)</td><td><span class="decision state-collection-restricted">COLLECTION_RESTRICTED</span></td><td>0</td><td><a href="https://rbclima.com" target="_blank" rel="noreferrer">rbclima.com</a></td><td>Riprova acquisizione gratuita e controlla fonte alternativa ufficiale.</td><td><span class="muted">Report disponibili dopo shortlist/escalation</span></td></tr></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Report Rapidi</h2>
+      <div class="prospects"><section class="prospect" id="climatica-albenga"><div class="prospect-head"><h3>Climatica Albenga</h3><span class="decision state-escalate">ESCALATE</span></div><div class="meta"><span>pmi</span><span>climatizzazione_impianti</span><span>Albenga</span><span>EUR 0.0000</span></div><div class="contact"><span>Telefono: NON_TROVATO</span><span>Cellulare/WhatsApp: +39 3288258190</span><span>Email: climatica.albenga@gmail.com</span><span>Indirizzo: Regione Cavallo, 13 - 17031 Albenga (SV)</span></div><div class="coverage"><span class="pill state-found">official_website: FOUND</span><span class="pill state-found">contacts: FOUND</span><span class="pill state-found">google: FOUND</span><span class="pill state-found">review_portals: FOUND</span><span class="pill state-not-checked">entity_resolution: NOT_CHECKED</span><span class="pill state-not-checked">social: NOT_CHECKED</span><span class="pill state-found">public_financials: FOUND</span></div><div class="score-grid"><div class="meter"><div class="meter-top"><span>category fit score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>commercial gap score</span><strong>15</strong></div><div class="bar"><span style="width:15%"></span></div></div><div class="meter"><div class="meter-top"><span>reputation score</span><strong>0</strong></div><div class="bar"><span style="width:0%"></span></div></div><div class="meter"><div class="meter-top"><span>social presence score</span><strong>0</strong></div><div class="bar"><span style="width:0%"></span></div></div><div class="meter"><div class="meter-top"><span>financial capacity score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>contactability score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>data quality score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>preliminary score</span><strong>95</strong></div><div class="bar"><span style="width:95%"></span></div></div></div><div class="report-links"><a href="reports/climatica-albenga.md">Passaggio 1</a><a href="guided_reports/climatica-albenga.md">Passaggio 2</a><a href="full_rrt_locked/climatica-albenga.md">Passaggio 3</a></div><p class="next">Pronto per selezione umana; A1-A9 resta bloccato finche non autorizzato.</p></section><section class="prospect" id="ld-tecnoimpianti-snc"><div class="prospect-head"><h3>LD Tecnoimpianti Snc</h3><span class="decision state-escalate">ESCALATE</span></div><div class="meta"><span>pmi</span><span>climatizzazione_impianti</span><span>Savona</span><span>EUR 0.0000</span></div><div class="contact"><span>Telefono: +39 375 5313039</span><span>Cellulare/WhatsApp: +39 375 5313038</span><span>Email: ldtecnoimpiantisnc@gmail.com</span><span>Indirizzo: Via Torino, 56R - 17100 Savona (SV)</span></div><div class="coverage"><span class="pill state-found">official_website: FOUND</span><span class="pill state-found">contacts: FOUND</span><span class="pill state-found">google: FOUND</span><span class="pill state-found">review_portals: FOUND</span><span class="pill state-not-checked">entity_resolution: NOT_CHECKED</span><span class="pill state-found">social: FOUND</span><span class="pill state-found">public_financials: FOUND</span></div><div class="score-grid"><div class="meter"><div class="meter-top"><span>category fit score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>commercial gap score</span><strong>40</strong></div><div class="bar"><span style="width:40%"></span></div></div><div class="meter"><div class="meter-top"><span>reputation score</span><strong>0</strong></div><div class="bar"><span style="width:0%"></span></div></div><div class="meter"><div class="meter-top"><span>social presence score</span><strong>75</strong></div><div class="bar"><span style="width:75%"></span></div></div><div class="meter"><div class="meter-top"><span>financial capacity score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>contactability score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>data quality score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>preliminary score</span><strong>95</strong></div><div class="bar"><span style="width:95%"></span></div></div></div><div class="report-links"><a href="reports/ld-tecnoimpianti-snc.md">Passaggio 1</a><a href="guided_reports/ld-tecnoimpianti-snc.md">Passaggio 2</a><a href="full_rrt_locked/ld-tecnoimpianti-snc.md">Passaggio 3</a></div><p class="next">Pronto per selezione umana; A1-A9 resta bloccato finche non autorizzato.</p></section><section class="prospect" id="gigatech-impianti"><div class="prospect-head"><h3>Gigatech Impianti</h3><span class="decision state-escalate">ESCALATE</span></div><div class="meta"><span>pmi</span><span>climatizzazione_impianti</span><span>Vado Ligure</span><span>EUR 0.0000</span></div><div class="contact"><span>Telefono: +39 019 2160225</span><span>Cellulare/WhatsApp: NON_TROVATO</span><span>Email: info@gigatechimpianti.it</span><span>Indirizzo: Via Piave, 33 - Vado Ligure (SV)</span></div><div class="coverage"><span class="pill state-found">official_website: FOUND</span><span class="pill state-found">contacts: FOUND</span><span class="pill state-found">google: FOUND</span><span class="pill state-found">review_portals: FOUND</span><span class="pill state-not-checked">entity_resolution: NOT_CHECKED</span><span class="pill state-not-checked">social: NOT_CHECKED</span><span class="pill state-found">public_financials: FOUND</span></div><div class="score-grid"><div class="meter"><div class="meter-top"><span>category fit score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>commercial gap score</span><strong>40</strong></div><div class="bar"><span style="width:40%"></span></div></div><div class="meter"><div class="meter-top"><span>reputation score</span><strong>0</strong></div><div class="bar"><span style="width:0%"></span></div></div><div class="meter"><div class="meter-top"><span>social presence score</span><strong>0</strong></div><div class="bar"><span style="width:0%"></span></div></div><div class="meter"><div class="meter-top"><span>financial capacity score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>contactability score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>data quality score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>preliminary score</span><strong>76</strong></div><div class="bar"><span style="width:76%"></span></div></div></div><div class="report-links"><a href="reports/gigatech-impianti.md">Passaggio 1</a><a href="guided_reports/gigatech-impianti.md">Passaggio 2</a><a href="full_rrt_locked/gigatech-impianti.md">Passaggio 3</a></div><p class="next">Pronto per selezione umana; A1-A9 resta bloccato finche non autorizzato.</p></section><section class="prospect" id="fratelli-zanti-srl"><div class="prospect-head"><h3>Fratelli Zanti Srl</h3><span class="decision state-escalate">ESCALATE</span></div><div class="meta"><span>pmi</span><span>climatizzazione_impianti</span><span>Cairo Montenotte</span><span>EUR 0.0000</span></div><div class="contact"><span>Telefono: +39 019 50 50 99</span><span>Cellulare/WhatsApp: +39 335 7615199</span><span>Email: zanti@zanti.it</span><span>Indirizzo: Borgo Gramsci, 14 - 17014 Cairo Montenotte (SV)</span></div><div class="coverage"><span class="pill state-found">official_website: FOUND</span><span class="pill state-found">contacts: FOUND</span><span class="pill state-found">google: FOUND</span><span class="pill state-found">review_portals: FOUND</span><span class="pill state-not-checked">entity_resolution: NOT_CHECKED</span><span class="pill state-found">social: FOUND</span><span class="pill state-found">public_financials: FOUND</span></div><div class="score-grid"><div class="meter"><div class="meter-top"><span>category fit score</span><strong>80</strong></div><div class="bar"><span style="width:80%"></span></div></div><div class="meter"><div class="meter-top"><span>commercial gap score</span><strong>35</strong></div><div class="bar"><span style="width:35%"></span></div></div><div class="meter"><div class="meter-top"><span>reputation score</span><strong>0</strong></div><div class="bar"><span style="width:0%"></span></div></div><div class="meter"><div class="meter-top"><span>social presence score</span><strong>50</strong></div><div class="bar"><span style="width:50%"></span></div></div><div class="meter"><div class="meter-top"><span>financial capacity score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>contactability score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>data quality score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>preliminary score</span><strong>74</strong></div><div class="bar"><span style="width:74%"></span></div></div></div><div class="report-links"><a href="reports/fratelli-zanti-srl.md">Passaggio 1</a><a href="guided_reports/fratelli-zanti-srl.md">Passaggio 2</a><a href="full_rrt_locked/fratelli-zanti-srl.md">Passaggio 3</a></div><p class="next">Pronto per selezione umana; A1-A9 resta bloccato finche non autorizzato.</p></section><section class="prospect" id="pernorio-termotecnica-srl"><div class="prospect-head"><h3>Pernorio Termotecnica Srl</h3><span class="decision state-escalate">ESCALATE</span></div><div class="meta"><span>pmi</span><span>climatizzazione_impianti</span><span>Savona</span><span>EUR 0.0000</span></div><div class="contact"><span>Telefono: +39 019 861701</span><span>Cellulare/WhatsApp: NON_TROVATO</span><span>Email: pernorio.leo@libero.it</span><span>Indirizzo: Via Bonini, 17 - 17100 Savona (SV)</span></div><div class="coverage"><span class="pill state-found">official_website: FOUND</span><span class="pill state-found">contacts: FOUND</span><span class="pill state-found">google: FOUND</span><span class="pill state-found">review_portals: FOUND</span><span class="pill state-not-checked">entity_resolution: NOT_CHECKED</span><span class="pill state-not-checked">social: NOT_CHECKED</span><span class="pill state-found">public_financials: FOUND</span></div><div class="score-grid"><div class="meter"><div class="meter-top"><span>category fit score</span><strong>80</strong></div><div class="bar"><span style="width:80%"></span></div></div><div class="meter"><div class="meter-top"><span>commercial gap score</span><strong>35</strong></div><div class="bar"><span style="width:35%"></span></div></div><div class="meter"><div class="meter-top"><span>reputation score</span><strong>0</strong></div><div class="bar"><span style="width:0%"></span></div></div><div class="meter"><div class="meter-top"><span>social presence score</span><strong>0</strong></div><div class="bar"><span style="width:0%"></span></div></div><div class="meter"><div class="meter-top"><span>financial capacity score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>contactability score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>data quality score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>preliminary score</span><strong>74</strong></div><div class="bar"><span style="width:74%"></span></div></div></div><div class="report-links"><a href="reports/pernorio-termotecnica-srl.md">Passaggio 1</a><a href="guided_reports/pernorio-termotecnica-srl.md">Passaggio 2</a><a href="full_rrt_locked/pernorio-termotecnica-srl.md">Passaggio 3</a></div><p class="next">Pronto per selezione umana; A1-A9 resta bloccato finche non autorizzato.</p></section><section class="prospect" id="rb-clima-srl"><div class="prospect-head"><h3>RB Clima Srl</h3><span class="decision state-collection-restricted">COLLECTION_RESTRICTED</span></div><div class="meta"><span>pmi</span><span>climatizzazione_impianti</span><span>Savona</span><span>EUR 0.0000</span></div><div class="contact"><span>Telefono: +39 0182 1761 063</span><span>Cellulare/WhatsApp: +39 331 4407 983</span><span>Email: rbclima@rbclima.it</span><span>Indirizzo: Piazza Guido Rossa 14/R, 17100 Savona (SV)</span></div><div class="coverage"><span class="pill state-found">official_website: FOUND</span><span class="pill state-found">contacts: FOUND</span><span class="pill state-found">google: FOUND</span><span class="pill state-found">review_portals: FOUND</span><span class="pill state-not-checked">entity_resolution: NOT_CHECKED</span><span class="pill state-not-checked">social: NOT_CHECKED</span><span class="pill state-found">public_financials: FOUND</span></div><div class="score-grid"><div class="meter"><div class="meter-top"><span>category fit score</span><strong>0</strong></div><div class="bar"><span style="width:0%"></span></div></div><div class="meter"><div class="meter-top"><span>commercial gap score</span><strong>0</strong></div><div class="bar"><span style="width:0%"></span></div></div><div class="meter"><div class="meter-top"><span>reputation score</span><strong>0</strong></div><div class="bar"><span style="width:0%"></span></div></div><div class="meter"><div class="meter-top"><span>social presence score</span><strong>0</strong></div><div class="bar"><span style="width:0%"></span></div></div><div class="meter"><div class="meter-top"><span>financial capacity score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>contactability score</span><strong>0</strong></div><div class="bar"><span style="width:0%"></span></div></div><div class="meter"><div class="meter-top"><span>data quality score</span><strong>100</strong></div><div class="bar"><span style="width:100%"></span></div></div><div class="meter"><div class="meter-top"><span>preliminary score</span><strong>0</strong></div><div class="bar"><span style="width:0%"></span></div></div></div><span class="muted">Report disponibili dopo shortlist/escalation</span><p class="next">Riprova acquisizione gratuita e controlla fonte alternativa ufficiale.</p></section></div>
+    </section>
+  </main>
+  <script>
+    const filters = {
+      decision: document.getElementById('filter-decision'),
+      vertical: document.getElementById('filter-vertical'),
+      target: document.getElementById('filter-target'),
+      city: document.getElementById('filter-city'),
+      search: document.getElementById('filter-search')
+    };
+    const rows = Array.from(document.querySelectorAll('#prospect-table tbody tr'));
+    const cards = Array.from(document.querySelectorAll('.prospect'));
+    function applyFilters() {
+      const d = filters.decision.value.toLowerCase();
+      const v = filters.vertical.value.toLowerCase();
+      const t = filters.target.value.toLowerCase();
+      const c = filters.city.value.toLowerCase();
+      const s = filters.search.value.toLowerCase();
+      rows.forEach((row, i) => {
+        const text = row.textContent.toLowerCase();
+        const visible = (!d || text.includes(d)) && (!v || text.includes(v)) && (!t || text.includes(t)) && (!c || text.includes(c)) && (!s || text.includes(s));
+        row.hidden = !visible;
+        if (cards[i]) cards[i].hidden = !visible;
+      });
+    }
+    Object.values(filters).forEach(el => el.addEventListener('input', applyFilters));
+  </script>
+</body>
+</html>

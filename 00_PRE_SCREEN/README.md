@@ -24,6 +24,7 @@ zsh rrt_build_and_prescreen.sh 20 "Milano,Roma" dentale
 zsh rrt_build_and_prescreen.sh 20 "Milano,Roma" ristorazione
 zsh rrt_build_and_prescreen.sh 20 "Milano,Roma" ristorazione pizzeria
 zsh rrt_build_and_prescreen.sh 20 "Milano,Roma" pmi
+zsh rrt_build_and_prescreen.sh 20 "Savona" pmi climatizzazione
 ```
 
 Il comando:
@@ -138,6 +139,9 @@ Target: piccole e medie imprese fino a circa 200 persone, con uso consigliato su
 - D3: certificazioni / referenze / clienti / case study
 - D4: team / sede / produzione / laboratorio / stabilimento
 - D5: innovazione / digitale / sostenibilità / export / assistenza
+
+Segmento target supportato:
+- `climatizzazione_impianti`: climatizzazione, condizionamento, pompe di calore, impianti termici, VMC, FGAS, ISO, terzo responsabile, assistenza e manutenzione.
 
 ## Nicchie interessanti v1
 Queste categorie sono utili perché hanno segnali pubblici leggibili, valore commerciale potenziale e frequenti gap di comunicazione sul sito:
