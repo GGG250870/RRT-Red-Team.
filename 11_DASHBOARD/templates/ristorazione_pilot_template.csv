@@ -1,0 +1,2 @@
+company,domain,city,vertical,target_segment,phone,mobile_phone,email,address,google_url,review_portal_url,source_url,vat_id,notes
+ESEMPIO Ristorante,https://example.com,Milano,ristorazione,pizzeria,+390000000000,+393000000000,info@example.com,"Via Esempio 1, Milano",https://www.google.com/maps/search/ESEMPIO,https://www.tripadvisor.it/,https://example.com,IT00000000000,Sostituire questa riga con dati reali verificati

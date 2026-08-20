@@ -1,7 +1,7 @@
-import json, subprocess, sys, uuid
+import json, os, subprocess, sys, uuid
 from pathlib import Path
 
-from cost_control import BudgetPolicy
+from cost_control import BudgetPolicy, usd_to_eur
 from state_store import StateStore
 
 class Orchestrator:
@@ -41,7 +41,17 @@ class Orchestrator:
             return False, f"RUN_BUDGET_EXCEEDED ${total_cost:.4f}/${self.budget.per_run_usd:.4f}"
         return True, "PASS"
 
+    def _agent_team_consent_ok(self, live):
+        if not live:
+            return True, "PASS"
+        if os.getenv("RRT_AGENT_TEAM_APPROVAL") == "I_APPROVE_AGENT_TEAM_LIVE_RUN":
+            return True, "PASS"
+        return False, "AGENT_TEAM_REQUIRES_EXPLICIT_USER_APPROVAL"
+
     def run_agents_parallel(self, agent_ids, live=False, case_id=None):
+        ok,reason=self._agent_team_consent_ok(live)
+        if not ok:
+            return {"status":"BLOCKED","reason":reason,"required_env":"RRT_AGENT_TEAM_APPROVAL=I_APPROVE_AGENT_TEAM_LIVE_RUN"}
         if live and case_id:
             ok,reason=self._budget_ok(case_id)
             if not ok:
@@ -63,7 +73,9 @@ class Orchestrator:
         return out
 
     def status(self):
+        total_cost_usd = self.store.total_cost()
         return {
             "tasks": self.store.stats(),
-            "total_cost_usd": round(self.store.total_cost(),6),
+            "total_cost_usd": round(total_cost_usd,6),
+            "total_cost_eur": usd_to_eur(total_cost_usd),
         }

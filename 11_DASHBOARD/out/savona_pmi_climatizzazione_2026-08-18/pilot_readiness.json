@@ -1,0 +1,61 @@
+{
+  "status": "READY",
+  "input_csv": "00_PRE_SCREEN/savona_pmi_climatizzazione_results_2026-08-18.csv",
+  "rows": 6,
+  "min_rows": 6,
+  "cost_eur": "EUR 0.0000",
+  "agent_team_status": "AGENT_TEAM_LOCKED",
+  "blockers": [],
+  "warnings": [],
+  "coverage": {
+    "company": {
+      "count": 6,
+      "percent": 100.0
+    },
+    "domain": {
+      "count": 6,
+      "percent": 100.0
+    },
+    "city": {
+      "count": 6,
+      "percent": 100.0
+    },
+    "vertical": {
+      "count": 6,
+      "percent": 100.0
+    },
+    "target_segment": {
+      "count": 6,
+      "percent": 100.0
+    },
+    "phone": {
+      "count": 5,
+      "percent": 83.3
+    },
+    "mobile_phone": {
+      "count": 4,
+      "percent": 66.7
+    },
+    "email": {
+      "count": 6,
+      "percent": 100.0
+    },
+    "address": {
+      "count": 6,
+      "percent": 100.0
+    }
+  },
+  "verticals": {
+    "pmi": 6
+  },
+  "cities": {
+    "Savona": 3,
+    "Vado Ligure": 1,
+    "Albenga": 1,
+    "Cairo Montenotte": 1
+  },
+  "target_segments": {
+    "climatizzazione_impianti": 6
+  },
+  "next_action": "Run pre-screen, enrichment and dashboard."
+}

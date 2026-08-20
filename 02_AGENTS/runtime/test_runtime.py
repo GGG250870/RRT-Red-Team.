@@ -2,7 +2,7 @@ import json
 import tempfile
 from pathlib import Path
 
-from cost_control import BudgetPolicy, check_call_budget, estimate_cost_usd
+from cost_control import BudgetPolicy, check_call_budget, estimate_cost_usd, format_eur, usd_to_eur
 from granularity_loop import LoopPolicy, should_continue
 from llm_provider import LLMProvider, _normalize_url, MAX_OUTPUT_BY_AGENT
 from state_store import StateStore
@@ -13,10 +13,43 @@ from wave4_7_runner import stage_gate
 
 def test_cost_control():
     assert estimate_cost_usd("gpt-5.6-luna", 1_000_000, 0) == 1.0
+    assert usd_to_eur(1.23) == 1.23
+    assert format_eur(1.23) == "EUR 1.2300"
     ok, _ = check_call_budget(0.01, BudgetPolicy(per_call_usd=0.25, per_case_usd=2.0, per_run_usd=10.0))
     assert ok
     ok, _ = check_call_budget(0.30, BudgetPolicy(per_call_usd=0.25, per_case_usd=2.0, per_run_usd=10.0))
     assert not ok
+
+
+def test_live_agent_team_requires_explicit_approval():
+    from orchestrator import Orchestrator
+
+    with tempfile.TemporaryDirectory() as td:
+        runtime = Path(td)
+        (runtime / "agent_registry.json").write_text('{"agents": {}}', encoding="utf-8")
+        orch = Orchestrator(runtime)
+        result = orch.run_agents_parallel([], live=True, case_id="C1")
+        assert result["status"] == "BLOCKED"
+        assert result["reason"] == "AGENT_TEAM_REQUIRES_EXPLICIT_USER_APPROVAL"
+
+
+def test_prescreen_primary_intelligence_sources_cover_all_verticals():
+    import importlib.util
+
+    repo_root = Path(__file__).resolve().parents[2]
+    path = repo_root / "00_PRE_SCREEN" / "build_batch.py"
+    spec = importlib.util.spec_from_file_location("build_batch", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    required_groups = {"google", "review_portals", "social", "public_financials"}
+    for vertical in module.PRIMARY_PORTALS_BY_VERTICAL:
+        sources = module.PRIMARY_INTELLIGENCE_SOURCES_BY_VERTICAL.get(vertical)
+        assert sources, vertical
+        assert required_groups.issubset(sources), vertical
+        assert "google_business_profile" in sources["google"]
+        assert "google_reviews" in sources["google"]
+        assert "registroimprese.it" in sources["public_financials"]
 
 
 def test_loop_controller():
@@ -160,6 +193,8 @@ def test_end_to_end_runner_contract():
 def main():
     tests = [
         test_cost_control,
+        test_live_agent_team_requires_explicit_approval,
+        test_prescreen_primary_intelligence_sources_cover_all_verticals,
         test_loop_controller,
         test_state_store_roundtrip,
         test_web_tool_routing,

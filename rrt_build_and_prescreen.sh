@@ -2,11 +2,27 @@
 set -e
 TARGET="${1:-100}"
 AREAS="${2:-Milano,Roma,Torino,Genova,Bologna}"
-BATCH="${3:-00_PRE_SCREEN/batch_dentale.csv}"
-RESULTS="${4:-00_PRE_SCREEN/batch_dentale_results.csv}"
-SHORTLIST="${5:-00_PRE_SCREEN/batch_dentale_shortlist.csv}"
+VERTICAL="${VERTICAL:-dentale}"
+TARGET_SEGMENT="${RRT_TARGET_SEGMENT:-auto}"
+if [[ -n "${3:-}" && "${3}" != *.csv ]]; then
+  VERTICAL="$3"
+  if [[ -n "${4:-}" && "${4}" != *.csv ]]; then
+    TARGET_SEGMENT="$4"
+    BATCH="${5:-00_PRE_SCREEN/batch_${VERTICAL}_${TARGET_SEGMENT}.csv}"
+    RESULTS="${6:-00_PRE_SCREEN/batch_${VERTICAL}_${TARGET_SEGMENT}_results.csv}"
+    SHORTLIST="${7:-00_PRE_SCREEN/batch_${VERTICAL}_${TARGET_SEGMENT}_shortlist.csv}"
+  else
+    BATCH="${4:-00_PRE_SCREEN/batch_${VERTICAL}.csv}"
+    RESULTS="${5:-00_PRE_SCREEN/batch_${VERTICAL}_results.csv}"
+    SHORTLIST="${6:-00_PRE_SCREEN/batch_${VERTICAL}_shortlist.csv}"
+  fi
+else
+  BATCH="${3:-00_PRE_SCREEN/batch_${VERTICAL}.csv}"
+  RESULTS="${4:-00_PRE_SCREEN/batch_${VERTICAL}_results.csv}"
+  SHORTLIST="${5:-00_PRE_SCREEN/batch_${VERTICAL}_shortlist.csv}"
+fi
 
-python3 00_PRE_SCREEN/build_batch.py "$BATCH" --target "$TARGET" --areas "$AREAS"
+python3 00_PRE_SCREEN/build_batch.py "$BATCH" --target "$TARGET" --areas "$AREAS" --vertical "$VERTICAL" --target-segment "$TARGET_SEGMENT"
 python3 00_PRE_SCREEN/pre_screen.py "$BATCH" "$RESULTS"
 python3 - "$RESULTS" "$SHORTLIST" <<'PY'
 import csv, sys
