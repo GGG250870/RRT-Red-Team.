@@ -1,1 +1,3 @@
 02_AGENTS/runtime/state/
+__pycache__/
+*.py[cod]
