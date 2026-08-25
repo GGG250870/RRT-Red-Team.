@@ -74,7 +74,7 @@ Vedi [[01_ARCHITECTURE/Knowledge Graph Flow]] per la mappa navigabile.
 11. Cheap-first, escalate-on-uncertainty.
 12. Ogni finding deve mantenere la catena prospect → evidence → target → benchmark → red-team → commercial gate → validation.
 13. `level = 0` è valido solo con `NOT_FOUND_AFTER_PROTOCOL`.
-14. Gli agent team A1→A9 restano `AGENT_TEAM_LOCKED` finche l'utente non autorizza esplicitamente il run e il budget in EUR.
+14. Gli agent team A1→A9 a pagamento sono disponibili, ma ogni run resta `AGENT_TEAM_LOCKED` finché l'utente non riceve preventivamente scope, agenti, attività, dati/fonti, costo massimo stimato in EUR e stop condition, e non autorizza esplicitamente quello specifico run con il relativo budget.
 15. Regola aurea: eseguire prima tutto cio che e gratuito, legalmente accessibile e realisticamente utile; mai inventare, mai spendere senza consenso.
 16. AI gratuite esterne sono ammesse solo come assistenza non autoritativa su dati pubblici/non sensibili; non sono fonti primarie e non sbloccano A1→A9.
 17. La dashboard e una superficie di controllo, non il prodotto: il prodotto e il Signal che sopravvive a entity resolution, benchmark, Red Team e human review.
