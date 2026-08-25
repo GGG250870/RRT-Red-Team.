@@ -21,6 +21,7 @@ Ogni Evidence Pack deve conservare:
 Nessun finding può esistere senza evidence_id valido.
 
 ## Evidence Pack attivi
+- [[05_EVIDENCE/SAV-DENT-01 - Zecca-Cohen Evidence Pack]] — Savona dental pilot; evidence pack per Signal Google profile -> sito ufficiale -> prima visita.
 - [[05_EVIDENCE/B04-34 - Evidence Pack]] — pre-reaudit.
 - [[05_EVIDENCE/B04-37 - Evidence Pack]] — audited / pipeline A1→A9 READY.
 - [[05_EVIDENCE/B04-48 - Evidence Pack]] — pre-reaudit.

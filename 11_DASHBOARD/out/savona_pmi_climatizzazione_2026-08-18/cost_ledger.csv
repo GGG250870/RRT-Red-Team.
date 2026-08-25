@@ -1,0 +1,23 @@
+scope,prospect_id,company,operation,status,estimated_cost_eur,actual_cost_eur,requires_approval,notes
+batch,,,zero_llm_dashboard_generation,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Local dashboard/export generation; no paid API and no agent team.
+prospect,climatica-albenga,Climatica Albenga,free_public_prescreen_context,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Free-first public/source coverage context only.
+report,climatica-albenga,Climatica Albenga,passaggio_1_rapid_report,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Zero-LLM rapid report generated locally.
+report,climatica-albenga,Climatica Albenga,passaggio_2_guided_report,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Non-agentic guided report generated locally.
+report,climatica-albenga,Climatica Albenga,passaggio_3_full_a1_a9_report,LOCKED,REQUIRED_BEFORE_RUN,EUR 0.0000,YES,Agent team locked; requires explicit approval and EUR budget cap.
+prospect,ld-tecnoimpianti-snc,LD Tecnoimpianti Snc,free_public_prescreen_context,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Free-first public/source coverage context only.
+report,ld-tecnoimpianti-snc,LD Tecnoimpianti Snc,passaggio_1_rapid_report,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Zero-LLM rapid report generated locally.
+report,ld-tecnoimpianti-snc,LD Tecnoimpianti Snc,passaggio_2_guided_report,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Non-agentic guided report generated locally.
+report,ld-tecnoimpianti-snc,LD Tecnoimpianti Snc,passaggio_3_full_a1_a9_report,LOCKED,REQUIRED_BEFORE_RUN,EUR 0.0000,YES,Agent team locked; requires explicit approval and EUR budget cap.
+prospect,gigatech-impianti,Gigatech Impianti,free_public_prescreen_context,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Free-first public/source coverage context only.
+report,gigatech-impianti,Gigatech Impianti,passaggio_1_rapid_report,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Zero-LLM rapid report generated locally.
+report,gigatech-impianti,Gigatech Impianti,passaggio_2_guided_report,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Non-agentic guided report generated locally.
+report,gigatech-impianti,Gigatech Impianti,passaggio_3_full_a1_a9_report,LOCKED,REQUIRED_BEFORE_RUN,EUR 0.0000,YES,Agent team locked; requires explicit approval and EUR budget cap.
+prospect,fratelli-zanti-srl,Fratelli Zanti Srl,free_public_prescreen_context,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Free-first public/source coverage context only.
+report,fratelli-zanti-srl,Fratelli Zanti Srl,passaggio_1_rapid_report,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Zero-LLM rapid report generated locally.
+report,fratelli-zanti-srl,Fratelli Zanti Srl,passaggio_2_guided_report,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Non-agentic guided report generated locally.
+report,fratelli-zanti-srl,Fratelli Zanti Srl,passaggio_3_full_a1_a9_report,LOCKED,REQUIRED_BEFORE_RUN,EUR 0.0000,YES,Agent team locked; requires explicit approval and EUR budget cap.
+prospect,pernorio-termotecnica-srl,Pernorio Termotecnica Srl,free_public_prescreen_context,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Free-first public/source coverage context only.
+report,pernorio-termotecnica-srl,Pernorio Termotecnica Srl,passaggio_1_rapid_report,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Zero-LLM rapid report generated locally.
+report,pernorio-termotecnica-srl,Pernorio Termotecnica Srl,passaggio_2_guided_report,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Non-agentic guided report generated locally.
+report,pernorio-termotecnica-srl,Pernorio Termotecnica Srl,passaggio_3_full_a1_a9_report,LOCKED,REQUIRED_BEFORE_RUN,EUR 0.0000,YES,Agent team locked; requires explicit approval and EUR budget cap.
+prospect,rb-clima-srl,RB Clima Srl,free_public_prescreen_context,COMPLETED,EUR 0.0000,EUR 0.0000,NO,Free-first public/source coverage context only.

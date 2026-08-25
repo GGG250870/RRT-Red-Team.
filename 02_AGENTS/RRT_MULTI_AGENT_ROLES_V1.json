@@ -46,14 +46,14 @@
     "A8_COMMERCIAL_GATE": {
       "mission": "Classifica NO_SIGNAL / WATCHLIST / OPPORTUNITY_SIGNAL_CANDIDATE.",
       "inputs": ["audited finding", "red-team result", "discoverability/economic evidence"],
-      "outputs": ["commercial state", "safe wording", "forbidden claims"],
-      "forbidden": ["inventare ROI", "lost revenue", "autonomous outreach"]
+      "outputs": ["commercial state", "safe wording", "forbidden claims", "human_review_required"],
+      "forbidden": ["inventare ROI", "lost revenue", "autonomous outreach", "certificare OPPORTUNITY_SIGNAL", "rilasciare outreach senza human gate"]
     },
     "A9_QA_ORCHESTRATOR": {
-      "mission": "Controlla coerenza tra agenti e blocca conflitti non risolti.",
+      "mission": "Controlla coerenza tra agenti e prepara il pacchetto per human approval/release.",
       "inputs": ["all agent outputs"],
-      "outputs": ["READY / BLOCKED", "conflict ledger", "audit hash"],
-      "forbidden": ["riscrivere silenziosamente output degli agenti"]
+      "outputs": ["READY_FOR_HUMAN_REVIEW / BLOCKED", "conflict ledger", "audit hash", "release checklist"],
+      "forbidden": ["riscrivere silenziosamente output degli agenti", "simulare approvazione umana", "certificare OPPORTUNITY_SIGNAL autonomamente"]
     }
   }
 }

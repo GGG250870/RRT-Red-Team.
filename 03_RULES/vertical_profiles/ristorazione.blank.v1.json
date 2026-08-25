@@ -1,0 +1,94 @@
+{
+  "profile_id": "ristorazione.blank.v1",
+  "status": "draft",
+  "vertical": "ristorazione",
+  "description": "Blank second-vertical adapter template. This is a contract scaffold only: it contains no live evidence, no pilot result and no certified Signal.",
+  "existing_runtime_profile_keys": {
+    "pre_screen_category": "ristorazione",
+    "active_gate": ""
+  },
+  "target_segments": [
+    {
+      "segment_id": "TO_DEFINE",
+      "label": "TO_DEFINE",
+      "customer_job": "TO_DEFINE"
+    }
+  ],
+  "source_policy": {
+    "required_sources": [
+      "official_website",
+      "google_business_profile_or_maps_public_profile",
+      "public_contact_details",
+      "vertical_review_portal_when_entity_matched",
+      "local_comparator_path"
+    ],
+    "allowed_sources": [
+      "google_reviews_as_public_signal",
+      "tripadvisor_or_other_review_portal_as_public_signal_when_manually_verified_or_authorized",
+      "official_social_profiles",
+      "public_company_registry_or_public_financial_documents_when_available"
+    ],
+    "disallowed_collection": [
+      "business_contact_submission",
+      "mass_review_scraping",
+      "circumventing login, captcha, paywall or robots restrictions",
+      "inventing ratings, review counts, menu prices or revenue impact"
+    ]
+  },
+  "entity_identity_rules": [
+    "TO_DEFINE: brand, address, official website and review profile must refer to the same restaurant entity.",
+    "TO_DEFINE: multiple locations or delivery-only profiles must be resolved before scoring.",
+    "TO_DEFINE: out-of-area or ambiguous review links block Signal promotion."
+  ],
+  "observable_customer_path_signals": [
+    "TO_DEFINE: reservation path, menu visibility, hours, phone/WhatsApp and review trust route."
+  ],
+  "comparator_rules": [
+    "TO_DEFINE: comparator must match target segment, price/occasion context and local decision market.",
+    "TO_DEFINE: comparator evidence must focus on decision path, not food quality claims."
+  ],
+  "red_team_falsification_prompts": [
+    "TO_DEFINE: is reservation/contact already clear through another official channel?",
+    "TO_DEFINE: is the comparator truly same occasion/segment?",
+    "TO_DEFINE: are review signals current and entity-matched?",
+    "TO_DEFINE: is the finding only generic menu/site hygiene?"
+  ],
+  "client_language_constraints": {
+    "safe_framing": "TO_DEFINE",
+    "forbidden_phrases": [
+      "state perdendo clienti",
+      "il cibo non e buono",
+      "i competitor sono migliori",
+      "avete poche recensioni",
+      "dovete usare una piattaforma specifica"
+    ]
+  },
+  "contact_script_framing": {
+    "opening": "TO_DEFINE",
+    "finding_style": "TO_DEFINE",
+    "offer": "TO_DEFINE",
+    "must_not_do": "No food-quality claim, no revenue claim, no review-volume shaming."
+  },
+  "signal_promotion_rules": [
+    "Draft profile cannot certify Signals.",
+    "Define gate checklist before any client-facing report.",
+    "Promote only after entity, review, customer path, comparator and Red Team evidence exist."
+  ],
+  "dashboard_contract": {
+    "vertical_selector_label": "Ristorazione",
+    "required_columns": [
+      "company",
+      "domain",
+      "city",
+      "vertical",
+      "target_segment",
+      "phone",
+      "email",
+      "address",
+      "google_maps_search_url"
+    ],
+    "gate_state_column": "signal_gate_state",
+    "default_gate_state": "NOT_EVALUATED"
+  },
+  "related": []
+}

@@ -1,0 +1,256 @@
+{
+  "generated_at": "2026-08-18T10:40:03.719203+00:00",
+  "cost_summary": {
+    "completed_operations": 17,
+    "locked_operations": 5,
+    "estimated_free_cost_eur": "EUR 0.0000",
+    "actual_cost_eur": "EUR 0.0000",
+    "requires_approval_count": 5,
+    "currency": "EUR",
+    "agent_team_status": "AGENT_TEAM_LOCKED"
+  },
+  "cost_ledger": [
+    {
+      "scope": "batch",
+      "prospect_id": "",
+      "company": "",
+      "operation": "zero_llm_dashboard_generation",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Local dashboard/export generation; no paid API and no agent team."
+    },
+    {
+      "scope": "prospect",
+      "prospect_id": "climatica-albenga",
+      "company": "Climatica Albenga",
+      "operation": "free_public_prescreen_context",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Free-first public/source coverage context only."
+    },
+    {
+      "scope": "report",
+      "prospect_id": "climatica-albenga",
+      "company": "Climatica Albenga",
+      "operation": "passaggio_1_rapid_report",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Zero-LLM rapid report generated locally."
+    },
+    {
+      "scope": "report",
+      "prospect_id": "climatica-albenga",
+      "company": "Climatica Albenga",
+      "operation": "passaggio_2_guided_report",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Non-agentic guided report generated locally."
+    },
+    {
+      "scope": "report",
+      "prospect_id": "climatica-albenga",
+      "company": "Climatica Albenga",
+      "operation": "passaggio_3_full_a1_a9_report",
+      "status": "LOCKED",
+      "estimated_cost_eur": "REQUIRED_BEFORE_RUN",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "YES",
+      "notes": "Agent team locked; requires explicit approval and EUR budget cap."
+    },
+    {
+      "scope": "prospect",
+      "prospect_id": "ld-tecnoimpianti-snc",
+      "company": "LD Tecnoimpianti Snc",
+      "operation": "free_public_prescreen_context",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Free-first public/source coverage context only."
+    },
+    {
+      "scope": "report",
+      "prospect_id": "ld-tecnoimpianti-snc",
+      "company": "LD Tecnoimpianti Snc",
+      "operation": "passaggio_1_rapid_report",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Zero-LLM rapid report generated locally."
+    },
+    {
+      "scope": "report",
+      "prospect_id": "ld-tecnoimpianti-snc",
+      "company": "LD Tecnoimpianti Snc",
+      "operation": "passaggio_2_guided_report",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Non-agentic guided report generated locally."
+    },
+    {
+      "scope": "report",
+      "prospect_id": "ld-tecnoimpianti-snc",
+      "company": "LD Tecnoimpianti Snc",
+      "operation": "passaggio_3_full_a1_a9_report",
+      "status": "LOCKED",
+      "estimated_cost_eur": "REQUIRED_BEFORE_RUN",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "YES",
+      "notes": "Agent team locked; requires explicit approval and EUR budget cap."
+    },
+    {
+      "scope": "prospect",
+      "prospect_id": "gigatech-impianti",
+      "company": "Gigatech Impianti",
+      "operation": "free_public_prescreen_context",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Free-first public/source coverage context only."
+    },
+    {
+      "scope": "report",
+      "prospect_id": "gigatech-impianti",
+      "company": "Gigatech Impianti",
+      "operation": "passaggio_1_rapid_report",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Zero-LLM rapid report generated locally."
+    },
+    {
+      "scope": "report",
+      "prospect_id": "gigatech-impianti",
+      "company": "Gigatech Impianti",
+      "operation": "passaggio_2_guided_report",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Non-agentic guided report generated locally."
+    },
+    {
+      "scope": "report",
+      "prospect_id": "gigatech-impianti",
+      "company": "Gigatech Impianti",
+      "operation": "passaggio_3_full_a1_a9_report",
+      "status": "LOCKED",
+      "estimated_cost_eur": "REQUIRED_BEFORE_RUN",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "YES",
+      "notes": "Agent team locked; requires explicit approval and EUR budget cap."
+    },
+    {
+      "scope": "prospect",
+      "prospect_id": "fratelli-zanti-srl",
+      "company": "Fratelli Zanti Srl",
+      "operation": "free_public_prescreen_context",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Free-first public/source coverage context only."
+    },
+    {
+      "scope": "report",
+      "prospect_id": "fratelli-zanti-srl",
+      "company": "Fratelli Zanti Srl",
+      "operation": "passaggio_1_rapid_report",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Zero-LLM rapid report generated locally."
+    },
+    {
+      "scope": "report",
+      "prospect_id": "fratelli-zanti-srl",
+      "company": "Fratelli Zanti Srl",
+      "operation": "passaggio_2_guided_report",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Non-agentic guided report generated locally."
+    },
+    {
+      "scope": "report",
+      "prospect_id": "fratelli-zanti-srl",
+      "company": "Fratelli Zanti Srl",
+      "operation": "passaggio_3_full_a1_a9_report",
+      "status": "LOCKED",
+      "estimated_cost_eur": "REQUIRED_BEFORE_RUN",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "YES",
+      "notes": "Agent team locked; requires explicit approval and EUR budget cap."
+    },
+    {
+      "scope": "prospect",
+      "prospect_id": "pernorio-termotecnica-srl",
+      "company": "Pernorio Termotecnica Srl",
+      "operation": "free_public_prescreen_context",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Free-first public/source coverage context only."
+    },
+    {
+      "scope": "report",
+      "prospect_id": "pernorio-termotecnica-srl",
+      "company": "Pernorio Termotecnica Srl",
+      "operation": "passaggio_1_rapid_report",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Zero-LLM rapid report generated locally."
+    },
+    {
+      "scope": "report",
+      "prospect_id": "pernorio-termotecnica-srl",
+      "company": "Pernorio Termotecnica Srl",
+      "operation": "passaggio_2_guided_report",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Non-agentic guided report generated locally."
+    },
+    {
+      "scope": "report",
+      "prospect_id": "pernorio-termotecnica-srl",
+      "company": "Pernorio Termotecnica Srl",
+      "operation": "passaggio_3_full_a1_a9_report",
+      "status": "LOCKED",
+      "estimated_cost_eur": "REQUIRED_BEFORE_RUN",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "YES",
+      "notes": "Agent team locked; requires explicit approval and EUR budget cap."
+    },
+    {
+      "scope": "prospect",
+      "prospect_id": "rb-clima-srl",
+      "company": "RB Clima Srl",
+      "operation": "free_public_prescreen_context",
+      "status": "COMPLETED",
+      "estimated_cost_eur": "EUR 0.0000",
+      "actual_cost_eur": "EUR 0.0000",
+      "requires_approval": "NO",
+      "notes": "Free-first public/source coverage context only."
+    }
+  ]
+}

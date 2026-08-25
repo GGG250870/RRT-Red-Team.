@@ -1,0 +1,84 @@
+{
+  "version": "v1",
+  "status": "active",
+  "authorization_scope": "Agents integrated in RRT may be used across verticals when bounded by active rules, provenance, cost controls and human release.",
+  "vertical_neutral": true,
+  "active_example_vertical": "dentale.v1",
+  "agent_clusters": {
+    "discovery_evidence_collection": {
+      "agents": ["A1_DISCOVERY", "A3_DEEP_SCAN"],
+      "must_output": ["source_candidates_or_evidence_pack", "query_trace", "provenance_refs", "collection_state"],
+      "forbidden": ["commercial_conclusion", "signal_promotion", "business_contact", "prohibited_scraping"]
+    },
+    "entity_resolution": {
+      "agents": ["A2_ENTITY_SCOPE"],
+      "must_output": ["entity_state", "accepted_sources", "rejected_sources", "conflict_ledger"],
+      "forbidden": ["silent_entity_merge", "portal_as_official_domain", "advance_ambiguous_entity"]
+    },
+    "comparator_research": {
+      "agents": ["A5_TARGET_MATCH", "A6_BENCHMARK"],
+      "must_output": ["eligible_target", "benchmark_candidates", "fit_basis", "scope_warnings"],
+      "forbidden": ["gap_maximizing_comparator_selection", "incompatible_segment_comparison", "quality_claims", "economic_inference"]
+    },
+    "red_team_challenger": {
+      "agents": ["A7_RED_TEAM"],
+      "must_output": ["verdict", "counterevidence", "alternative_explanations", "residual_caveats"],
+      "allowed_verdicts": ["FALSIFIED", "WEAK_SURVIVAL", "SURVIVES"],
+      "forbidden": ["defend_by_default", "unsupported_claims", "signal_certification"]
+    },
+    "dossier_report_preparation": {
+      "agents": ["A8_COMMERCIAL_GATE"],
+      "must_output": ["commercial_state", "safe_wording", "forbidden_claims", "human_review_required"],
+      "allowed_states": ["NO_SIGNAL", "WATCHLIST", "OPPORTUNITY_SIGNAL_CANDIDATE"],
+      "forbidden": ["OPPORTUNITY_SIGNAL_CERTIFICATION", "usable_outreach_without_human_approval", "revenue_or_quality_claims"]
+    },
+    "human_approval_release": {
+      "agents": ["A9_QA_ORCHESTRATOR"],
+      "must_output": ["qa_state", "conflict_ledger", "audit_hash_or_refs", "release_checklist"],
+      "human_only_outputs": ["OPPORTUNITY_SIGNAL", "VALIDATED_SIGNAL", "OUTREACH_APPROVED_FOR_USE"],
+      "forbidden": ["silent_output_rewrite", "human_approval_simulation"]
+    }
+  },
+  "handoff_required_fields": [
+    "case_id",
+    "vertical_profile_id",
+    "target_segment",
+    "agent_id",
+    "stage",
+    "input_refs",
+    "output_refs",
+    "provenance_refs",
+    "state",
+    "blocking_conditions",
+    "cost_eur_estimated",
+    "cost_eur_actual",
+    "requires_human_review"
+  ],
+  "global_forbidden_actions": [
+    "contact_business",
+    "submit_forms",
+    "browse_behind_login",
+    "bypass_captcha_or_paywall",
+    "mass_review_scraping",
+    "invent_evidence",
+    "invent_financials",
+    "claim_lost_revenue_without_required_evidence",
+    "release_outreach_without_human_approval"
+  ],
+  "cost_consent_controls": {
+    "live_agent_env_required": "RRT_AGENT_TEAM_APPROVAL=I_APPROVE_AGENT_TEAM_LIVE_RUN",
+    "budget_envs": ["RRT_BUDGET_PER_CALL_USD", "RRT_BUDGET_PER_CASE_USD", "RRT_BUDGET_PER_RUN_USD", "RRT_USD_EUR_RATE"],
+    "currency_for_user": "EUR",
+    "free_prescreen_does_not_unlock_live_agents": true
+  },
+  "signal_release_rule": [
+    "active_vertical_profile",
+    "entity_resolution_pass",
+    "evidence_pack_with_provenance",
+    "frozen_fit_comparator",
+    "red_team_survives",
+    "safe_client_language",
+    "qa_ready_for_human_review",
+    "explicit_human_approval"
+  ]
+}

@@ -5,7 +5,26 @@ status: active
 
 # CHANGELOG
 
+## 2026-08-25
+- Generalizzato il prodotto oltre il pilot dentale con [[01_ARCHITECTURE/RRT_VERTICAL_CONFIGURATION_MODEL_V1]]: separati core comune e profili verticali per target segment, fonti, entity rules, customer path, comparator, Red Team, linguaggio cliente e framing script.
+- Aggiunti `03_RULES/vertical_profiles/dentale.v1.json`, schema profilo e template draft `ristorazione.blank.v1.json`; dentale resta il primo profilo attivo, ristorazione e solo adapter/template senza evidenza live.
+- Definito [[01_ARCHITECTURE/RRT_DASHBOARD_VERTICAL_DATA_CONTRACT_V1]]: la dashboard orchestra verticale/citta/segmento, evidenza, gate e artefatti, ma non trasforma liste o score in Opportunity Signal.
+- Formalizzata l'autorizzazione agli agenti integrati con [[02_AGENTS/RRT_AGENT_OPERATING_MODEL_V1]] e `RRT_AGENT_AUTHORIZATION_POLICY_V1.json`: discovery, entity, comparator, Red Team e report sono consentiti con provenance/costi/stop condition; Signal e outreach restano human-approved.
+
+## 2026-08-18
+- Avviato pilot `Savona PMI climatizzazione`: aggiunto segmento `climatizzazione_impianti` al pre-screen, seed pubblico da 6 aziende, risultati pre-screen, dashboard locale zero-costo e gate `RRT_PMI_CLIMATIZZAZIONE_SAVONA_LEAD_TRUST_GATE_V1`.
+- Creati triage, Red Team review e outcome Signal: nessun Opportunity Signal certificato nella prima passata; Gigatech Impianti e Pernorio Termotecnica passano in `WATCHLIST`, RB Clima resta benchmark/reference.
+
+## 2026-08-17
+- Chiuso il primo Opportunity Signal confermato del pilot dentale Savona: `SAV-DENT-01 - Studio Odontoiatrico Zecca-Cohen`, con dossier Signal, evidence pack, Red Team review, mini-audit cliente, script di primo contatto e checklist riusabile `RRT_DENTAL_SAVONA_DISCOVERY_TO_FIRST_VISIT_GATE_V1`.
+- Il Signal Zecca-Cohen e formulato conservativamente come `Google profile -> sito ufficiale -> prima visita continuity gap`; esclusi claim clinici, SEO generici, conversioni perse o perdita economica.
+- Applicato il gate dentale Savona ai candidati rimanenti: nessun nuovo Opportunity Signal certificato; creati triage operativo, outcome no-signal/deferral e batch Red Team review.
+- Classificati Mantovani e Roberto Cristiano Martinengo come benchmark/reference; Vesalici come `WATCHLIST_WEAK`; Bianco e San Giovanni come deferral/entity resolution; gli altri candidati non superano il gate discovery-to-first-visit.
+
 ## 2026-08-12
+- Creata `01_ARCHITECTURE/RRT_PRODUCT_NORTH_STAR_V1.md`: definizione ufficiale di RRT come Red Team commerciale esterno, non scraper/SEO audit/report marketing. Il prodotto finale e 3-7 Opportunity Signal forti, non ovvi, falsificati, auditabili e commercialmente potenti.
+- Riallineate HOME, Architecture Overview, Rules Index e Dashboard Product Spec alla North Star: dashboard, scoring, runtime, liste prospect e report rapidi sono infrastruttura/output intermedi, non prodotto vendibile se non portano a Signal che sopravvivono a entity resolution, benchmark, Red Team, commercial gate e human review.
+- Aggiunto Product Drift Test: ogni nuovo sviluppo deve dimostrare come aumenta affidabilita, confronto target-specifico, falsificazione, costo basso per prospect o effetto "come l'avete visto dall'esterno?".
 - Rafforzata PR #7 `agent/prescreen-batch-generator`: il batch builder portal-first scarta link di navigazione/generici e non usa più domini di portale come domini ufficiali del prospect.
 - `build_batch.py` risolve domini ufficiali solo da link espliciti `Sito web`/`website` nella scheda portale; altrimenti lascia `domain` vuoto e imposta `official_domain_state = UNRESOLVED`.
 - `pre_screen.py` preserva `source_url` e ferma i record senza dominio ufficiale come `COLLECTION_RESTRICTED` con `fetch_state = NO_OFFICIAL_DOMAIN`.
@@ -20,6 +39,27 @@ status: active
 - Riallineate le note Obsidian di Tranche D al ledger machine-readable `09_VALIDATION/RRT_BATCH_04_SATURATION_REAUDIT_TRANCHE_D_V1.json`: B04-34, B04-37 e B04-48 risultano re-audit PASS 3/3.
 - Aggiornate le schede B04-34 e B04-48: benchmark freeze parziale e `NO_SIGNAL_PROVISIONAL`; P1-P8 prominence/discoverability resta il gate aperto prima di qualunque conclusione commerciale.
 - La Legacy Zero Repair Queue resta aperta con 15 item: nessuno zero legacy è stato convertito automaticamente.
+- Reso il pre-screen adattabile per categoria: profili `dentale`, `ristorazione`, `pmi`, `hospitality`, `benessere_estetica`, `servizi_casa`, `formazione` e `generic` con dimensioni, page hints, pattern high-value e gap separati. La discovery automatica resta validata solo per `dentale`/MioDottore; le altre categorie usano CSV manuali finché fonti category-safe non sono validate.
+- Creato `01_ARCHITECTURE/RRT_FINAL_DASHBOARD_PRODUCT_SPEC_V1.md`: specifica dashboard finale con scelta categoria/citta, raccomandazione percorso opportunita, export CSV/XLSX/JSON/MD/DOCX/PDF, tre report per imprenditore e contatore costi in EUR.
+- Aggiunto guard runtime: i run live degli agent team A1-A9 restano bloccati senza consenso esplicito via `RRT_AGENT_TEAM_APPROVAL=I_APPROVE_AGENT_TEAM_LIVE_RUN`.
+- Formalizzate le primary intelligence sources per tutte le categorie: Google Business/Profile Reviews/Maps, portali recensioni, social e bilanci pubblici/Registro Imprese, separandole dalla risoluzione del dominio ufficiale e dagli Opportunity Signal.
+- Creato `01_ARCHITECTURE/RRT_DASHBOARD_ONLINE_RESEARCH_NOTES_V1.md` con ricerca online e autoanalisi su moduli utili per la dashboard: Opportunity Cockpit, Source Coverage Matrix, Explainable Score, Map View, Entity Resolution, Review Intelligence, Public Financial Snapshot, Report Builder, Cost & Consent e Calibration Loop.
+- Formalizzata la regola aurea dashboard: massimizzare prima tutto cio che e gratuito, legalmente accessibile e realisticamente utile; mai inventare e mai usare agent/API/fonti a pagamento senza consenso. Aggiunte SLA operative: triage singolo in 30-90s, report rapido 2-5m, batch 50 in 5-15m, batch 200 in 15-45m con output progressivo.
+- Implementata `11_DASHBOARD/dashboard.py`: dashboard HTML locale zero-LLM da CSV pre-screen, con Opportunity Cockpit, Source Coverage Matrix, shortlist CSV, payload JSON, report batch Markdown, report rapidi singoli e stato `AGENT_TEAM_LOCKED`.
+- Estesi gli export dashboard: `prospects.xlsx`, `batch_report.docx` e `print_report.html` generati localmente senza dipendenze esterne e con costo `EUR 0.0000`.
+- Aggiunti tre report per prospect selezionato: rapido zero-LLM (`reports/`), opportunita guidato non-agentico (`guided_reports/`) e template A1-A9 bloccato (`full_rrt_locked/`) con consenso/budget richiesti.
+- Implementato `11_DASHBOARD/enrich_public_sources.py`: enrichment online gratuito/legal-safe da sito ufficiale e URL pubblici forniti, con estrazione social/review/bilanci linkati, `robots.txt` check, provenance `source_refs_json`, nessun aggiramento e costo `EUR 0.0000`.
+- Aggiunta segmentazione target per `ristorazione`: `fine_dining`, `pizzeria`, `trattoria_osteria`, `sushi_etnico`, `delivery_asporto`, `eventi_catering`, `enoteca_wine_bar`, `bar_cafe` e `ristorazione_generic`, con TripAdvisor e altri portali review come intelligence/provenance per segmento.
+- Rafforzati i tre report per imprenditore come passaggi crescenti: Passaggio 1 rapido zero-LLM, Passaggio 2 guidato non-agentico, Passaggio 3 A1-A9 locked. Ogni passaggio e gli export operativi includono telefono, cellulare/WhatsApp quando disponibile, email e indirizzo, senza inventare dati mancanti.
+- Esteso l'enrichment gratuito/legal-safe con estrazione prudente di contatti da sito ufficiale, link `tel:`, `mailto:`, WhatsApp e dati strutturati JSON-LD pubblici.
+- La lista operativa della dashboard espone contatti e link diretti ai tre passaggi report per ogni prospect selezionato in `SHORTLIST` o `ESCALATE`.
+- Aggiunto `Cost & Consent Panel` con ledger costi esportabile in JSON/CSV/XLSX: operazioni gratuite concluse a `EUR 0.0000`, Passaggio 3 A1-A9 bloccato con `REQUIRED_BEFORE_RUN` fino a consenso esplicito e budget EUR.
+- Creato `01_ARCHITECTURE/RRT_DASHBOARD_DELIVERY_ROADMAP_V1.md`: roadmap tempi per merge, pilot ristorazione in 24 ore dal dataset reale, pilot PMI/nicchie, calibrazione 50-200 prospect in 3-5 giorni e connettori ufficiali opzionali.
+- Aggiunto pilot kit dashboard: `11_DASHBOARD/pilot_readiness.py`, runbook pilot e template CSV ristorazione/PMI per controllare readiness dataset prima di pre-screen e dashboard.
+- Esteso `00_PRE_SCREEN/build_batch.py` con discovery open data city-first via fonte cartografica pubblica per ristorazione, hospitality, benessere/estetica, servizi casa, formazione e PMI best effort; geocoding pubblico usato solo per bounding box citta con User-Agent e limiti.
+- Creata `03_RULES/RRT_FREE_AI_ASSISTANCE_POLICY_V1.md`: AI gratuite esterne ammesse solo come assistenza non autoritativa, a costo `EUR 0.0000`, su dati pubblici/non sensibili e senza sbloccare A1-A9.
+- Rafforzata discovery open data con cache bbox, opzione `--bbox` manuale, retry leggero JSON e filtro `addr:city` per ridurre ambiguita geografiche.
+- Aggiunti link di verifica Google Maps/TripAdvisor nei seed di ristorazione e `11_DASHBOARD/review_intelligence.py` per aggregare recensioni/rating da API o export autorizzati senza scraping.
 - Creato `09_VALIDATION/RRT_LEGACY_ZERO_REPAIR_PASS1_V1.json`: primo repair pass sui 15 zeri legacy. Esito: 4 `FOUND`, 3 `COLLECTION_RESTRICTED`, 8 `UNRESOLVED`, 0 `NOT_FOUND_AFTER_PROTOCOL`; 11 item restano bloccanti prima dello scoring storico.
 
 ## 2026-08-10
