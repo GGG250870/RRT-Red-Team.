@@ -1,0 +1,32 @@
+{
+  "type": "vertical_profile_schema",
+  "version": "v1",
+  "status": "active",
+  "required_top_level_keys": [
+    "profile_id",
+    "status",
+    "vertical",
+    "target_segments",
+    "source_policy",
+    "entity_identity_rules",
+    "observable_customer_path_signals",
+    "comparator_rules",
+    "red_team_falsification_prompts",
+    "client_language_constraints",
+    "contact_script_framing",
+    "signal_promotion_rules",
+    "dashboard_contract"
+  ],
+  "state_rules": {
+    "active": "Can be used for operational pilots when linked to a gate/checklist.",
+    "draft": "Can be used as a template or design artifact only; it cannot certify a Signal.",
+    "disabled": "Must not be used by runtime or dashboard selection."
+  },
+  "promotion_guardrails": [
+    "A profile never turns a pre-screen score into an Opportunity Signal.",
+    "A profile must define customer-path observables before a gate can promote findings.",
+    "A profile must define unsafe language before client-facing artifacts are generated.",
+    "A profile must identify required sources and allowed sources separately.",
+    "A profile with status draft can support planning, not live evidence claims."
+  ]
+}

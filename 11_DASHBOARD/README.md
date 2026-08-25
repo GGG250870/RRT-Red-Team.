@@ -6,6 +6,16 @@ Dashboard locale zero-LLM per trasformare un CSV di pre-screen in output immedia
 
 Prima usa tutto cio che e gratuito, legalmente accessibile e realisticamente utile. Non inventa dati e non avvia gli agent team.
 
+## Boundary prodotto
+
+La dashboard e una superficie di controllo multi-verticale, non il prodotto vendibile.
+
+Puo selezionare categoria, citta, target segment, fonti, prospect, profondita report e costo. Deve mostrare stato profilo verticale, copertura fonti, entity resolution e gate state.
+
+Non puo certificare Opportunity Signal, non puo trasformare `SHORTLIST`, `ESCALATE` o score alto in Signal, e non puo nascondere evidenza mancante.
+
+Contratto dati: [[01_ARCHITECTURE/RRT_DASHBOARD_VERTICAL_DATA_CONTRACT_V1]].
+
 ## Uso
 
 ```bash
@@ -157,11 +167,12 @@ zsh rrt_dashboard.sh 00_PRE_SCREEN/batch_ristorazione_pizzeria_results.csv 11_DA
 
 ## Flusso consigliato
 
-1. Genera o importa un CSV con domini ufficiali.
-2. Esegui `00_PRE_SCREEN/pre_screen.py`.
-3. Verifica entita e link review con `entity_resolution.py` quando lavori su liste generate per citta/categoria.
-4. Genera la dashboard.
-5. Esegui enrichment pubblico gratuito se vuoi massimizzare le fonti online.
-6. Usa filtri categoria/citta/decisione per selezionare prospect.
-7. Completa manualmente Google, recensioni, social e bilanci pubblici dove mancanti o non estraibili.
-8. Solo dopo selezione umana valuta un report guidato o A1-A9 con consenso e budget.
+1. Seleziona un profilo verticale `active` o usa un profilo `draft` solo per template.
+2. Genera o importa un CSV con domini ufficiali.
+3. Esegui `00_PRE_SCREEN/pre_screen.py`.
+4. Verifica entita e link review con `entity_resolution.py` quando lavori su liste generate per citta/categoria.
+5. Genera la dashboard.
+6. Esegui enrichment pubblico gratuito se vuoi massimizzare le fonti online.
+7. Usa filtri categoria/citta/decisione per selezionare prospect.
+8. Completa manualmente Google, recensioni, social e bilanci pubblici dove mancanti o non estraibili.
+9. Solo dopo selezione umana valuta un report guidato o A1-A9 con consenso e budget.

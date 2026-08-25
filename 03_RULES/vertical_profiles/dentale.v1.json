@@ -1,0 +1,116 @@
+{
+  "profile_id": "dentale.v1",
+  "status": "active",
+  "vertical": "dentale",
+  "description": "Dental is the first operational pilot vertical. The core RRT method remains vertical-agnostic; this profile defines dental-specific evidence, path and language rules.",
+  "existing_runtime_profile_keys": {
+    "pre_screen_category": "dentale",
+    "active_gate": "03_RULES/RRT_DENTAL_SAVONA_DISCOVERY_TO_FIRST_VISIT_GATE_V1.md"
+  },
+  "target_segments": [
+    {
+      "segment_id": "first_visit_path",
+      "label": "Prima visita / richiesta appuntamento",
+      "customer_job": "A potential patient finds the clinic and needs to understand how to ask for a first visit."
+    },
+    {
+      "segment_id": "implantologia_high_value",
+      "label": "Implantologia / riabilitazioni",
+      "customer_job": "A potential patient evaluates trust, technology, cost and appointment route for high-value care."
+    },
+    {
+      "segment_id": "ansia_sedazione",
+      "label": "Ansia / sedazione / dolore",
+      "customer_job": "A potential patient needs reassurance that the clinic understands fear, pain and sedation needs."
+    }
+  ],
+  "source_policy": {
+    "required_sources": [
+      "official_website",
+      "google_business_profile_or_maps_public_profile",
+      "public_contact_details",
+      "local_comparator_path"
+    ],
+    "allowed_sources": [
+      "google_reviews_as_public_signal",
+      "miodottore_or_other_vertical_directory_when_entity_matched",
+      "official_social_profiles",
+      "public_company_registry_or_public_financial_documents_when_available"
+    ],
+    "disallowed_collection": [
+      "business_contact_submission",
+      "mass_review_scraping",
+      "claiming clinical quality differences",
+      "inventing conversion, revenue or patient loss"
+    ]
+  },
+  "entity_identity_rules": [
+    "Public name, address and official website must match the same studio or clinic.",
+    "Different dentists inside the same studio must not be merged unless public evidence shows shared entity/brand.",
+    "Google profile state must be observed with date before a Google-to-site continuity finding is promoted.",
+    "Entity ambiguity blocks Signal promotion and must be recorded as ENTITY_UNRESOLVED or ENTITY_CONFLICT."
+  ],
+  "observable_customer_path_signals": [
+    "Google profile links or fails to link the official site.",
+    "Mobile official site shows or hides first-visit CTA, form, call, WhatsApp or booking route.",
+    "The patient can understand what to do for a first visit without interpreting generic content.",
+    "Comparator makes the same first action clearer for the same local decision context."
+  ],
+  "comparator_rules": [
+    "Comparator must operate locally or in a clearly comparable patient decision market.",
+    "Comparator can be stronger digitally without implying superior clinical care.",
+    "Comparator evidence must focus on customer path clarity, not design taste.",
+    "Comparator review signals are public signals only, not clinical quality judgments."
+  ],
+  "red_team_falsification_prompts": [
+    "Was the booking/contact path present but missed?",
+    "Is a phone-first workflow intentional and clearly communicated?",
+    "Is the comparator actually comparable or just digitally more mature?",
+    "Is the gap decision-relevant or merely aesthetic?",
+    "Are we confusing absence of evidence with evidence of absence?",
+    "Does the finding require unsupported clinical or economic claims?"
+  ],
+  "client_language_constraints": {
+    "safe_framing": "Abbiamo osservato il percorso pubblico con cui un potenziale paziente trova lo studio e prova a chiedere una prima visita. Ci sono gia segnali positivi; il punto e rendere piu continuo e guidato il passaggio da Google al primo contatto.",
+    "forbidden_phrases": [
+      "state perdendo pazienti",
+      "il sito e vecchio",
+      "i competitor sono migliori",
+      "la vostra qualita clinica non emerge",
+      "avete poche recensioni",
+      "dovete usare booking online"
+    ]
+  },
+  "contact_script_framing": {
+    "opening": "Rispetto per i segnali professionali gia presenti.",
+    "finding_style": "Un punto pratico sul percorso pubblico di primo contatto.",
+    "offer": "Mini-review gratuita del percorso Google -> sito -> richiesta visita.",
+    "must_not_do": "No clinical criticism, no conversion claim, no pressure."
+  },
+  "signal_promotion_rules": [
+    "NO_SIGNAL when contact/first-visit path is already clear enough.",
+    "WATCHLIST when evidence is incomplete or phone-first may falsify the gap.",
+    "OPPORTUNITY_SIGNAL_CANDIDATE only after entity, Google state, mobile path and comparator evidence exist.",
+    "OPPORTUNITY_SIGNAL only after Red Team survives and human review approves."
+  ],
+  "dashboard_contract": {
+    "vertical_selector_label": "Dentale",
+    "required_columns": [
+      "company",
+      "domain",
+      "city",
+      "vertical",
+      "target_segment",
+      "phone",
+      "email",
+      "address",
+      "google_maps_search_url"
+    ],
+    "gate_state_column": "signal_gate_state",
+    "default_gate_state": "NOT_EVALUATED"
+  },
+  "related": [
+    "03_RULES/RRT_DENTAL_SAVONA_DISCOVERY_TO_FIRST_VISIT_GATE_V1.md",
+    "07_SIGNALS/SAV-DENT-01 - Zecca-Cohen Opportunity Signal Dossier.md"
+  ]
+}

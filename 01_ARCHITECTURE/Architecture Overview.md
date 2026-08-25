@@ -20,6 +20,14 @@ INPUT → GENERAL EVIDENCE → TARGET DISCOVERY → PROSPECT EVIDENCE SATURATION
 ## Product Pipeline
 COMPANY / PROSPECT LIST → ENTITY RESOLUTION → PUBLIC MARKET VIEW → TARGET-SPECIFIC EVIDENCE → COMPARABLE BENCHMARK → DECISION GAP → RED TEAM FALSIFICATION → OPPORTUNITY SIGNAL → HUMAN REVIEW → COMMERCIAL ENTRY POINT
 
+## Core vs Vertical
+
+RRT core is vertical-agnostic: entity resolution, evidence provenance, source states, comparator requirement, Red Team falsification, Signal state machine, cost/consent and human review.
+
+Vertical-specific behavior must be declared in a vertical profile before it becomes operational: target segments, source policy, identity rules, observable customer path, comparator rules, falsification prompts, client language constraints and contact-script framing.
+
+See [[01_ARCHITECTURE/RRT_VERTICAL_CONFIGURATION_MODEL_V1]].
+
 ## Validation layers
 - Entity Resolution
 - Scope Resolution
@@ -41,6 +49,8 @@ COMPANY / PROSPECT LIST → ENTITY RESOLUTION → PUBLIC MARKET VIEW → TARGET-
 
 ## Related
 - [[01_ARCHITECTURE/RRT_PRODUCT_NORTH_STAR_V1]]
+- [[01_ARCHITECTURE/RRT_VERTICAL_CONFIGURATION_MODEL_V1]]
+- [[01_ARCHITECTURE/RRT_DASHBOARD_VERTICAL_DATA_CONTRACT_V1]]
 - [[01_ARCHITECTURE/RRT_FINAL_DASHBOARD_PRODUCT_SPEC_V1]]
 - [[01_ARCHITECTURE/RRT_DASHBOARD_ONLINE_RESEARCH_NOTES_V1]]
 - [[02_AGENTS/Multi-Agent System]]

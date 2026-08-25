@@ -11,6 +11,8 @@ updated: 2026-08-12
 - [[00_HOME/SECOND_BRAIN]]
 - [[01_ARCHITECTURE/Architecture Overview]]
 - [[01_ARCHITECTURE/RRT_PRODUCT_NORTH_STAR_V1]]
+- [[01_ARCHITECTURE/RRT_VERTICAL_CONFIGURATION_MODEL_V1]]
+- [[01_ARCHITECTURE/RRT_DASHBOARD_VERTICAL_DATA_CONTRACT_V1]]
 - [[01_ARCHITECTURE/Integrated Knowledge Model]]
 - [[01_ARCHITECTURE/Knowledge Graph Flow]]
 - [[01_ARCHITECTURE/RRT_FINAL_DASHBOARD_PRODUCT_SPEC_V1]]
@@ -46,6 +48,7 @@ updated: 2026-08-12
 - GitHub: fonte persistente e auditabile.
 - Obsidian: interfaccia umana del second brain e knowledge graph.
 - Dashboard finale: specificata in [[01_ARCHITECTURE/RRT_FINAL_DASHBOARD_PRODUCT_SPEC_V1]], con categorie/citta/export/report e contatore costi in EUR.
+- Vertical configuration: [[01_ARCHITECTURE/RRT_VERTICAL_CONFIGURATION_MODEL_V1]] separa core comune e regole di verticale; dentale e il primo profilo attivo, non il confine del prodotto.
 - Dashboard V1 locale: [[11_DASHBOARD/README]], generabile da CSV pre-screen senza API, costi o agent team.
 - Roadmap tempi dashboard: [[01_ARCHITECTURE/RRT_DASHBOARD_DELIVERY_ROADMAP_V1]], con pilot in 24 ore dal dataset reale e calibrazione batch in 3-5 giorni.
 
@@ -73,6 +76,7 @@ Vedi [[01_ARCHITECTURE/Knowledge Graph Flow]] per la mappa navigabile.
 15. Regola aurea: eseguire prima tutto cio che e gratuito, legalmente accessibile e realisticamente utile; mai inventare, mai spendere senza consenso.
 16. AI gratuite esterne sono ammesse solo come assistenza non autoritativa su dati pubblici/non sensibili; non sono fonti primarie e non sbloccano A1→A9.
 17. La dashboard e una superficie di controllo, non il prodotto: il prodotto e il Signal che sopravvive a entity resolution, benchmark, Red Team e human review.
+18. Ogni nuovo verticale deve avere un profilo esplicito; se il profilo e `draft`, puo produrre solo template/pianificazione, non Signal.
 
 ## Casi runtime di riferimento
 - [[04_PROSPECTS/B04-37 - Studio Dentistico Pietro Leone]]
