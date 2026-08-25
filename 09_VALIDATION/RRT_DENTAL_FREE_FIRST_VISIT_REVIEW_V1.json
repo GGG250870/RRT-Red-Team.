@@ -1,0 +1,203 @@
+{
+  "version": "v1",
+  "status": "FREE_DEEP_REVIEW_COMPLETE",
+  "vertical_profile_id": "dentale.v1",
+  "batch_id": "DENT-GE-FIRST-VISIT-FREE-01",
+  "observed_at": "2026-08-25",
+  "method": "Manual public official-site first-visit-path review with local comparator-fit triage. No A1-A9 live or paid agents.",
+  "cost_eur_actual": "0.0000",
+  "reviewed_records": 9,
+  "outcome_summary": {
+    "deep_review_candidate": 3,
+    "watchlist_weak": 1,
+    "no_signal_provisional": 5,
+    "opportunity_signal": 0
+  },
+  "records": [
+    {
+      "company": "Studio Dentistico Quinto al Mare",
+      "state": "NO_SIGNAL_PROVISIONAL",
+      "official_source": "https://www.studioquintoalmare.it/",
+      "observations": [
+        "Contact details are prominent",
+        "Explicit invitation to call for an appointment",
+        "Address, hours, phone, mobile and email are visible"
+      ],
+      "falsification": "The initially inferred first-visit gap is contradicted by an explicit appointment CTA.",
+      "comparator_fit": null,
+      "caveats": [
+        "Google-profile-to-site continuity not observed in this free pass"
+      ]
+    },
+    {
+      "company": "Ge.O Genova Odontoiatrica",
+      "state": "NO_SIGNAL_PROVISIONAL",
+      "official_source": "https://www.genovaodontoiatrica.it/",
+      "observations": [
+        "Explicit contact-to-appointment language",
+        "Phone and email are visible",
+        "Sedation-conscious content is explicit",
+        "Conventions are publicly listed"
+      ],
+      "falsification": "The site already communicates appointment route and anxiety/sedation capability.",
+      "comparator_fit": null,
+      "caveats": [
+        "Google state not observed"
+      ]
+    },
+    {
+      "company": "Studio Dentistico Emanuele Muller",
+      "state": "DEEP_REVIEW_CANDIDATE",
+      "official_source": "https://www.studiodentisticomuller.com/",
+      "observations": [
+        "Phone CTA and contact form are available",
+        "Services and practitioner identity are clear",
+        "Appointment path is primarily phone/form"
+      ],
+      "falsification": "Not an absent-contact finding; the remaining question is whether the first-visit decision path is sufficiently guided.",
+      "comparator_fit": {
+        "candidate": "Studio Odontoiatrico Alessandro Leonardi",
+        "basis": "Independent central-Genova practice with explicit first-visit/appointment framing and complete contact block"
+      },
+      "caveats": [
+        "Requires mobile-path and Google-profile observation",
+        "No economic or conversion claim"
+      ]
+    },
+    {
+      "company": "Studio Dentistico Enrico Figliomeno",
+      "state": "NO_SIGNAL_PROVISIONAL",
+      "official_source": "https://www.studiodentisticofigliomeno.it/",
+      "observations": [
+        "Explicit appointment CTA",
+        "Anxiety/analgesia-sedation content is clear",
+        "Financing language is explicit",
+        "Phone, mobile, email and address are visible"
+      ],
+      "falsification": "The proposed first-visit/anxiety/financing visibility gap is contradicted by the official site.",
+      "comparator_fit": null,
+      "caveats": [
+        "Earlier access restriction was transient"
+      ]
+    },
+    {
+      "company": "Studio Odontoiatrico Fabio Garbarini",
+      "state": "NO_SIGNAL_PROVISIONAL",
+      "official_source": "https://www.studiogarbarini.it/",
+      "observations": [
+        "Repeated explicit free first-visit CTA",
+        "Phone-only booking rule is clearly explained",
+        "Address and email are visible"
+      ],
+      "falsification": "Phone-first is intentional and clearly communicated; missing online booking is not a finding.",
+      "comparator_fit": null,
+      "caveats": [
+        "Google state not observed"
+      ]
+    },
+    {
+      "company": "Studio Dentistico Luca Giachin",
+      "state": "WATCHLIST_WEAK",
+      "official_source": "https://www.studiodentisticogiachin.eu/",
+      "observations": [
+        "Contact page offers phone, email and form",
+        "Appointment requests are explicitly mentioned",
+        "Emergency mobile is separately identified"
+      ],
+      "falsification": "The contact path is present; only the degree of first-visit guidance remains uncertain.",
+      "comparator_fit": {
+        "candidate": "Studio Dentistico Quinto al Mare",
+        "basis": "Nearby Genova Levante independent practice with explicit appointment invitation"
+      },
+      "caveats": [
+        "Comparator difference may be too small",
+        "Do not use emergency mobile for outreach"
+      ]
+    },
+    {
+      "company": "Studio Dentistico Salusciev",
+      "state": "DEEP_REVIEW_CANDIDATE",
+      "official_source": "https://www.studiodentisticosalusciev.it/",
+      "observations": [
+        "Phone, mobile, email and contact form are visible",
+        "Financing language is explicit",
+        "Service pages generally end in generic consultation/contact prompts"
+      ],
+      "falsification": "Contactability is not missing; the candidate question is whether a new patient can understand the first-visit step and reassurance as clearly as a close local comparator.",
+      "comparator_fit": {
+        "candidate": "Studio Dentistico Di Bartolo",
+        "basis": "Same Sampierdarena market; explicit first-visit control framing, WhatsApp/contact route and anxiety-oriented social proof"
+      },
+      "caveats": [
+        "Must observe Google profile and mobile path",
+        "Must verify that phone-first workflow is not already sufficient"
+      ]
+    },
+    {
+      "company": "Studio Dentistico Paolo Zuppa - Albaro",
+      "state": "DEEP_REVIEW_CANDIDATE",
+      "official_source": "https://www.studiozuppa.it/contattaci.html",
+      "observations": [
+        "Appointment contact page lists phone, email and hours",
+        "Two locations are clearly separated",
+        "Limited first-visit explanation observed in the acquired contact path"
+      ],
+      "falsification": "This is not an absence-of-contact claim; it is a possible guidance/decision-path gap.",
+      "comparator_fit": {
+        "candidate": "Studio Odontoiatrico Alessandro Leonardi",
+        "basis": "Independent Genova practice with explicit appointment framing and complete first-contact cues"
+      },
+      "caveats": [
+        "Confirm comparator locality/segment fit",
+        "Observe additional official pages and mobile path"
+      ]
+    },
+    {
+      "company": "Studio Dentistico Di Bartolo",
+      "state": "NO_SIGNAL_PROVISIONAL",
+      "official_source": "https://www.studiodentisticosampierdarena.it/",
+      "observations": [
+        "Explicit first-visit CTA",
+        "Phone and WhatsApp routes are visible",
+        "Anxiety/timori language and patient testimonials are present",
+        "New-patient guidance is explicit"
+      ],
+      "falsification": "The first-visit and reassurance paths are already strongly visible.",
+      "comparator_fit": null,
+      "caveats": [
+        "Public testimonial attribution should be independently checked before client use"
+      ]
+    }
+  ],
+  "recommended_for_a1_a9": [
+    {
+      "priority": 1,
+      "company": "Studio Dentistico Salusciev",
+      "reason": "Closest local comparator fit and a narrow, falsifiable first-visit-guidance question."
+    },
+    {
+      "priority": 2,
+      "company": "Studio Dentistico Paolo Zuppa - Albaro",
+      "reason": "Contact exists but acquired path gives limited first-visit guidance; requires deeper multi-page/mobile check."
+    },
+    {
+      "priority": 3,
+      "company": "Studio Dentistico Emanuele Muller",
+      "reason": "Clear phone/form path but weaker first-visit framing than a comparable independent central-Genova practice."
+    }
+  ],
+  "authorization_boundary": {
+    "state": "AGENT_TEAM_LOCKED",
+    "required_before_run": [
+      "prospect_or_batch_scope",
+      "agents_to_be_used",
+      "planned_activity",
+      "data_and_sources_in_scope",
+      "estimated_max_cost_eur",
+      "stop_conditions",
+      "explicit_user_approval_per_run"
+    ],
+    "silent_or_reused_approval_forbidden": true
+  },
+  "promotion_rule": "DEEP_REVIEW_CANDIDATE is not OPPORTUNITY_SIGNAL_CANDIDATE. No promotion is permitted without target-specific evidence, comparator freeze, A1-A9/QA as applicable, Red Team and Human Review."
+}
