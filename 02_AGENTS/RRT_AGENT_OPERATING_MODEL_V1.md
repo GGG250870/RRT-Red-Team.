@@ -312,6 +312,22 @@ Required consent controls:
 
 Free/local/pre-screen work remains `EUR 0.0000` and does not unlock live agents.
 
+
+### Per-run user notice
+
+Paid/live agents are available, but every run requires a new notice before execution until the user changes this instruction.
+
+The notice must state:
+
+- prospect or batch scope;
+- agents that will be used;
+- planned activity;
+- data and sources in scope;
+- estimated maximum cost in EUR;
+- stop conditions.
+
+A prior authorization cannot be silently reused. The run starts only after the user approves that specific notice and the runtime approval/budget controls are present. Preparing free inputs, plans or estimates does not count as a paid/live agent run.
+
 ## Release Rule
 
 No Signal or outreach artifact is usable until:
