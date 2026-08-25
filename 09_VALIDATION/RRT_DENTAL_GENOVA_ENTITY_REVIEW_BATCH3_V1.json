@@ -1,0 +1,147 @@
+{
+  "version": "v1",
+  "status": "BATCH3_COMPLETE",
+  "vertical_profile_id": "dentale.v1",
+  "batch_id": "DENT-GE-ENTITY-B03",
+  "observed_at": "2026-08-25",
+  "method": "Manual public official-site identity review; no live/paid agents.",
+  "cost_eur_actual": "0.0000",
+  "summary": {
+    "records": 10,
+    "entity_resolved": 7,
+    "entity_resolved_with_gaps": 2,
+    "collection_restricted": 1,
+    "entity_conflict": 0
+  },
+  "records": [
+    {
+      "company": "Centro Dentistico Primo Genova Sestri",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.centridentisticiprimo.it/centro-dentistico-a-genova-ge-sestri/",
+      "evidence": [
+        "Via Sestri 223",
+        "0100995400",
+        "info.gesestri@centriprimo.it",
+        "Primo S.p.A. P.IVA 10353600017"
+      ],
+      "warnings": [
+        "Multi-location network; keep location-specific scope"
+      ]
+    },
+    {
+      "company": "SDC Genova",
+      "state": "COLLECTION_RESTRICTED",
+      "accepted_source": "https://www.sdcgenova.it/",
+      "evidence": [
+        "Official domain found and prior public search identifies Genova scope"
+      ],
+      "warnings": [
+        "Direct access returns verification page",
+        "Do not interpret as absence"
+      ]
+    },
+    {
+      "company": "Studio Dentistico Pascuzzi",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.pascuzzistudiodontoiatrico.it/",
+      "evidence": [
+        "Via Canepari 21/4",
+        "010411083 / WhatsApp 3283974733",
+        "info@pascuzzistudiodontoiatrico.it",
+        "Director Giuseppe Pascuzzi"
+      ],
+      "warnings": []
+    },
+    {
+      "company": "Studio Dentistico Del Buono",
+      "state": "ENTITY_RESOLVED_WITH_GAPS",
+      "accepted_source": "https://studiodelbuono.it/",
+      "evidence": [
+        "Official Genova brand",
+        "010592808 / WhatsApp 3474535384",
+        "segreteria@studiodelbuono.eu",
+        "Studio Del Buono S.r.l."
+      ],
+      "warnings": [
+        "Address not observed in acquired page"
+      ]
+    },
+    {
+      "company": "Centro Odontoiatrico Dr. Bobbio",
+      "state": "ENTITY_RESOLVED_WITH_GAPS",
+      "accepted_source": "https://www.centroodontoiatrico.com/",
+      "evidence": [
+        "Official Centro Odontoiatrico Dr. Bobbio brand and Genova scope",
+        "010877192 / 3932002004 and email observed in public official result"
+      ],
+      "warnings": [
+        "Address not confirmed in acquired text"
+      ]
+    },
+    {
+      "company": "Studio Dentistico GPA",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://studiodentisticogpa.it/",
+      "evidence": [
+        "Guiducci-Pauly-Albertini official name",
+        "Via Smirne 18R",
+        "010872182 / 3426471942",
+        "studiogpagenova@gmail.com",
+        "P.IVA 01777590991"
+      ],
+      "warnings": []
+    },
+    {
+      "company": "HDental Genova",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.hdental.it/ambulatori-odontoiatrici/genova/",
+      "evidence": [
+        "Centro Commerciale Bisagno location",
+        "Via Lungo Bisagno Dalmazia 75/77",
+        "0108369244",
+        "info.genova@hdental.it"
+      ],
+      "warnings": [
+        "Multi-location network"
+      ]
+    },
+    {
+      "company": "Studio Odontoiatrico Marco Ronda",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://studiomarcoronda.it/contatti/",
+      "evidence": [
+        "Piazza Brignole 3/8",
+        "010583435 / 3939336462",
+        "info@studiomarcoronda.it",
+        "P.IVA 02475090995"
+      ],
+      "warnings": []
+    },
+    {
+      "company": "Studio Odontoiatrico Fabio Garbarini",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.studiogarbarini.it/",
+      "evidence": [
+        "Via Palestro 8/6",
+        "010880205",
+        "fabio.garbarini@studiogarbarini.it",
+        "Official doctor name and Genova scope"
+      ],
+      "warnings": []
+    },
+    {
+      "company": "Studio Dentistico Quinto al Mare",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.studioquintoalmare.it/",
+      "evidence": [
+        "Studio associato Servato e Raso",
+        "Via Giuseppe Majorana 16R",
+        "0103200314 / 3939691588",
+        "info@studioquintoalmare.it",
+        "P.IVA 01708730997"
+      ],
+      "warnings": []
+    }
+  ],
+  "promotion_rule": "Entity review only. No shortlist, score, Opportunity Signal or commercial conclusion is produced by this ledger."
+}
