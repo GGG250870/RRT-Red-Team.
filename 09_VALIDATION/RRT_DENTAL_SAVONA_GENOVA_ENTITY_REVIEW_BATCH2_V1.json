@@ -1,0 +1,161 @@
+{
+  "version": "v1",
+  "status": "BATCH2_COMPLETE",
+  "vertical_profile_id": "dentale.v1",
+  "batch_id": "DENT-SV-GE-ENTITY-B02",
+  "observed_at": "2026-08-25",
+  "method": "Manual public official-site identity review; no live/paid agents.",
+  "cost_eur_actual": "0.0000",
+  "summary": {
+    "records": 10,
+    "entity_resolved": 9,
+    "collection_restricted": 1,
+    "entity_conflict": 0
+  },
+  "records": [
+    {
+      "company": "Studio Odontoiatrico Alberto Faucci",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.studiofaucci.it/dove-siamo-e-contatti/",
+      "evidence": [
+        "Official name and Savona scope",
+        "Via L. Corsi 5/1",
+        "019854961",
+        "studio.faucci@gmail.com",
+        "P.I. 01688080090"
+      ],
+      "warnings": []
+    },
+    {
+      "company": "Studio Dentistico Vesalici",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.studiovesalici.it/chi-siamo/",
+      "evidence": [
+        "Official name and Savona scope",
+        "Piazza Saffi 3/3",
+        "019853434 / WhatsApp 3534236691",
+        "studiovesalici@gmail.com",
+        "P.IVA 01765990096"
+      ],
+      "warnings": [
+        "Historical WATCHLIST_WEAK; do not promote from entity review"
+      ]
+    },
+    {
+      "company": "Studio Odontoiatrico Zecca-Cohen",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://cohenorthodontic.wixsite.com/odontoiatriasavona",
+      "evidence": [
+        "Official public name Studio Odontoiatrico Ortodontico Zecca-Cohen",
+        "Via Guidobono 18/1",
+        "019811396 / 3240868097",
+        "cohen.orthodontic@gmail.com and studiozeccasavona@virgilio.it"
+      ],
+      "warnings": [
+        "Existing confirmed Signal; regression/control only"
+      ]
+    },
+    {
+      "company": "Studio Odontoiatrico Associato Platania",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.plataniadentistigenova.it/contatti/",
+      "evidence": [
+        "Official Genova Centro location",
+        "Piazza Colombo 3/6",
+        "010565017 / WhatsApp 3429382367",
+        "segreteria@platania3p.it",
+        "P.IVA 01622500997"
+      ],
+      "warnings": []
+    },
+    {
+      "company": "Ge.O Genova Odontoiatrica",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.genovaodontoiatrica.it/",
+      "evidence": [
+        "Official brand and Genova location",
+        "Viale Brigata Bisagno 2/16",
+        "0100997300",
+        "info@genovaodontoiatrica.it",
+        "P.IVA 02547560991"
+      ],
+      "warnings": [
+        "Site also exposes segreteria@genovaodontoiatrica.it"
+      ]
+    },
+    {
+      "company": "Ambulatorio Dentistico Dott. Piccardo",
+      "state": "COLLECTION_RESTRICTED",
+      "accepted_source": "https://www.dentista-genova-dottpiccardo.it/",
+      "evidence": [
+        "Official domain and Genova Centro contact details were present in public search results",
+        "Via Maragliano 5",
+        "0105959492"
+      ],
+      "warnings": [
+        "Direct access currently returns verification page",
+        "Do not interpret restriction as absence",
+        "Recheck via allowed source before scoring"
+      ]
+    },
+    {
+      "company": "Clindent Genova",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.clindent.it/centro-dentale/genova/",
+      "evidence": [
+        "Official Genova location page",
+        "Via Brigata Liguria 40/46",
+        "0105165117 / 010500130",
+        "info.ge@clindent.it",
+        "Clindent Ge Srl P.IVA 02384520991"
+      ],
+      "warnings": [
+        "Keep location identity distinct from general footer entity"
+      ]
+    },
+    {
+      "company": "ABCDental Genova",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.abcdental.eu/",
+      "evidence": [
+        "Official multi-location website",
+        "San Teodoro: Via Bologna 55 rosso",
+        "3757926908 / 0100987762"
+      ],
+      "warnings": [
+        "Scope this record to Genova San Teodoro; do not merge with Certosa or Rapallo"
+      ]
+    },
+    {
+      "company": "OdontoSalute Genova",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.odontosalute.it/studi-odontoiatrici/odontosalute-genova/",
+      "evidence": [
+        "Official Genova location page",
+        "Via Edmondo de Amicis 2",
+        "0100980640",
+        "genova@odontosalute.it",
+        "Location director and first-visit form exposed"
+      ],
+      "warnings": [
+        "Multi-location group; use location-specific comparator path"
+      ]
+    },
+    {
+      "company": "Studio Dentistico Fassio",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://studiodentisticofassio.com/",
+      "evidence": [
+        "Official name and Genova scope",
+        "Via Odessa 28/7",
+        "3409419500",
+        "Director and authorization number exposed"
+      ],
+      "warnings": [
+        "P.IVA not observed",
+        "Phone is also used for urgencies"
+      ]
+    }
+  ],
+  "promotion_rule": "Entity review only. No shortlist, score, Opportunity Signal or commercial conclusion is produced by this ledger."
+}
