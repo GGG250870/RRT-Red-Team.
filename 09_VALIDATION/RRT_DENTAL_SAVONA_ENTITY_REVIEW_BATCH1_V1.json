@@ -8,7 +8,7 @@
   "cost_eur_actual": "0.0000",
   "summary": {
     "records": 10,
-    "entity_resolved": 8,
+    "entity_resolved": 7,
     "entity_resolved_scope_warning": 1,
     "usable_with_gaps": 1,
     "entity_conflict": 0
