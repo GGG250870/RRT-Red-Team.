@@ -1,0 +1,125 @@
+{
+  "version": "v1",
+  "status": "MANUAL_SHORTLIST_COMPLETE",
+  "vertical_profile_id": "dentale.v1",
+  "batch_id": "DENT-SV-GE-PRESCREEN-MANUAL-01",
+  "observed_at": "2026-08-25",
+  "method": "Deterministic zero-LLM public-site prescreen followed by human/manual shortlist review. No A1-A9 live or paid agents.",
+  "cost_eur_actual": "0.0000",
+  "prescreen_summary": {
+    "records": 50,
+    "unique_entities": 50,
+    "fetch_ok": 44,
+    "collection_restricted": 6,
+    "escalate": 39,
+    "shortlist": 5,
+    "reject": 0,
+    "score_range": [
+      0,
+      100
+    ]
+  },
+  "interpretation_guardrails": [
+    "Preliminary score and ESCALATE/SHORTLIST are operational filters, not Opportunity Signals.",
+    "commercial_gap_count means configured patterns were not observed in acquired text; it is not proof of absence.",
+    "COLLECTION_RESTRICTED is not absence and is not a weak-prospect judgment.",
+    "Entity-review access state and prescreen fetch state are separate dated observations.",
+    "No outreach, contact submission or paid-agent execution is authorized by this review."
+  ],
+  "manual_review_findings": {
+    "score_saturation": "39/50 records reached ESCALATE, including many 100 scores. Generic dental high-value, team and technology language saturates the heuristic; manual selection is mandatory.",
+    "multi_location_duplicates": [
+      "Clindent Savona / Genova",
+      "Piccardo Centro / Nervi / Rivarolo",
+      "Pesce & Gavazzi Nervi / Sampierdarena"
+    ],
+    "historical_controls": [
+      "Studio Dentistico Roberto Cristiano Martinengo",
+      "Studio Odontoiatrico Zecca-Cohen",
+      "Studio Dentistico Vesalici"
+    ],
+    "collection_restricted": [
+      "Casa della Salute Savona - Odontoiatria",
+      "Studio Odontoiatrico Zecca-Cohen",
+      "OdontoSalute Genova",
+      "Studio Dentistico Fassio",
+      "Studio Dentistico GPA",
+      "Studio Odontoiatrico Marco Ronda"
+    ],
+    "thin_acquisition_watchlist": [
+      "ABCDental Genova",
+      "HDental Genova",
+      "Studio Dentistico Sadeghi",
+      "Studio Medico Dentistico Canevello",
+      "Centro di Ortodonzia Genova Castelletto"
+    ]
+  },
+  "selected_count": 9,
+  "selected": [
+    {
+      "rank": 1,
+      "company": "Studio Dentistico Quinto al Mare",
+      "rationale": "Strong high-value and structure signals with only 2 observed dimensions and 4 pattern gaps; location-specific independent studio.",
+      "caveat": "Pattern gaps require target-specific confirmation; not a Signal.",
+      "state": "SELECTED_FOR_FREE_DEEP_REVIEW"
+    },
+    {
+      "rank": 2,
+      "company": "Ge.O Genova Odontoiatrica",
+      "rationale": "High-value and structure-rich site with 4 pattern gaps and good acquisition depth.",
+      "caveat": "Generic keyword saturation may inflate the score; inspect first-visit path manually.",
+      "state": "SELECTED_FOR_FREE_DEEP_REVIEW"
+    },
+    {
+      "rank": 3,
+      "company": "Studio Dentistico Emanuele Muller",
+      "rationale": "High-value service signals, local independent scope and 3 pattern gaps.",
+      "caveat": "Public email and VAT ID remain missing.",
+      "state": "SELECTED_FOR_FREE_DEEP_REVIEW"
+    },
+    {
+      "rank": 4,
+      "company": "Studio Dentistico Enrico Figliomeno",
+      "rationale": "Current site acquisition shows high-value content, adequate contactability and 3 pattern gaps.",
+      "caveat": "Earlier entity pass encountered a verification page; access state is unstable.",
+      "state": "SELECTED_FOR_FREE_DEEP_REVIEW"
+    },
+    {
+      "rank": 5,
+      "company": "Studio Odontoiatrico Fabio Garbarini",
+      "rationale": "Deep acquisition, high-value and structure signals, plus 3 pattern gaps.",
+      "caveat": "No VAT ID observed; absence patterns still need protocol confirmation.",
+      "state": "SELECTED_FOR_FREE_DEEP_REVIEW"
+    },
+    {
+      "rank": 6,
+      "company": "Studio Dentistico Luca Giachin",
+      "rationale": "Independent Nervi studio with strong structure, 4 pattern gaps and verified contacts.",
+      "caveat": "Emergency mobile must not be treated as general outreach permission.",
+      "state": "SELECTED_FOR_FREE_DEEP_REVIEW"
+    },
+    {
+      "rank": 7,
+      "company": "Studio Dentistico Salusciev",
+      "rationale": "Local independent scope, 4 pattern gaps, verified contacts and adequate page depth.",
+      "caveat": "Only one high-value pattern; verify commercial relevance before escalation.",
+      "state": "SELECTED_FOR_FREE_DEEP_REVIEW"
+    },
+    {
+      "rank": 8,
+      "company": "Studio Dentistico Paolo Zuppa - Albaro",
+      "rationale": "Five pattern gaps and high-value content make it useful for first-visit-path review.",
+      "caveat": "Only one acquired page and contactability 1; keep Albaro separate from Sampierdarena.",
+      "state": "SELECTED_FOR_FREE_DEEP_REVIEW"
+    },
+    {
+      "rank": 9,
+      "company": "Studio Dentistico Di Bartolo",
+      "rationale": "Independent Sampierdarena studio with 3 pattern gaps and sufficient contactability.",
+      "caveat": "Moderate high-value evidence; comparator fit must be established.",
+      "state": "SELECTED_FOR_FREE_DEEP_REVIEW"
+    }
+  ],
+  "next_gate": "Perform free manual first-visit-path review and comparator-fit screening on the 9 selected records. Before any A1-A9 live run, provide per-run scope, agents, activity, sources/data, max EUR budget and stop conditions, then obtain explicit approval.",
+  "promotion_rule": "No selected record is an Opportunity Signal. Promotion requires target-specific evidence, comparator freeze, Red Team falsification, QA and Human Review."
+}
