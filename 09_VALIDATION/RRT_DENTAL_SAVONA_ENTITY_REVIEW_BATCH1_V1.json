@@ -1,0 +1,163 @@
+{
+  "version": "v1",
+  "status": "BATCH1_COMPLETE",
+  "vertical_profile_id": "dentale.v1",
+  "batch_id": "DENT-SV-ENTITY-B01",
+  "observed_at": "2026-08-25",
+  "method": "Manual public official-site identity review; no live/paid agents.",
+  "cost_eur_actual": "0.0000",
+  "summary": {
+    "records": 10,
+    "entity_resolved": 8,
+    "entity_resolved_scope_warning": 1,
+    "usable_with_gaps": 1,
+    "entity_conflict": 0
+  },
+  "records": [
+    {
+      "company": "Odontoiatrika",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://odontoiatrika.it/",
+      "evidence": [
+        "Brand and Savona location on official site",
+        "Piazza Ilaria Alpi 2N/4N",
+        "0194503960 / 3489211874",
+        "info@odontoiatrika.it",
+        "P.IVA 01635710096"
+      ],
+      "warnings": []
+    },
+    {
+      "company": "Studio Medico Dentistico Pisano - Savona",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://studiodentisticopisano.it/contatti/",
+      "evidence": [
+        "Official site separates Savona and Casatenovo locations",
+        "Savona: Via Nizza 76/R",
+        "0192216555 / WhatsApp 3896587066",
+        "pisanomariafederica@gmail.com",
+        "P.I. 02009800968"
+      ],
+      "warnings": [
+        "Keep Savona location separate from Casatenovo scope"
+      ]
+    },
+    {
+      "company": "Clindent Savona",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.clindent.it/centro-dentale/savona/",
+      "evidence": [
+        "Savona location page",
+        "Via C. Astengo 21",
+        "0198933330",
+        "info.savona@clindent.it",
+        "Location entity Clindent Ge Srl P.IVA 02384520991"
+      ],
+      "warnings": [
+        "General footer also exposes Clin Med Srl P.IVA 02222560993; use location entity for this scope"
+      ]
+    },
+    {
+      "company": "Centro Odontoiatrico San Giovanni Savona",
+      "state": "ENTITY_RESOLVED_WITH_GAPS",
+      "accepted_source": "https://www.sangiovannisavona.it/contatti",
+      "evidence": [
+        "Official studio name and Savona scope",
+        "Corso Ricci 177/R",
+        "sangiovannisavona@gmail.com",
+        "Public appointment form"
+      ],
+      "warnings": [
+        "Telephone not exposed in fetched public text; do not infer it"
+      ]
+    },
+    {
+      "company": "DentalPro Savona",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.dentalpro.it/centri/dentista-savona/",
+      "evidence": [
+        "Official Savona center page",
+        "Piazza Giulio II",
+        "019814315",
+        "rec.savona@dentalpro.it",
+        "Ragione sociale DP DENT SRL"
+      ],
+      "warnings": [
+        "Multi-location chain; compare location-specific path"
+      ]
+    },
+    {
+      "company": "Casa della Salute Savona - Odontoiatria",
+      "state": "ENTITY_RESOLVED_SCOPE_WARNING",
+      "accepted_source": "https://cds.it/struttura/savona/",
+      "evidence": [
+        "Official Savona facility page",
+        "Corso Agostino Ricci 203R",
+        "0199380816 / WhatsApp 3290484123",
+        "Odontoiatria and orthodontics explicitly listed",
+        "Casa della Salute S.p.A. P.IVA 02193240997"
+      ],
+      "warnings": [
+        "Poliambulatorio with dental department, not standalone dental clinic",
+        "Comparator must match multi-specialty context"
+      ]
+    },
+    {
+      "company": "SmileCenter Savona",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://smilecentersavona.it/",
+      "evidence": [
+        "Clinica Smile Center del dott. Ravera Stefano",
+        "Via Don Minzoni 30-32-34R",
+        "019822682",
+        "info@smilecentersavona.it",
+        "STEMAR SMILE SRL P.IVA 01581490099"
+      ],
+      "warnings": []
+    },
+    {
+      "company": "Studio Odontoiatrico Bellini",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.studiodentisticobellinisv.it/contatti/",
+      "evidence": [
+        "Dott. Vincenzo Bellini",
+        "Via Paolo Boselli 10/4",
+        "0198489478",
+        "P.I. 01334870092"
+      ],
+      "warnings": [
+        "No public email was confirmed in fetched text"
+      ]
+    },
+    {
+      "company": "Studio Dentistico Roberto Cristiano Martinengo",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.studiodentisticomartinengo.com/",
+      "evidence": [
+        "Dott. Roberto Cristiano Martinengo",
+        "Galleria Scarzeria 5/8",
+        "019808291",
+        "rmartinengo70@hotmail.it",
+        "P.IVA 01235830096"
+      ],
+      "warnings": [
+        "3472213365 is explicitly an emergency number",
+        "Historical benchmark/reference; do not treat as new finding"
+      ]
+    },
+    {
+      "company": "Studio Dentistico Parodi e Orengia",
+      "state": "USABLE_WITH_GAPS",
+      "accepted_source": "https://www.studiodentisticoparodi.it/",
+      "evidence": [
+        "Official site found in public search",
+        "Savona location and contact data observed in search result"
+      ],
+      "warnings": [
+        "Confirmation fetch timed out",
+        "Current page title uses Parodi e Associati while seed name uses Parodi e Orengia; resolve public-name variant before scoring"
+      ]
+    }
+  ],
+  "promotion_rule": "Entity review only. No shortlist, score, Opportunity Signal or commercial conclusion is produced by this ledger."
+}
