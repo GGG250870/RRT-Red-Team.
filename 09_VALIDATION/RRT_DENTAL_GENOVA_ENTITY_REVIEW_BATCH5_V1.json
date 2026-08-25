@@ -1,0 +1,154 @@
+{
+  "version": "v1",
+  "status": "BATCH5_COMPLETE",
+  "vertical_profile_id": "dentale.v1",
+  "batch_id": "DENT-GE-ENTITY-B05",
+  "observed_at": "2026-08-25",
+  "method": "Manual public official-site identity review; no live/paid agents.",
+  "cost_eur_actual": "0.0000",
+  "summary": {
+    "records": 10,
+    "entity_resolved": 9,
+    "entity_resolved_with_gaps": 1,
+    "entity_conflict": 0
+  },
+  "records": [
+    {
+      "company": "Pesce & Gavazzi - Genova Sampierdarena",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.pescegavazzi.com/",
+      "evidence": [
+        "Via Antonio Cantore 44/3",
+        "010415195 / WhatsApp 3713334339",
+        "sampierdarena@pescegavazzi.com",
+        "Pesce & Gavazzi Studio Dentistico SRL STP"
+      ],
+      "warnings": [
+        "Keep separate from Nervi"
+      ]
+    },
+    {
+      "company": "Studio Dentistico Di Bartolo",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.studiodentisticosampierdarena.it/",
+      "evidence": [
+        "Dott.ssa Luana Di Bartolo",
+        "Via A. Cantore 35/1, 16149 Genova",
+        "010415174",
+        "luanadibartolo73@gmail.com"
+      ],
+      "warnings": []
+    },
+    {
+      "company": "Studio Dentistico Sadeghi",
+      "state": "ENTITY_RESOLVED_WITH_GAPS",
+      "accepted_source": "https://www.studiosadeghi.it/",
+      "evidence": [
+        "Official domain and Genova scope previously observed",
+        "010543682",
+        "info@studiosadeghi.it",
+        "P.IVA 03773030105"
+      ],
+      "warnings": [
+        "Direct official page not acquired in current pass",
+        "Confirm exact street address before outreach"
+      ]
+    },
+    {
+      "company": "Studio Medico Dentistico Canevello",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://studiomedicodentisticocanevello.it/",
+      "evidence": [
+        "Canevello Riccardo",
+        "Via Albaro 17/2, 16145 Genova",
+        "010364617",
+        "P.IVA 03015880101"
+      ],
+      "warnings": []
+    },
+    {
+      "company": "Studio Dentistico Salusciev",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.studiodentisticosalusciev.it/",
+      "evidence": [
+        "Via Carlo Rota 4/6, Genova Sampierdarena",
+        "0106454179 / 3469667053",
+        "drproscovia@gmail.com",
+        "P.IVA 02751370103"
+      ],
+      "warnings": []
+    },
+    {
+      "company": "Studio Dentistico Luca Giachin",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.studiodentisticogiachin.eu/",
+      "evidence": [
+        "Dr Luca Giachin",
+        "Via G. Oberdan 40/2, 16167 Genova Nervi",
+        "0103724455",
+        "luca.giachin@gmail.com"
+      ],
+      "warnings": [
+        "3356694455 is identified as emergency contact"
+      ]
+    },
+    {
+      "company": "Studio Dentistico Paolo Zuppa - Albaro",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.studiozuppa.it/contattaci.html",
+      "evidence": [
+        "Genova Albaro, Via G. Bovio 13/3",
+        "010311163",
+        "paolo.zuppa@fastwebnet.it"
+      ],
+      "warnings": [
+        "Second location in Sampierdarena; keep Albaro scope"
+      ]
+    },
+    {
+      "company": "Centro di Ortodonzia Genova Castelletto",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.centrodiortodonzia.com/contact/",
+      "evidence": [
+        "Corso Paganini 6R, 16125 Genova",
+        "3392251983",
+        "info@centrodiortodonzia.com",
+        "Castelletto specialist orthodontics scope"
+      ],
+      "warnings": [
+        "Specialist segment, not general dental clinic"
+      ]
+    },
+    {
+      "company": "Studio Dentistico Bardoneschi",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://studiobardoneschi.com/studio-dentistico-genova/",
+      "evidence": [
+        "Dott. Simone Bardoneschi",
+        "Corso Sardegna 99/1, 16142 Genova",
+        "010880087",
+        "info@studiobardoneschi.it",
+        "P.IVA 02080600998"
+      ],
+      "warnings": [
+        "Separate Genova location from Cogoleto"
+      ]
+    },
+    {
+      "company": "Studio Dentistico Dottor Risso",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.dottorisso.com/",
+      "evidence": [
+        "Dottor Marco Risso",
+        "Sestri Ponente, Via G. Biancheri 15/3",
+        "0106048022",
+        "studiodentisticorisso@gmail.com",
+        "P.IVA 02817730100"
+      ],
+      "warnings": [
+        "Second location in Pegli, Via Argentina 36, phone 0106982717"
+      ]
+    }
+  ],
+  "promotion_rule": "Entity review only. No shortlist, score, Opportunity Signal or commercial conclusion is produced by this ledger."
+}
