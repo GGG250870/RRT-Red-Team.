@@ -4,6 +4,8 @@ Vault Obsidian e repository operativo del progetto RRT.
 
 Apri `00_HOME/HOME.md` come punto di ingresso principale.
 
+Codex e gli agenti devono applicare `AGENTS.md`: `main` è la fonte unica e ogni lavoro passa da un ramo `agent/<scope>`, validazione e pull request.
+
 ## Struttura
 - `00_HOME` — dashboard e navigazione
 - `01_ARCHITECTURE` — architettura del sistema
