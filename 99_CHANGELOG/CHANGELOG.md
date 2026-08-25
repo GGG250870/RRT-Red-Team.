@@ -6,6 +6,7 @@ status: active
 # CHANGELOG
 
 ## 2026-08-25
+- Riabilitata la disponibilità degli agenti live/a pagamento con consenso granulare: prima di ogni run sono obbligatori avviso all'utente con scope, agenti, attività, dati/fonti, costo massimo stimato in EUR e stop condition, più approvazione esplicita per quello specifico run; vietato riutilizzare silenziosamente autorizzazioni precedenti.
 - Generalizzato il prodotto oltre il pilot dentale con [[01_ARCHITECTURE/RRT_VERTICAL_CONFIGURATION_MODEL_V1]]: separati core comune e profili verticali per target segment, fonti, entity rules, customer path, comparator, Red Team, linguaggio cliente e framing script.
 - Aggiunti `03_RULES/vertical_profiles/dentale.v1.json`, schema profilo e template draft `ristorazione.blank.v1.json`; dentale resta il primo profilo attivo, ristorazione e solo adapter/template senza evidenza live.
 - Definito [[01_ARCHITECTURE/RRT_DASHBOARD_VERTICAL_DATA_CONTRACT_V1]]: la dashboard orchestra verticale/citta/segmento, evidenza, gate e artefatti, ma non trasforma liste o score in Opportunity Signal.
