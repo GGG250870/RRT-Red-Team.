@@ -20,6 +20,7 @@ updated: 2026-08-12
 - [[01_ARCHITECTURE/RRT_DASHBOARD_ONLINE_RESEARCH_NOTES_V1]]
 - [[01_ARCHITECTURE/RRT_ARCHITECTURE_ECONOMIC_SUSTAINABILITY_AUDIT_V1]]
 - [[02_AGENTS/Multi-Agent System]]
+- [[02_AGENTS/RRT_AGENT_OPERATING_MODEL_V1]]
 - [[03_RULES/Rules Index]]
 - [[03_RULES/RRT_FREE_AI_ASSISTANCE_POLICY_V1]]
 - [[04_PROSPECTS/Prospects Index]]
@@ -37,7 +38,7 @@ updated: 2026-08-12
 
 ## Stato progetto
 - North Star prodotto: RRT non e uno scraper, un SEO audit o un report marketing generico; e un Red Team commerciale esterno che deve produrre pochi Opportunity Signal forti, falsificati, auditabili e commercialmente sorprendenti. Vedi [[01_ARCHITECTURE/RRT_PRODUCT_NORTH_STAR_V1]].
-- Runtime A1→A9: **VALIDATO** su B04-37 con A9 `READY`.
+- Runtime A1→A9: **VALIDATO** su B04-37; nuovo stato release-safe finale `READY_FOR_HUMAN_REVIEW`, non approvazione automatica.
 - Runner end-to-end: `rrt_e2e.sh` + `02_AGENTS/runtime/end_to_end_runner.py` presenti in `main`.
 - Auto-repair: **VALIDATO**. Se A4 blocca con `COLLECTION_RESTRICTED`, il runner esegue una sola volta A3 repair e A4/A5 re-audit.
 - Isolation guard: i worker reclamano task per `case_id`; eliminata contaminazione tra prospect.
@@ -45,6 +46,7 @@ updated: 2026-08-12
 - Caso ICO-01: auto-repair eseguito correttamente; esito finale `COLLECTION_RESTRICTED` su D1-D5 per insufficiente acquisizione ufficiale. Questo è uno stato valido, non un errore tecnico.
 - Scoring Integrity V2: regression suite 11/11 PASS; individuati 15 zeri legacy da ri-validare.
 - Human review: obbligatorio per ogni Opportunity Signal.
+- Agent operating model: [[02_AGENTS/RRT_AGENT_OPERATING_MODEL_V1]] autorizza agenti integrati per discovery, entity, comparatori, Red Team e preparazione dossier, ma blocca contatti, evidenze inventate, outreach e Signal senza human gate.
 - GitHub: fonte persistente e auditabile.
 - Obsidian: interfaccia umana del second brain e knowledge graph.
 - Dashboard finale: specificata in [[01_ARCHITECTURE/RRT_FINAL_DASHBOARD_PRODUCT_SPEC_V1]], con categorie/citta/export/report e contatore costi in EUR.
@@ -77,6 +79,7 @@ Vedi [[01_ARCHITECTURE/Knowledge Graph Flow]] per la mappa navigabile.
 16. AI gratuite esterne sono ammesse solo come assistenza non autoritativa su dati pubblici/non sensibili; non sono fonti primarie e non sbloccano A1→A9.
 17. La dashboard e una superficie di controllo, non il prodotto: il prodotto e il Signal che sopravvive a entity resolution, benchmark, Red Team e human review.
 18. Ogni nuovo verticale deve avere un profilo esplicito; se il profilo e `draft`, puo produrre solo template/pianificazione, non Signal.
+19. Gli agenti integrati possono preparare e sfidare evidenze, ma `OPPORTUNITY_SIGNAL`, `VALIDATED_SIGNAL` e outreach approvato sono output human-approved.
 
 ## Casi runtime di riferimento
 - [[04_PROSPECTS/B04-37 - Studio Dentistico Pietro Leone]]

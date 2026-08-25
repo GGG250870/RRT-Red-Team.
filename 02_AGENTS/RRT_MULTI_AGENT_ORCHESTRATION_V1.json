@@ -7,8 +7,8 @@
     {"wave":3,"parallel":["A4_EVIDENCE_AUDITOR","A5_TARGET_MATCH"],"note":"Target Match usa soltanto evidence pack già emersi; audit può retrocedere prima del downstream."},
     {"wave":4,"parallel":["A6_BENCHMARK per target"],"note":"Benchmark selection congelata prima del gap."},
     {"wave":5,"parallel":["A7_RED_TEAM per finding","discoverability checks"],"note":"Red-team indipendente dalla generazione del finding."},
-    {"wave":6,"parallel":["A8_COMMERCIAL_GATE"],"note":"Nessun Signal senza red-team e audit PASS."},
-    {"wave":7,"parallel":["A9_QA_ORCHESTRATOR"],"note":"Conflitti => BLOCKED, mai media automatica."}
+    {"wave":6,"parallel":["A8_COMMERCIAL_GATE"],"note":"A8 puo produrre NO_SIGNAL, WATCHLIST o OPPORTUNITY_SIGNAL_CANDIDATE; non certifica Signal e non rilascia outreach."},
+    {"wave":7,"parallel":["A9_QA_ORCHESTRATOR"],"note":"Conflitti => BLOCKED, mai media automatica. READY significa READY_FOR_HUMAN_REVIEW, non approvazione finale."}
   ],
   "conflict_policy": {
     "entity_conflict": "hard block",
@@ -17,5 +17,6 @@
     "benchmark_conflict": "retain top alternatives and require human gate",
     "commercial_conflict": "choose more conservative state"
   },
-  "human_review": "Mandatory for Opportunity Signal Candidate."
+  "human_review": "Mandatory for Opportunity Signal Candidate.",
+  "release_policy": "OPPORTUNITY_SIGNAL, VALIDATED_SIGNAL and outreach-approved artifacts require explicit human approval after A9 QA."
 }

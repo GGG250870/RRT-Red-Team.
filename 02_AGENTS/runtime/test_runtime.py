@@ -177,8 +177,21 @@ def test_wave4_7_stage_gates():
     assert ok and reason == "WATCHLIST"
     ok, reason = stage_gate("A8_COMMERCIAL_GATE", {"signal_class": "OPPORTUNITY_SIGNAL", "contradictions": []})
     assert not ok and reason == "A8_INVALID_SIGNAL_CLASS"
+    ok, reason = stage_gate("A9_QA_ORCHESTRATOR", {"verdict": "READY_FOR_HUMAN_REVIEW", "contradictions": []})
+    assert ok and reason == "READY_FOR_HUMAN_REVIEW"
     ok, reason = stage_gate("A9_QA_ORCHESTRATOR", {"verdict": "READY", "contradictions": []})
     assert ok and reason == "READY"
+
+
+def test_agent_authorization_policy_contract():
+    import importlib.util
+
+    repo_root = Path(__file__).resolve().parents[2]
+    path = repo_root / "02_AGENTS" / "validate_agent_authorization_policy.py"
+    spec = importlib.util.spec_from_file_location("validate_agent_authorization_policy", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    assert module.main() == 0
 
 
 def test_end_to_end_runner_contract():
@@ -205,6 +218,7 @@ def main():
         test_wave3_persisted_a3_extraction,
         test_wave3_nonblocking_restrictions_gate,
         test_wave4_7_stage_gates,
+        test_agent_authorization_policy_contract,
         test_end_to_end_runner_contract,
     ]
     for test in tests:

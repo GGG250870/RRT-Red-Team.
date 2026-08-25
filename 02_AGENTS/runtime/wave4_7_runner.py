@@ -79,7 +79,7 @@ def stage_gate(agent_id, output):
 
     if agent_id == "A9_QA_ORCHESTRATOR":
         verdict = output.get("verdict") or output.get("state") or output.get("overall_state")
-        return (verdict == "READY"), (verdict or "A9_UNCERTIFIED")
+        return (verdict in {"READY", "READY_FOR_HUMAN_REVIEW"}), (verdict or "A9_UNCERTIFIED")
 
     return False, "UNKNOWN_AGENT"
 
@@ -164,19 +164,20 @@ def build_payload(agent_id, case_id, upstream, a5_record):
             "a7_red_team": provider_output(upstream["A7_RED_TEAM"]),
             "a8_commercial_gate": provider_output(upstream["A8_COMMERCIAL_GATE"]),
             "output_contract": {
-                "required_keys": ["case_id", "verdict", "conflict_ledger", "unresolved_states", "qa_checks"],
-                "verdict_values": ["READY", "BLOCKED"],
+                "required_keys": ["case_id", "verdict", "conflict_ledger", "unresolved_states", "qa_checks", "release_checklist"],
+                "verdict_values": ["READY_FOR_HUMAN_REVIEW", "BLOCKED"],
                 "max_conflicts": 5,
                 "max_unresolved": 5,
                 "per_note_max_words": 18,
-                "forbidden": ["long prose", "restating full upstream outputs", "new findings", "new commercial inference"]
+                "forbidden": ["long prose", "restating full upstream outputs", "new findings", "new commercial inference", "human approval simulation"]
             },
             "requirements": [
-                "Return READY or BLOCKED only.",
+                "Return READY_FOR_HUMAN_REVIEW or BLOCKED only.",
                 "Do not silently rewrite upstream outputs.",
+                "Do not certify Opportunity Signal or approve outreach for use.",
                 "Check only provenance continuity, restricted-evidence resurrection, unsupported economic inference, cross-agent contradictions and allowed state transitions.",
                 "Emit compact conflict_ledger and unresolved_states; do not repeat upstream evidence text.",
-                "READY is allowed with nonblocking unresolved states if they are explicitly preserved and do not support the commercial signal.",
+                "READY_FOR_HUMAN_REVIEW is allowed with nonblocking unresolved states if they are explicitly preserved and do not support the commercial signal.",
                 "BLOCK only on a material QA failure, not merely because unresolved states exist."
             ]
         }
@@ -248,7 +249,7 @@ def main():
     print(json.dumps({
         "case_id": args.case_id,
         "run_started_at": started_at,
-        "current_run_status": {"status": "PASS", "final_stage": "A9_QA_ORCHESTRATOR", "qa_state": stage_results.get("A9_QA_ORCHESTRATOR", {}).get("gate_reason")},
+        "current_run_status": {"status": "READY_FOR_HUMAN_REVIEW", "final_stage": "A9_QA_ORCHESTRATOR", "qa_state": stage_results.get("A9_QA_ORCHESTRATOR", {}).get("gate_reason")},
         "stages": stage_results,
         "historical_store_status": orch.status()
     }, ensure_ascii=False, indent=2))
