@@ -60,6 +60,7 @@ status: active
 - Creata `03_RULES/RRT_FREE_AI_ASSISTANCE_POLICY_V1.md`: AI gratuite esterne ammesse solo come assistenza non autoritativa, a costo `EUR 0.0000`, su dati pubblici/non sensibili e senza sbloccare A1-A9.
 - Rafforzata discovery open data con cache bbox, opzione `--bbox` manuale, retry leggero JSON e filtro `addr:city` per ridurre ambiguita geografiche.
 - Aggiunti link di verifica Google Maps/TripAdvisor nei seed di ristorazione e `11_DASHBOARD/review_intelligence.py` per aggregare recensioni/rating da API o export autorizzati senza scraping.
+- Creato `09_VALIDATION/RRT_LEGACY_ZERO_REPAIR_PASS1_V1.json`: primo repair pass sui 15 zeri legacy. Esito: 4 `FOUND`, 3 `COLLECTION_RESTRICTED`, 8 `UNRESOLVED`, 0 `NOT_FOUND_AFTER_PROTOCOL`; 11 item restano bloccanti prima dello scoring storico.
 
 ## 2026-08-10
 - Integrato il framework persistito del repository con le librerie metodologiche consolidate emerse nel lavoro conversazionale.
