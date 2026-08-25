@@ -39,6 +39,7 @@ Preserve these invariants:
 - The dashboard in `11_DASHBOARD/` consumes pre-screen and evidence states; it must not promote its own score to an Opportunity Signal.
 - Vertical behavior comes from explicit profiles in `03_RULES/vertical_profiles/`; do not hard-code dental assumptions into the common core.
 - A1-A9 live execution remains locked unless `RRT_AGENT_TEAM_APPROVAL=I_APPROVE_AGENT_TEAM_LIVE_RUN` and the applicable budget controls are present.
+- Paid/live agents are available, but before every run tell the user the scope, agents, activity, data/sources, maximum estimated cost in EUR and stop conditions; do not silently reuse approval from an earlier run.
 
 ## Required validation before push
 
