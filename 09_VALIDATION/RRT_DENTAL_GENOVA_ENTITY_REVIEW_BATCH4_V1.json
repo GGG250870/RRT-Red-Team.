@@ -1,0 +1,147 @@
+{
+  "version": "v1",
+  "status": "BATCH4_COMPLETE",
+  "vertical_profile_id": "dentale.v1",
+  "batch_id": "DENT-GE-ENTITY-B04",
+  "observed_at": "2026-08-25",
+  "method": "Manual public official-site identity review; no live/paid agents.",
+  "cost_eur_actual": "0.0000",
+  "summary": {
+    "records": 10,
+    "entity_resolved": 9,
+    "collection_restricted": 1,
+    "entity_conflict": 0
+  },
+  "records": [
+    {
+      "company": "Dentalicum",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://dentalicum.it/",
+      "evidence": [
+        "Via Fiumara 7 int. 11, 16149 Genova",
+        "0104699788 / WhatsApp 3476149986",
+        "info@dentalicum.it",
+        "Dentalicum SRL P.IVA 02475630998"
+      ],
+      "warnings": []
+    },
+    {
+      "company": "Studio Odontoiatrico Alessandro Leonardi",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://alessandroleonardi.it/",
+      "evidence": [
+        "Piazza della Vittoria 12, 16121 Genova",
+        "0105740296",
+        "info@alessandroleonardi.it",
+        "P.IVA 01276000997"
+      ],
+      "warnings": []
+    },
+    {
+      "company": "Studio Odontoiatrico Melchiorre",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.studiomelchiorre.com/",
+      "evidence": [
+        "Via G.T. Invrea 7/3, 16129 Genova",
+        "0109845146 / 3356791951",
+        "segreteria@studiomelchiorre.com",
+        "P.IVA 01836940062"
+      ],
+      "warnings": []
+    },
+    {
+      "company": "Studio Dentistico Enrico Figliomeno",
+      "state": "COLLECTION_RESTRICTED",
+      "accepted_source": "https://www.studiodentisticofigliomeno.it/",
+      "evidence": [
+        "Official domain and Enrico Figliomeno / Genova-Prà scope observed in public search"
+      ],
+      "warnings": [
+        "Direct access returns verification page",
+        "Do not interpret as absence"
+      ]
+    },
+    {
+      "company": "Studio Dentistico Emanuele Muller",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.studiodentisticomuller.com/",
+      "evidence": [
+        "Dr Emanuele Muller",
+        "Via Fieschi 3, Genova",
+        "010580666",
+        "First-visit path"
+      ],
+      "warnings": [
+        "Email and VAT ID not observed"
+      ]
+    },
+    {
+      "company": "Studio Odontoiatrico Solimei",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.studiodentisticosolimei.it/",
+      "evidence": [
+        "Piazza Corvetto 1/1, 16122 Genova",
+        "010814285",
+        "info@solimei.com",
+        "Luca Solimei P.IVA 01626860991"
+      ],
+      "warnings": [
+        "Privacy policy exposes a second phone, 010888871"
+      ]
+    },
+    {
+      "company": "Dentista.TV Genova Sampierdarena",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.dentista.tv/sedi/studio-dentistico-genova-sampierdarena/",
+      "evidence": [
+        "Via Carzino 43, 16149 Genova Sampierdarena",
+        "010468670",
+        "Location-specific official page"
+      ],
+      "warnings": [
+        "Multi-location network"
+      ]
+    },
+    {
+      "company": "Ambulatori Dentistici Dr. Piccardo - Genova Nervi",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.dentista.ge/",
+      "evidence": [
+        "Ambulatori Dentistici Dr. Piccardo U. SRL",
+        "Genova Nervi, Via Oberdan 207R",
+        "Location director L. Bonica"
+      ],
+      "warnings": [
+        "Keep separate from Genova Centro and Rivarolo"
+      ]
+    },
+    {
+      "company": "Ambulatori Dentistici Dr. Piccardo - Genova Rivarolo",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.dentista.ge/",
+      "evidence": [
+        "Ambulatori Dentistici Dr. Piccardo U. SRL",
+        "Rivarolo, Via Rivarolo 57",
+        "Location director G. Calabretto"
+      ],
+      "warnings": [
+        "Keep separate from Genova Centro and Nervi"
+      ]
+    },
+    {
+      "company": "Pesce & Gavazzi - Genova Nervi",
+      "state": "ENTITY_RESOLVED",
+      "accepted_source": "https://www.pescegavazzi.com/dentista-genova-nervi/",
+      "evidence": [
+        "Viale Goffredo Franchini 24R",
+        "0103728253 / WhatsApp 3663289353",
+        "nervi@pescegavazzi.com",
+        "Pesce & Gavazzi Studio Dentistico SRL STP"
+      ],
+      "warnings": [
+        "Keep location-specific scope"
+      ]
+    }
+  ],
+  "promotion_rule": "Entity review only. No shortlist, score, Opportunity Signal or commercial conclusion is produced by this ledger."
+}
