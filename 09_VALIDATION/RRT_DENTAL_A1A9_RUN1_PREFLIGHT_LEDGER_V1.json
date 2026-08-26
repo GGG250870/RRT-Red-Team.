@@ -1,0 +1,77 @@
+{
+  "version": "v1",
+  "run_id": "DENT-GE-A1A9-RUN-001",
+  "status": "BLOCKED_PREFLIGHT",
+  "recorded_at": "2026-08-26",
+  "authorization": {
+    "phrase": "agent ok",
+    "received": true,
+    "approval_granularity": "this_run_only",
+    "reused": false,
+    "consumed_by_attempt": true
+  },
+  "scope": [
+    "Studio Dentistico Salusciev",
+    "Studio Dentistico Paolo Zuppa - Albaro",
+    "Studio Dentistico Emanuele Muller"
+  ],
+  "agents": [
+    "A1_DISCOVERY",
+    "A2_ENTITY_SCOPE",
+    "A3_DEEP_SCAN",
+    "A4_EVIDENCE_AUDITOR",
+    "A5_TARGET_MATCH",
+    "A6_BENCHMARK",
+    "A7_RED_TEAM",
+    "A8_COMMERCIAL_GATE",
+    "A9_QA_ORCHESTRATOR"
+  ],
+  "planned_activity": [
+    "public-source discovery",
+    "entity confirmation",
+    "target-specific deep scan",
+    "evidence audit",
+    "target match",
+    "benchmark freeze",
+    "Red Team falsification",
+    "commercial gate",
+    "QA orchestration"
+  ],
+  "data_and_sources": [
+    "official public websites",
+    "public Google/Maps profiles when accessible",
+    "canonical entity ledgers",
+    "free prescreen and deep-review artifacts in GitHub main"
+  ],
+  "budget_eur": {
+    "per_call_max": 0.25,
+    "per_case_max": 2,
+    "run_max": 6
+  },
+  "stop_conditions": [
+    "entity or scope conflict",
+    "insufficient provenance",
+    "collection restriction",
+    "no fit comparator",
+    "per-call budget reached",
+    "per-case budget reached",
+    "run budget reached"
+  ],
+  "forbidden_actions": [
+    "contact business",
+    "submit forms",
+    "outreach",
+    "login",
+    "captcha/paywall bypass",
+    "invent evidence"
+  ],
+  "preflight": {
+    "openai_api_key": "MISSING",
+    "openai_sdk": "MISSING",
+    "model_calls_started": 0,
+    "agents_started": 0,
+    "stop_triggered": "LIVE_PROVIDER_UNAVAILABLE"
+  },
+  "cost_eur_actual": "0.0000",
+  "next_action": "Configure the task-relevant OpenAI API key and SDK in the authorized execution environment, then issue a new per-run notice and obtain a new explicit `agent ok` approval. Do not reuse this authorization."
+}
